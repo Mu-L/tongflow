@@ -22,6 +22,7 @@ import {
 import { type ResolvedSpec, resolveSpec } from "./resolve";
 import {
     batchOn,
+    collectAll,
     configField,
     type FieldSourceOverride,
     handle,
@@ -45,6 +46,7 @@ export const NODE_TYPE_TO_ABI_FEATURE: Readonly<Record<string, NodeSlot>> = {
     textGenSpeechInstructNode: "text-gen-speech-instruct",
     removeVideoSubtitleNode: "subtitle_remove",
     videoUpscaleNode: "video-upscale",
+    videoEditNode: "video-edit",
     removeWatermarkNode: "remove_watermark",
     extractAudioNode: "extract-audio",
     removeVideoAudioNode: "remove-video-audio",
@@ -69,6 +71,7 @@ export const NODE_TYPE_TO_ABI_FEATURE: Readonly<Record<string, NodeSlot>> = {
     mergeVideoAudioNode: "merge-video-audio",
     audioVideoLipSyncNode: "audio-video-lip-sync",
     imageFusionNode: "image-fusion",
+    imagesGenVideoNode: "images-gen-video",
     speechImageGenVideoNode: "audio-image-gen-video",
     speechTextGenVideoNode: "speech-text-gen-video",
     speechVideoGenVideoNode: "speech-video-gen-video",
@@ -114,6 +117,10 @@ export const NODE_TYPE_SOURCE_SPEC: Partial<
         image: handle({ nodeType: "imageNode" }),
         text: handle({ nodeType: "textNode", path: "texts[0]", manual: true }),
     },
+    videoEditNode: {
+        video: handle({ nodeType: "videoNode" }),
+        text: handle({ nodeType: "textNode", path: "texts[0]", manual: true }),
+    },
     speechTextGenVideoNode: {
         text: handle({ nodeType: "textNode", path: "texts[0]" }),
         audio: handle({ nodeType: "audioNode" }),
@@ -138,6 +145,15 @@ export const NODE_TYPE_SOURCE_SPEC: Partial<
     },
     textGenSpeechCloneComposeNode: {
         text: batchOn({ nodeType: "textNode", path: "texts" }),
+    },
+    imageFusionNode: {
+        images: collectAll(),
+        text: handle({ nodeType: "textNode", path: "texts[0]", manual: true }),
+    },
+    imagesGenVideoNode: {
+        images: collectAll(),
+        text: handle({ nodeType: "textNode", path: "texts[0]", manual: true }),
+        duration: configField(),
     },
 };
 

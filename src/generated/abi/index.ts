@@ -204,6 +204,86 @@ const _slot_image_fusion_outputs = {
 } as const;
 export type ImageFusionOutput = FromSchema<typeof _slot_image_fusion_outputs>;
 
+const _slot_images_gen_video_inputs = {
+    type: "object",
+    required: ["text"],
+    properties: {
+        text: {
+            type: "string",
+            minLength: 1,
+        },
+        images: {
+            type: "array",
+            items: {
+                type: "object",
+                required: ["bytesBase64"],
+                properties: {
+                    bytesBase64: {
+                        type: "string",
+                        minLength: 1,
+                    },
+                    filename: {
+                        type: "string",
+                    },
+                    mime: {
+                        type: "string",
+                    },
+                },
+                additionalProperties: false,
+            },
+        },
+        duration: {
+            type: "number",
+        },
+        seed: {
+            type: "integer",
+        },
+        width: {
+            type: "integer",
+        },
+        height: {
+            type: "integer",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImagesGenVideoInput = FromSchema<
+    typeof _slot_images_gen_video_inputs
+>;
+const _slot_images_gen_video_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        video: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImagesGenVideoOutput = FromSchema<
+    typeof _slot_images_gen_video_outputs
+>;
+
 const _slot_image_gen_text_inputs = {
     type: "object",
     required: ["text"],
@@ -1510,6 +1590,76 @@ const _slot_video_upscale_outputs = {
     additionalProperties: false,
 } as const;
 export type VideoUpscaleOutput = FromSchema<typeof _slot_video_upscale_outputs>;
+
+const _slot_video_edit_inputs = {
+    type: "object",
+    required: ["text", "video"],
+    properties: {
+        text: {
+            type: "string",
+            minLength: 1,
+        },
+        video: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        seed: {
+            type: "integer",
+        },
+        width: {
+            type: "integer",
+        },
+        height: {
+            type: "integer",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type VideoEditInput = FromSchema<typeof _slot_video_edit_inputs>;
+const _slot_video_edit_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        video: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type VideoEditOutput = FromSchema<typeof _slot_video_edit_outputs>;
 
 const _slot_image_describe_inputs = {
     type: "object",
@@ -3129,6 +3279,7 @@ export type NodeSlot =
     | "split-text"
     | "combine-text"
     | "image-fusion"
+    | "images-gen-video"
     | "image-gen-text"
     | "video-gen-text"
     | "transcribe"
@@ -3149,6 +3300,7 @@ export type NodeSlot =
     | "image-edit"
     | "image-upscale"
     | "video-upscale"
+    | "video-edit"
     | "image-describe"
     | "video-describe"
     | "audio-image-gen-video"
@@ -3178,6 +3330,7 @@ export type SlotInputsMap = {
     "split-text": SplitTextInput;
     "combine-text": CombineTextInput;
     "image-fusion": ImageFusionInput;
+    "images-gen-video": ImagesGenVideoInput;
     "image-gen-text": ImageGenTextInput;
     "video-gen-text": VideoGenTextInput;
     transcribe: TranscribeInput;
@@ -3198,6 +3351,7 @@ export type SlotInputsMap = {
     "image-edit": ImageEditInput;
     "image-upscale": ImageUpscaleInput;
     "video-upscale": VideoUpscaleInput;
+    "video-edit": VideoEditInput;
     "image-describe": ImageDescribeInput;
     "video-describe": VideoDescribeInput;
     "audio-image-gen-video": AudioImageGenVideoInput;
@@ -3227,6 +3381,7 @@ export type SlotOutputsMap = {
     "split-text": SplitTextOutput;
     "combine-text": CombineTextOutput;
     "image-fusion": ImageFusionOutput;
+    "images-gen-video": ImagesGenVideoOutput;
     "image-gen-text": ImageGenTextOutput;
     "video-gen-text": VideoGenTextOutput;
     transcribe: TranscribeOutput;
@@ -3247,6 +3402,7 @@ export type SlotOutputsMap = {
     "image-edit": ImageEditOutput;
     "image-upscale": ImageUpscaleOutput;
     "video-upscale": VideoUpscaleOutput;
+    "video-edit": VideoEditOutput;
     "image-describe": ImageDescribeOutput;
     "video-describe": VideoDescribeOutput;
     "audio-image-gen-video": AudioImageGenVideoOutput;
@@ -3529,6 +3685,53 @@ export const ABI_NODES = {
                 },
                 image: {
                     $ref: "#/$defs/ImageRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "images-gen-video": {
+        inputs: {
+            type: "object",
+            required: ["text"],
+            properties: {
+                text: {
+                    type: "string",
+                    minLength: 1,
+                },
+                images: {
+                    type: "array",
+                    items: {
+                        $ref: "#/$defs/Asset",
+                    },
+                },
+                duration: {
+                    type: "number",
+                },
+                seed: {
+                    type: "integer",
+                },
+                width: {
+                    type: "integer",
+                },
+                height: {
+                    type: "integer",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                video: {
+                    $ref: "#/$defs/VideoRef",
                 },
             },
             additionalProperties: false,
@@ -4263,6 +4466,47 @@ export const ABI_NODES = {
                     type: "string",
                 },
                 seed: {
+                    type: "integer",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                video: {
+                    $ref: "#/$defs/VideoRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "video-edit": {
+        inputs: {
+            type: "object",
+            required: ["text", "video"],
+            properties: {
+                text: {
+                    type: "string",
+                    minLength: 1,
+                },
+                video: {
+                    $ref: "#/$defs/Asset",
+                },
+                seed: {
+                    type: "integer",
+                },
+                width: {
+                    type: "integer",
+                },
+                height: {
                     type: "integer",
                 },
             },

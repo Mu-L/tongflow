@@ -28,6 +28,7 @@ import ConcatVideoComposeNode from "./nodes/compose/concat-video";
 import ImageFusionNode from "./nodes/compose/image-fusion";
 import ImageGenVideoComposeNode from "./nodes/compose/image-gen-video-compose";
 import ImageImageGenVideoNode from "./nodes/compose/image-image-gen-video";
+import ImagesGenVideoNode from "./nodes/compose/images-gen-video";
 import MergeVideoAudioNode from "./nodes/compose/merge-video-audio";
 import SpeechImageGenVideoNode from "./nodes/compose/speech-image-gen-video";
 import SpeechTextGenVideoNode from "./nodes/compose/speech-text-gen-video";
@@ -73,6 +74,7 @@ import TextGenSpeechInstructNode from "./nodes/transfer/text-gen-speech-instruct
 import TextGenSpeechPresetNode from "./nodes/transfer/text-gen-speech-preset";
 import GenTextNode from "./nodes/transfer/text-gen-text";
 import TextGenVideoNode from "./nodes/transfer/text-gen-video";
+import VideoEditNode from "./nodes/transfer/video-edit";
 import VideoGenTextNode from "./nodes/transfer/video-gen-text";
 import VideoGenTextSpeechRecognizeNode from "./nodes/transfer/video-gen-text-speech-recognize";
 import VideoUpscaleNode from "./nodes/transfer/video-upscale";
@@ -116,6 +118,7 @@ export const NODE_TYPES: NodeTypes = {
     textGenSpeechInstructNode: TextGenSpeechInstructNode,
     removeVideoSubtitleNode: RemoveVideoSubtitleNode,
     videoUpscaleNode: VideoUpscaleNode,
+    videoEditNode: VideoEditNode,
     removeWatermarkNode: RemoveWatermarkNode,
     extractAudioNode: ExtractAudioNode,
     removeVideoAudioNode: RemoveVideoAudioNode,
@@ -140,6 +143,7 @@ export const NODE_TYPES: NodeTypes = {
     mergeVideoAudioNode: MergeVideoAudioNode,
     audioVideoLipSyncNode: AudioVideoLipSyncNode,
     imageFusionNode: ImageFusionNode,
+    imagesGenVideoNode: ImagesGenVideoNode,
     speechImageGenVideoNode: SpeechImageGenVideoNode,
     speechTextGenVideoNode: SpeechTextGenVideoNode,
     speechVideoGenVideoNode: speechVideoGenVideoNode,
@@ -204,6 +208,7 @@ export const NODE_CATEGORIES = {
         "removeVideoSubtitleNode",
         "removeWatermarkNode",
         "videoUpscaleNode",
+        "videoEditNode",
         "extractAudioNode",
         "removeVideoAudioNode",
         "denoiseAudioSubtitleNode",
@@ -223,6 +228,7 @@ export const NODE_CATEGORIES = {
         "mergeVideoAudioNode",
         "audioVideoLipSyncNode",
         "imageFusionNode",
+        "imagesGenVideoNode",
         "speechImageGenVideoNode",
         "speechTextGenVideoNode",
         "speechVideoGenVideoNode",
