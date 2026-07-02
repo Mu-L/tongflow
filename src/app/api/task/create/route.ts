@@ -14,20 +14,22 @@ function isAbiNodeSlot(s: string): s is NodeSlot {
 /**
  * POST /api/task/create
  *
- * Wire shape: `{ feature, pluginId, prompt, nodeId, workflowId? }`. `prompt`
- * holds only ABI business fields — routing/pluginId live at the top level and
- * are persisted in their own column.
+ * Wire shape: `{ feature, pluginId, model?, prompt, nodeId, workflowId? }`.
+ * `prompt` holds only ABI business fields — routing (pluginId, and the optional
+ * model for router-style plugins) lives at the top level and is persisted in
+ * its own column.
  */
 export async function POST(request: NextRequest) {
     try {
         const body = (await request.json()) as {
             feature: string;
             pluginId: string;
+            model?: string;
             prompt: Record<string, unknown>;
             nodeId: string;
             workflowId?: number;
         };
-        const { feature, pluginId, prompt, nodeId, workflowId } = body;
+        const { feature, pluginId, model, prompt, nodeId, workflowId } = body;
 
         if (!feature || typeof feature !== "string") {
             return NextResponse.json(
@@ -101,6 +103,8 @@ export async function POST(request: NextRequest) {
         // materializes Asset bytes; the persisted prompt stores the slim form
         // (fileKey strings) to keep the DB row small.
 
+        const trimmedModel = typeof model === "string" ? model.trim() : "";
+
         const db = await getDb();
 
         const taskId = nanoid();
@@ -111,6 +115,7 @@ export async function POST(request: NextRequest) {
                 nodeId,
                 feature: canonicalFeature,
                 pluginId: trimmedPluginId,
+                model: trimmedModel || null,
                 prompt: JSON.stringify(prompt),
                 status: "pending",
                 progress: 0,

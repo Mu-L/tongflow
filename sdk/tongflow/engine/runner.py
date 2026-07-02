@@ -274,6 +274,7 @@ def run_workflow(
             label = node.get("label") or node.get("feature") or ""
             slot = (node.get("feature") or "").strip()
             plugin_id = (node.get("pluginId") or "").strip()
+            model = (node.get("model") or "").strip() or None
             emit(
                 {
                     "type": "node_started",
@@ -313,6 +314,7 @@ def run_workflow(
                     prompt=business_input,
                     sdk_root=SDK_ROOT,
                     task_id=task_id,
+                    model=model,
                     on_progress=on_progress,
                 )
                 result = convert_asset_outputs_to_file_refs(slot, raw, abi, store)

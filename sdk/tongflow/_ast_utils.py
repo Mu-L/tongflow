@@ -99,6 +99,101 @@ def decorator_name(expr: ast.expr) -> str | None:
     return None
 
 
+SLOT_MODELS_CONST = "TONGFLOW_SLOT_MODELS"
+
+
+def extract_slot_models(
+    tree: ast.Module,
+) -> tuple[dict[str, list[str]], list[tuple[int, str]]]:
+    """
+    Parse the optional module-level ``TONGFLOW_SLOT_MODELS`` constant:
+    a pure dict literal mapping an ABI node slot to the list of model ids the
+    plugin exposes for it, e.g. ``{"image-gen": ["z-image-turbo", "seedream-4.5"]}``.
+
+    Only literal ``dict[str, list[str]]`` shapes are accepted — the scanner never
+    imports plugin code, so computed values cannot be resolved. Returns
+    ``(models_by_slot, problems)`` where each problem is ``(lineno, reason)``;
+    a malformed constant is reported instead of silently ignored.
+    """
+
+    models_by_slot: dict[str, list[str]] = {}
+    problems: list[tuple[int, str]] = []
+
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+            value = node.value
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+            value = node.value
+        else:
+            continue
+        if value is None:
+            continue
+        if not any(
+            isinstance(t, ast.Name) and t.id == SLOT_MODELS_CONST for t in targets
+        ):
+            continue
+
+        if not isinstance(value, ast.Dict):
+            problems.append(
+                (node.lineno, f"{SLOT_MODELS_CONST} must be a dict literal")
+            )
+            continue
+        for key, val in zip(value.keys, value.values):
+            if not (isinstance(key, ast.Constant) and isinstance(key.value, str) and key.value):
+                problems.append(
+                    (
+                        getattr(key, "lineno", node.lineno),
+                        f"{SLOT_MODELS_CONST} keys must be non-empty string literals",
+                    )
+                )
+                continue
+            slot = key.value
+            if slot in models_by_slot:
+                problems.append(
+                    (key.lineno, f"{SLOT_MODELS_CONST} has duplicate slot {slot!r}")
+                )
+                continue
+            if not isinstance(val, ast.List):
+                problems.append(
+                    (
+                        getattr(val, "lineno", node.lineno),
+                        f"{SLOT_MODELS_CONST}[{slot!r}] must be a list literal of strings",
+                    )
+                )
+                continue
+            models: list[str] = []
+            ok = True
+            for item in val.elts:
+                if not (
+                    isinstance(item, ast.Constant)
+                    and isinstance(item.value, str)
+                    and item.value.strip()
+                ):
+                    problems.append(
+                        (
+                            getattr(item, "lineno", val.lineno),
+                            f"{SLOT_MODELS_CONST}[{slot!r}] items must be non-empty string literals",
+                        )
+                    )
+                    ok = False
+                    break
+                if item.value in models:
+                    problems.append(
+                        (item.lineno, f"{SLOT_MODELS_CONST}[{slot!r}] has duplicate model {item.value!r}")
+                    )
+                    ok = False
+                    break
+                models.append(item.value)
+            if not ok:
+                continue
+            if models:
+                models_by_slot[slot] = models
+
+    return models_by_slot, problems
+
+
 def extract_node_slot_decorators(
     fn: ast.FunctionDef | ast.AsyncFunctionDef,
 ) -> tuple[str, ...]:
