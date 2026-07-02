@@ -59,6 +59,7 @@ export const NODE_TYPE_TO_ABI_FEATURE: Readonly<Record<string, NodeSlot>> = {
     videoGenTextSpeechRecognizeNode: "transcribe",
     audioGenTextSpeechRecognizeNode: "transcribe",
     fileGenTextNode: "parse-document",
+    linkGenTextNode: "link",
     getFirstFrameNode: "get-first-frame",
     getLastFrameNode: "get-last-frame",
 
@@ -154,6 +155,12 @@ export const NODE_TYPE_SOURCE_SPEC: Partial<
         images: collectAll(),
         text: handle({ nodeType: "textNode", path: "texts[0]", manual: true }),
         duration: configField(),
+    },
+    // `url` is a plain string (not a $ref), so force it to a linkNode-sourced
+    // handle instead of the default config/text classification. batchOn fans
+    // out one extraction per URL stored in the linkNode's `texts`.
+    linkGenTextNode: {
+        url: batchOn({ nodeType: "linkNode", path: "texts" }),
     },
 };
 

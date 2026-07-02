@@ -7,6 +7,7 @@ export const MODALITY_NODE_TYPES = [
     "audioNode",
     "fileNode",
     "modelNode",
+    "linkNode",
 ] as const;
 
 export type ModalityNodeType = (typeof MODALITY_NODE_TYPES)[number];

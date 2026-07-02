@@ -1,89 +1,103 @@
+import { Handle, Position, useNodeId, useNodesData } from "@xyflow/react";
 import { Link as LinkIcon, Plus, Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { memo, useCallback, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useAbiForm } from "@/hooks/use-abi-form";
-import type { TongflowPluginNodeProps } from "@/types/tongflow-flow";
+import useFlow from "@/hooks/use-flow";
+import { useNodeState } from "@/hooks/use-node-data";
+import type { RfDataNodeProps } from "@/types/nodes";
 
-import { AbiNodeShell } from "../base/abi-node-shell";
+import { BaseNodeShell } from "../base/base-node-shell";
 
-const AddLinkNode = ({
-    selected,
-    data,
-}: TongflowPluginNodeProps<"link", "addLinkNode">) => {
+// Add-link is an input node: it collects URL(s) and, like the other add nodes,
+// spawns its modality asset node (`linkNode`) downstream via `expands`. The URLs
+// are carried in the linkNode's `texts` field. Content extraction (the `link`
+// ABI feature) is a separate transform run on the linkNode.
+const AddLinkNode = ({ selected, data }: RfDataNodeProps<"addLinkNode">) => {
     const t = useTranslations("Workspace.nodes.add");
-    const form = useAbiForm("link");
+    const id = useNodeId();
+    const expands = useFlow((s) => s.expands);
+    const updateNode = useFlow((s) => s.updates);
+    const edges = useFlow((s) => s.edges);
 
-    // Local list state (not part of the ABI input shape).
+    const [state, updateState] = useNodeState({ urls: [] as string[] }, data);
+    const urls = state.urls;
     const [input, setInput] = useState("");
-    const [previews, setPreviews] = useState<string[]>(
-        () => (data as any).previews ?? [],
-    );
 
-    const handleAdd = () => {
-        if (!input.trim()) return;
-        const urlMatch = input.trim().match(/https?:\/\/[^\s]+/);
-        if (!urlMatch) return;
-        setPreviews((prev) => [...prev, urlMatch[0]]);
+    const downstreamId = useMemo(
+        () => edges.find((e) => e.source === id)?.target,
+        [edges, id],
+    );
+    const downstreamData = useNodesData(downstreamId ? [downstreamId] : []);
+
+    const setUrls = (next: string[]) => {
+        updateState({ urls: next });
+        // Keep an already-spawned linkNode in sync with edits.
+        if (downstreamId) {
+            updateNode(downstreamId, {
+                ...downstreamData[0]?.data,
+                texts: next,
+            });
+        }
+    };
+
+    const handleAddUrl = () => {
+        const match = input.trim().match(/https?:\/\/[^\s]+/);
+        if (!match) return;
+        setUrls([...urls, match[0]]);
         setInput("");
     };
 
-    const handleRemovePreview = (index: number) => {
-        setPreviews((prev) => prev.filter((_, i) => i !== index));
+    const handleRemove = (index: number) => {
+        setUrls(urls.filter((_, i) => i !== index));
     };
 
-    // Local-array batch: emit one ABI prompt per stored URL, preserving any
-    // fields `buildPrompts` already merged (e.g. plugin routing).
-    const transformPrompts = useCallback(
-        (built: Record<string, unknown>[]) => {
-            const base = built[0] ?? {};
-            return previews.map((url) => ({ ...base, url }));
-        },
-        [previews],
-    );
+    const handleCreate = () => {
+        if (!urls.length || !id || downstreamId) return;
+        expands(id, [{ type: "linkNode", data: { texts: urls } }]);
+    };
 
     return (
-        <AbiNodeShell
-            feature="link"
-            form={form}
+        <BaseNodeShell
             selected={selected}
             className="min-w-[480px]"
             data={data}
             title={t("addLink")}
             icon={<LinkIcon className="h-5 w-5" />}
-            executeLabel={t("extractContent")}
-            executeDisabled={previews.length === 0}
             isInputNode
-            transformPrompts={transformPrompts}
+            showPluginSelect={false}
         >
+            <Handle
+                type="source"
+                position={Position.Right}
+                id="out:linkNode"
+                isConnectableStart={false}
+            />
             <div className="p-4 space-y-2">
-                {previews.length > 0 && (
+                {urls.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {previews.map((preview, idx) => (
+                        {urls.map((url, idx) => (
                             <Card
                                 key={idx}
                                 className="p-3 relative rounded-lg border hover:shadow-sm transition-all"
                             >
                                 <button
                                     className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors"
-                                    onClick={() => handleRemovePreview(idx)}
+                                    onClick={() => handleRemove(idx)}
                                 >
                                     <Trash size={14} />
                                 </button>
                                 <div className="pr-6">
-                                    <h3 className="font-semibold text-sm mb-1 truncate">
-                                        {preview || t("linkPlaceholder")}
-                                    </h3>
                                     <a
-                                        href={preview}
+                                        href={url}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="text-primary text-xs hover:underline break-all line-clamp-2"
                                     >
-                                        {preview}
+                                        {url}
                                     </a>
                                 </div>
                             </Card>
@@ -103,21 +117,29 @@ const AddLinkNode = ({
                         onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
                                 e.preventDefault();
-                                handleAdd();
+                                handleAddUrl();
                             }
                         }}
                     />
                     <Button
                         variant="outline"
                         size="default"
-                        onClick={handleAdd}
+                        onClick={handleAddUrl}
                         className="h-10 px-3"
                     >
-                        <Plus size={16} className="mr-1" /> {t("generate")}
+                        <Plus size={16} />
                     </Button>
                 </div>
+
+                <Button
+                    onClick={handleCreate}
+                    disabled={!urls.length || !!downstreamId}
+                    className="w-full h-10"
+                >
+                    {t("addLink")}
+                </Button>
             </div>
-        </AbiNodeShell>
+        </BaseNodeShell>
     );
 };
 
