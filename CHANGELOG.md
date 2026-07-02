@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-07-02
+
+### Added
+
+- **Per-node model picker for router-style plugins** — a plugin can now declare
+  per-slot model lists (a `TONGFLOW_SLOT_MODELS` constant, discovered by the
+  scanner without importing plugin code). The node shows a **Model** dropdown
+  next to the plugin selector, and the selection travels top-level — like
+  `pluginId` — through task creation, the `tasks` table, the plugin envelope,
+  and workflow export. Fully opt-in: plugins that declare no models are
+  unchanged, and new plugins degrade gracefully to their default model on
+  older runtimes.
+- **APIMart official plugin** (`tongflow-api-apimart`) — one API key routes
+  **46 models across 7 slots** via the [APIMart](https://apimart.ai) gateway:
+  image generation / editing (Z-Image-Turbo, Seedream 4.5 / 4.0 / 5.0-Lite,
+  Nano Banana Pro / 2 / classic, GPT-Image 1 / 2, Imagen 4.0, Qwen Image 2.0,
+  Wan2.7, Grok Imagine), text / image → video (Kling v3 / 3.0-Turbo / 2.6,
+  VEO3.1 fast / quality / lite, Sora 2 / Pro, Seedance 2.0 / 1.5-Pro), text
+  generation (GPT-5.x, Claude, Gemini, DeepSeek), Whisper transcription, and
+  TTS — with the backing model selectable per node.
+- **Link node** — link modality asset node plus a link → text transform,
+  wired through connection validation and the workflow exporter.
+- Registered the **LeVo** official plugin (`tongflow-modal-levo`).
+
+### Changed
+
+- Python SDK **0.2.0** published to PyPI: the plugin scanner emits per-slot
+  model lists and the workflow engine forwards the node's model selection to
+  plugins.
+
 ## [0.1.9] - 2026-06-30
 
 ### Added
@@ -140,7 +170,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First public open-source release of TongFlow.
 
-[Unreleased]: https://github.com/tong-io/tongflow/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/tong-io/tongflow/compare/v0.1.10...HEAD
+[0.1.10]: https://github.com/tong-io/tongflow/compare/v0.1.9...v0.1.10
+[0.1.9]: https://github.com/tong-io/tongflow/compare/v0.1.8...v0.1.9
+[0.1.8]: https://github.com/tong-io/tongflow/compare/v0.1.7...v0.1.8
+[0.1.7]: https://github.com/tong-io/tongflow/compare/v0.1.6...v0.1.7
+[0.1.6]: https://github.com/tong-io/tongflow/compare/v0.1.5...v0.1.6
+[0.1.4]: https://github.com/tong-io/tongflow/compare/v0.1.3...v0.1.5
+[0.1.3]: https://github.com/tong-io/tongflow/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/tong-io/tongflow/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/tong-io/tongflow/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/tong-io/tongflow/releases/tag/v0.1.0
