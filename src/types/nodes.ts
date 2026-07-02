@@ -70,6 +70,9 @@ export interface BaseNodeData extends Record<string, unknown> {
     prompt?: Record<string, unknown>;
     /** Currently selected plugin ID (registry `nodeSlot` → `pluginIds`) */
     pluginId?: string;
+    /** Selected model for router-style plugins that declare per-slot model
+     * lists; empty/absent means the plugin's default. */
+    pluginModel?: string;
 
     /** Composition linkage (`useNodesData`) */
     ids?: string[];

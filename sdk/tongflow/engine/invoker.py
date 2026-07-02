@@ -70,6 +70,7 @@ def invoke_plugin(
     prompt: dict[str, Any],
     sdk_root: Path,
     task_id: str = "tongflow-engine",
+    model: Optional[str] = None,
     env_extra: Optional[dict[str, str]] = None,
     on_progress: Optional[ProgressCb] = None,
 ) -> dict[str, Any]:
@@ -78,6 +79,9 @@ def invoke_plugin(
             "pluginId": plugin_id,
             "nodeSlot": node_slot,
             "taskId": task_id,
+            # Optional per-node model choice for router-style plugins; omitted
+            # when unset so the envelope stays stable for existing plugins.
+            **({"model": model} if model else {}),
             "prompt": prompt,
         }
     )

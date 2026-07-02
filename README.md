@@ -184,6 +184,7 @@ Run the preloaded example node by node, or switch to Execute Mode and hit the ru
 - [tongflow-api-gemini](https://github.com/tong-io/tongflow-api-gemini) — Google Gemini for `gen_text` and image generation / editing / fusion (Nano Banana)
 - [tongflow-api-openai](https://github.com/tong-io/tongflow-api-openai) — OpenAI for `gen_text` and image generation / editing / fusion (`gpt-image-2`)
 - [tongflow-api-bytedance](https://github.com/tong-io/tongflow-api-bytedance) — Volcengine Ark (Doubao Seedance 2.0) for text/image/audio → video
+- [tongflow-api-apimart](https://github.com/tong-io/tongflow-api-apimart) — APIMart gateway with a per-node **model picker**: image gen/edit (Z-Image, Seedream, Nano Banana, GPT-Image), text/image → video (Kling, VEO3, Sora2, Seedance), `gen_text` (GPT-5, Claude, Gemini), Whisper transcription and TTS
 
 ### GPU/CPU plugins
 

@@ -8,7 +8,15 @@ export type PluginsRegistryPayload = {
     generatedAt: string;
     scannerVersion?: number;
     nodePluginMap: Record<string, string[]>;
-    plugins: Record<string, unknown>;
+    plugins: Record<
+        string,
+        {
+            methodsByNodeSlot?: Record<
+                string,
+                { methodName: string; models?: string[] }
+            >;
+        }
+    >;
     errors?: Array<{ pluginId: string; message: string }>;
 };
 
@@ -104,6 +112,21 @@ export function useNodePluginIds(nodeSlot: string): string[] {
     const registry = usePluginsRegistryStore((s) => s.registry);
     const list = registry?.nodePluginMap?.[nodeSlot] ?? [];
     return dedupeIds(list);
+}
+
+/**
+ * Model ids a plugin declares for one ABI `nodeSlot` (empty for single-model
+ * plugins — the model dropdown is hidden in that case).
+ */
+export function useNodePluginModels(
+    nodeSlot: string,
+    pluginId: string,
+): string[] {
+    const registry = usePluginsRegistryStore((s) => s.registry);
+    const models =
+        registry?.plugins?.[pluginId]?.methodsByNodeSlot?.[nodeSlot]?.models ??
+        [];
+    return dedupeIds(models);
 }
 
 /**

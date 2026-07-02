@@ -20,6 +20,8 @@ type NodePluginSelectProps = {
     value: string;
     onValueChange: (value: string) => void;
     options: NodePluginSelectOption[];
+    /** Card label; defaults to the plugin implementation title. */
+    title?: string;
 };
 
 /**
@@ -29,13 +31,14 @@ export function NodePluginSelect({
     value,
     onValueChange,
     options,
+    title,
 }: NodePluginSelectProps) {
     const t = useTranslations("Workspace.nodes.base");
     return (
         <Card className="p-3">
             <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">
-                    {t("pluginImplementationTitle")}
+                    {title ?? t("pluginImplementationTitle")}
                 </Label>
                 <Select value={value} onValueChange={onValueChange}>
                     <SelectTrigger className="w-full" size="sm">

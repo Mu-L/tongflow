@@ -3,6 +3,7 @@ import { useCallback, useEffect } from "react";
 import {
     useNodePluginIds,
     usePluginsRegistry,
+    usePluginsRegistryStore,
 } from "@/hooks/use-plugins-registry";
 
 /**
@@ -66,9 +67,33 @@ export function useNodePluginResolver(feature: string | undefined) {
         return validData || defaultPluginIdFromRegistry;
     }, [nodeId, getNode, defaultPluginIdFromRegistry, pluginOptions]);
 
+    /**
+     * Model for router-style plugins: the node's `pluginModel` when it is one
+     * of the active plugin's declared models, else that plugin's default
+     * (first declared model). `undefined` when the plugin declares none — the
+     * create-task API then omits the field entirely.
+     */
+    const resolveActiveModel = useCallback((): string | undefined => {
+        if (!feature) return undefined;
+        const pluginId = resolveActivePluginId();
+        if (!pluginId) return undefined;
+        const registry = usePluginsRegistryStore.getState().registry;
+        const models =
+            registry?.plugins?.[pluginId]?.methodsByNodeSlot?.[feature]
+                ?.models ?? [];
+        if (models.length === 0) return undefined;
+        const n = nodeId ? getNode(nodeId) : undefined;
+        const fromData = String(
+            (n?.data as { pluginModel?: string } | undefined)?.pluginModel ??
+                "",
+        ).trim();
+        return models.includes(fromData) ? fromData : models[0];
+    }, [feature, nodeId, getNode, resolveActivePluginId]);
+
     return {
         pluginOptions,
         defaultPluginIdFromRegistry,
         resolveActivePluginId,
+        resolveActiveModel,
     };
 }

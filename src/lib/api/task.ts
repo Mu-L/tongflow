@@ -20,6 +20,8 @@ export interface Task {
 export interface CreateTaskRequest {
     feature: string;
     pluginId: string;
+    /** Selected model for router-style plugins; omitted otherwise. */
+    model?: string;
     prompt: Record<string, unknown>;
     nodeId: string;
     workflowId?: number;

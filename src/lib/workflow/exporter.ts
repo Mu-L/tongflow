@@ -630,12 +630,17 @@ export class WorkflowExporter {
             typeof nodeData.pluginId === "string"
                 ? nodeData.pluginId.trim()
                 : "";
+        const model =
+            typeof nodeData.pluginModel === "string"
+                ? nodeData.pluginModel.trim()
+                : "";
 
         return {
             id: node.id,
             type: nodeType,
             feature: ns.reg.feature,
             pluginId,
+            ...(model ? { model } : {}),
             label,
             comment,
             locked,

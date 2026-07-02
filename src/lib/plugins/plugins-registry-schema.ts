@@ -13,6 +13,10 @@ import { z } from "zod";
  */
 export const PluginMethodSchema = z.object({
     methodName: z.string().min(1),
+    /** Optional per-slot model ids a router-style plugin exposes
+     * (`TONGFLOW_SLOT_MODELS` in the plugin source); first entry is the
+     * default. Absent for single-model plugins. */
+    models: z.array(z.string().min(1)).optional(),
 });
 
 export const PluginConfigSchema = z.object({

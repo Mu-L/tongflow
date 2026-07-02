@@ -26,6 +26,8 @@ export interface TaskData {
     taskId: string;
     nodeSlot: NodeSlot;
     pluginId: string;
+    /** Selected model for router-style plugins; undefined = plugin default. */
+    model?: string;
     prompt: Record<string, unknown>;
     nodeId: string;
     workflowId?: number | null;
@@ -62,6 +64,7 @@ export async function loadTaskData(taskId: string): Promise<TaskData | null> {
         taskId: task.id,
         nodeSlot,
         pluginId,
+        model: (task.model ?? "").trim() || undefined,
         prompt,
         nodeId: task.nodeId,
         workflowId: task.workflowId,
@@ -176,6 +179,7 @@ export async function executeTask(taskId: string): Promise<void> {
         const result = await executePlugin({
             pluginId: taskData.pluginId,
             nodeSlot: taskData.nodeSlot,
+            model: taskData.model,
             input: businessInput as never,
             taskId,
             signal: controller.signal,

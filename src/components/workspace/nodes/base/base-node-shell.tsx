@@ -37,6 +37,7 @@ import {
 } from "./node-header";
 import { NodeLoadingOverlay } from "./node-loading-overlay";
 import { NodePluginIdSelect } from "./node-plugin-id-select";
+import { NodePluginModelSelect } from "./node-plugin-model-select";
 
 /* ------------------------------------------------------------------ */
 /* Props                                                               */
@@ -236,8 +237,12 @@ export const BaseNodeShell = forwardRef<HTMLDivElement, BaseNodeShellProps>(
 
                         {/* Auto plugin select */}
                         {renderPluginSelect && (
-                            <div className="p-4 pb-0">
+                            <div className="p-4 pb-0 space-y-2">
                                 <NodePluginIdSelect
+                                    nodeSlot={feature}
+                                    data={data ?? { feature }}
+                                />
+                                <NodePluginModelSelect
                                     nodeSlot={feature}
                                     data={data ?? { feature }}
                                 />

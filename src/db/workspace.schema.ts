@@ -33,6 +33,8 @@ export const tasks = sqliteTable(
         nodeId: text("node_id").notNull(),
         feature: text("feature").notNull(),
         pluginId: text("plugin_id").notNull().default(""),
+        // Selected model for router-style plugins; null = plugin default
+        model: text("model"),
         prompt: text("prompt").notNull(), // JSON string (business fields only)
         status: text("status").notNull().default("pending"),
         progress: integer("progress").default(0).notNull(),

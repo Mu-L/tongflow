@@ -64,6 +64,9 @@ export async function execPlugin<S extends NodeSlot>(
         pluginId: req.pluginId,
         nodeSlot: req.nodeSlot,
         taskId: req.taskId,
+        // Optional per-node model choice for router-style plugins; omitted
+        // when unset so the envelope stays stable for existing plugins.
+        ...(req.model ? { model: req.model } : {}),
         prompt,
     };
 
