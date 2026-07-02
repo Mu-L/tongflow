@@ -6,10 +6,15 @@ import json
 from pathlib import Path
 
 from .abi import load_abi
-from ._ast_utils import extract_node_slot_decorators, looks_like_sdk_model_type
+from ._ast_utils import (
+    SLOT_MODELS_CONST,
+    extract_node_slot_decorators,
+    extract_slot_models,
+    looks_like_sdk_model_type,
+)
 from .parse_deploy import _slot_to_ident, parse_deploy_py
 
-SCANNER_VERSION = 1
+SCANNER_VERSION = 2
 
 SKIP_DIR_NAMES = frozenset(
     {
@@ -133,12 +138,54 @@ def _scan_methods_by_slot_in_file(path: Path) -> dict[str, str]:
 
 def _scan_methods_by_slot_in_dir(plugin_dir: Path) -> dict[str, str]:
     out: dict[str, str] = {}
-    for p in plugin_dir.rglob("*.py"):
-        if any(part in {"__pycache__", ".venv", "node_modules"} for part in p.parts):
-            continue
+    for p in _iter_plugin_py_files(plugin_dir):
         for slot_ident, method in _scan_methods_by_slot_in_file(p).items():
             out.setdefault(slot_ident, method)
     return out
+
+
+def _iter_plugin_py_files(plugin_dir: Path) -> list[Path]:
+    return [
+        p
+        for p in plugin_dir.rglob("*.py")
+        if not any(part in {"__pycache__", ".venv", "node_modules"} for part in p.parts)
+    ]
+
+
+def _scan_slot_models_in_dir(
+    plugin_dir: Path,
+) -> tuple[dict[str, list[str]], list[str]]:
+    """Collect TONGFLOW_SLOT_MODELS declarations across the plugin's files."""
+
+    models_by_slot: dict[str, list[str]] = {}
+    problems: list[str] = []
+    for p in _iter_plugin_py_files(plugin_dir):
+        try:
+            tree = ast.parse(p.read_text(encoding="utf-8"), filename=str(p))
+        except (OSError, SyntaxError):
+            continue
+        found, file_problems = extract_slot_models(tree)
+        for lineno, reason in file_problems:
+            problems.append(
+                _scan_error(
+                    p,
+                    reason,
+                    "declare a pure literal dict[str, list[str]]",
+                    line=lineno,
+                )
+            )
+        for slot, models in found.items():
+            if slot in models_by_slot:
+                problems.append(
+                    _scan_error(
+                        p,
+                        f"{SLOT_MODELS_CONST} declares slot {slot!r} more than once across files",
+                        "keep one declaration per slot",
+                    )
+                )
+                continue
+            models_by_slot[slot] = models
+    return models_by_slot, problems
 
 
 def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
@@ -208,6 +255,27 @@ def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
 
         if not llm_methods:
             continue
+
+        # Optional per-slot model lists (router-style plugins). Purely additive:
+        # plugins that declare no TONGFLOW_SLOT_MODELS are untouched.
+        models_by_slot, model_problems = _scan_slot_models_in_dir(pdir)
+        for message in model_problems:
+            errors.append({"pluginId": plugin_id, "message": message})
+        for slot, models in models_by_slot.items():
+            if slot not in llm_methods:
+                errors.append(
+                    {
+                        "pluginId": plugin_id,
+                        "message": _scan_error(
+                            pdir / "entry.py",
+                            f"{SLOT_MODELS_CONST} declares models for slot {slot!r} "
+                            "but the plugin has no @node_slot handler for it",
+                            "remove the entry or add the matching handler",
+                        ),
+                    }
+                )
+                continue
+            llm_methods[slot]["models"] = models
 
         plugins[plugin_id] = {
             "localSubdir": plugin_id,

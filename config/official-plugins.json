@@ -5,6 +5,7 @@
         "tongflow-api-gemini",
         "tongflow-api-openai",
         "tongflow-api-bytedance",
+        "tongflow-api-apimart",
         "tongflow-modal-ffmpeg",
         "tongflow-modal-pyscenedetect",
         "tongflow-modal-z-image",

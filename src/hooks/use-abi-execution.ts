@@ -286,7 +286,7 @@ export function useAbiExecution<F extends NodeSlot>(
     const { isLoading: taskLoading, createBatchTasks } = useBatchTaskManager();
     const loading = taskLoading || nodeExecutionStatus === "running";
 
-    const { pluginOptions, resolveActivePluginId } =
+    const { pluginOptions, resolveActivePluginId, resolveActiveModel } =
         useNodePluginResolver(feature);
     // The scanned registry only contains installed plugins; `isLoaded` lets the
     // run() guard distinguish "registry not fetched yet" from "nothing installed".
@@ -415,10 +415,13 @@ export function useAbiExecution<F extends NodeSlot>(
             prompt: prompts.length === 1 ? prompts[0] : prompts,
         });
 
+        const model = resolveActiveModel();
+
         try {
             const taskConfigs = prompts.map((prompt) => ({
                 feature,
                 pluginId,
+                ...(model ? { model } : {}),
                 prompt,
                 nodeId,
             }));
@@ -434,6 +437,7 @@ export function useAbiExecution<F extends NodeSlot>(
         updateNodeData,
         createBatchTasks,
         resolveActivePluginId,
+        resolveActiveModel,
         pluginOptions,
         pluginsRegistryLoaded,
         transformPrompts,

@@ -81,6 +81,9 @@ export interface ExecutableNode {
     feature: string;
     /** Plugin implementation chosen on the canvas (`tongflow-<runner>-*`). */
     pluginId: string;
+    /** Model chosen on the canvas for router-style plugins that declare
+     * per-slot model lists; absent = plugin default. */
+    model?: string;
     /** Node display name (used for mobile execution progress display) */
     label?: string;
     /** Node comment */
