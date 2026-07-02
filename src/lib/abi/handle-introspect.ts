@@ -20,7 +20,8 @@ export type DataNodeType =
     | "videoNode"
     | "textNode"
     | "fileNode"
-    | "modelNode";
+    | "modelNode"
+    | "linkNode";
 
 export type RefName =
     | "Asset"

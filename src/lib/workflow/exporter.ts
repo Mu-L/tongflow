@@ -497,7 +497,7 @@ export class WorkflowExporter {
             addTextNode: "textNode",
             addModelNode: "modelNode",
             addFileNode: "fileNode",
-            addLinkNode: "textNode",
+            addLinkNode: "linkNode",
         };
         return typeMap[nodeType] ?? "textNode";
     }

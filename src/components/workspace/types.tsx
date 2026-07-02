@@ -45,6 +45,7 @@ import AudioNode from "./nodes/modality/audio-node";
 import FileNode from "./nodes/modality/file-node";
 // Data nodes
 import ImageNode from "./nodes/modality/image-node";
+import LinkNode from "./nodes/modality/link-node";
 import ModelNode from "./nodes/modality/model-node";
 import TextNode from "./nodes/modality/text-node";
 import VideoNode from "./nodes/modality/video-node";
@@ -61,6 +62,7 @@ import ImageGenModelNode from "./nodes/transfer/image-gen-model";
 import ImageGenTextNode from "./nodes/transfer/image-gen-text";
 // Transform nodes
 import ImageGenVideoNode from "./nodes/transfer/image-gen-video";
+import LinkGenTextNode from "./nodes/transfer/link-gen-text";
 import RemoveVideoSubtitleNode from "./nodes/transfer/remove-subtitle";
 import RemoveVideoAudioNode from "./nodes/transfer/remove-video-audio";
 import RemoveWatermarkNode from "./nodes/transfer/remove-watermark";
@@ -91,6 +93,7 @@ export const NODE_TYPES: NodeTypes = {
     audioNode: AudioNode,
     fileNode: FileNode,
     modelNode: ModelNode,
+    linkNode: LinkNode,
 
     // Add nodes - Implemented
     addImageNode: AddImageNode,
@@ -131,6 +134,7 @@ export const NODE_TYPES: NodeTypes = {
     videoGenTextSpeechRecognizeNode: VideoGenTextSpeechRecognizeNode,
     audioGenTextSpeechRecognizeNode: AudioGenTextSpeechRecognizeNode,
     fileGenTextNode: FileGenTextNode,
+    linkGenTextNode: LinkGenTextNode,
     getFirstFrameNode: GetFirstFrameNode,
     getLastFrameNode: GetLastFrameNode,
 
@@ -182,6 +186,7 @@ export const NODE_CATEGORIES = {
         "audioNode",
         "fileNode",
         "modelNode",
+        "linkNode",
     ],
     ADD: [
         "addImageNode",
@@ -220,6 +225,7 @@ export const NODE_CATEGORIES = {
         "videoGenTextSpeechRecognizeNode",
         "audioGenTextSpeechRecognizeNode",
         "fileGenTextNode",
+        "linkGenTextNode",
         "getFirstFrameNode",
         "getLastFrameNode",
     ],

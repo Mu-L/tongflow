@@ -228,4 +228,7 @@ export const DATA_NODE_TYPES: Record<
     videoNode: { dataType: "video", outputField: "fileKeys" },
     modelNode: { dataType: "model", outputField: "fileKeys" },
     fileNode: { dataType: "file", outputField: "fileKeys" },
+    // A link is a URL string stored in `texts`; distinct nodeType gates
+    // connections (only feeds the `link` transform's url handle).
+    linkNode: { dataType: "text", outputField: "texts" },
 };

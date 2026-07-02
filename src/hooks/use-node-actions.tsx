@@ -199,27 +199,44 @@ export function useNodeActions(args: UseNodeActionsArgs): UseNodeActionsResult {
         }
         // Multiple text nodes
         if ((counts.textNode ?? 0) > 1) {
+            const textButtons: ButtonConfig[] = [
+                {
+                    text: t("mergeGroup"),
+                    id: "merge-group",
+                    onClick: () =>
+                        compose({
+                            type: "textNode",
+                            data: { texts: collectTexts() },
+                        }),
+                },
+                {
+                    text: t("rewriteText"),
+                    id: "text-rewrite",
+                    onClick: () =>
+                        compose({
+                            type: "textsGenTextNode",
+                            data: { ids },
+                        }),
+                },
+            ];
+            // gen-music has exactly two text handles (lyrics + tags): the two
+            // selected texts wire to in:lyrics / in:tags via resolveEdgeHandles.
+            if (counts.textNode === 2) {
+                textButtons.push({
+                    text: t("generateMusic"),
+                    id: "generate-music",
+                    nodeType: "textGenMusicNode",
+                    onClick: () =>
+                        compose({
+                            type: "textGenMusicNode",
+                            data: { ids },
+                        }),
+                });
+            }
             return (
                 <ActionItem
                     buttons={[
-                        {
-                            text: t("mergeGroup"),
-                            id: "merge-group",
-                            onClick: () =>
-                                compose({
-                                    type: "textNode",
-                                    data: { texts: collectTexts() },
-                                }),
-                        },
-                        {
-                            text: t("rewriteText"),
-                            id: "text-rewrite",
-                            onClick: () =>
-                                compose({
-                                    type: "textsGenTextNode",
-                                    data: { ids },
-                                }),
-                        },
+                        ...textButtons,
                         {
                             text: t("textToSpeechClone"),
                             id: "text-to-speech-clone",
@@ -934,6 +951,22 @@ export function useNodeActions(args: UseNodeActionsArgs): UseNodeActionsResult {
                                 onClick: () =>
                                     expands(id, [
                                         { type: "fileGenTextNode", data },
+                                    ]),
+                            },
+                        ]}
+                    />
+                );
+
+            case "linkNode":
+                return (
+                    <ActionItem
+                        buttons={[
+                            {
+                                text: t("extractContent"),
+                                id: "extract-content",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "linkGenTextNode", data },
                                     ]),
                             },
                         ]}
