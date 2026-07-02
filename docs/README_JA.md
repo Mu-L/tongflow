@@ -173,7 +173,7 @@ TongFlowで生成AIを活用し、創造力を解き放とう！
 ### API プラグイン
 
 - [tongflow-api-openrouter-free](https://github.com/tong-io/tongflow-api-openrouter-free) — デフォルトの `gen_text` ルート、OpenRouter の無料モデルを使用
-- [tongflow-api-gemini](https://github.com/tong-io/tongflow-api-gemini) — Google Gemini ベースの `gen_text` およびマルチモーダル処理
+- [tongflow-api-gemini](https://github.com/tong-io/tongflow-api-gemini) — Google Gemini ベースの `gen_text` および画像生成 / 編集 / 合成（Nano Banana）
 - [tongflow-api-openai](https://github.com/tong-io/tongflow-api-openai) — OpenAI ベースの `gen_text` および画像生成 / 編集 / 融合（`gpt-image-2`）
 - [tongflow-api-bytedance](https://github.com/tong-io/tongflow-api-bytedance) — Volcengine Ark（Doubao Seedance 2.0）ベースのテキスト / 画像 / 音声 → 動画
 
@@ -198,6 +198,7 @@ TongFlowで生成AIを活用し、創造力を解き放とう！
 - [tongflow-modal-qwen3tts](https://github.com/tong-io/tongflow-modal-qwen3tts) — Qwen3 テキストから音声
 - [tongflow-modal-whisper](https://github.com/tong-io/tongflow-modal-whisper) — Whisper 音声認識（タイムスタンプ付き、代替）
 - [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step テキストから音楽生成
+- [tongflow-modal-levo](https://github.com/tong-io/tongflow-modal-levo) — LeVo 2 / SongGeneration テキストから音楽生成（多言語・商用グレード）
 - [tongflow-modal-docling](https://github.com/tong-io/tongflow-modal-docling) — Docling ドキュメント → テキスト
 - [tongflow-modal-paddle](https://github.com/tong-io/tongflow-modal-paddle) — PaddleOCR ドキュメント → テキスト
 - [tongflow-modal-unlimited-ocr](https://github.com/tong-io/tongflow-modal-unlimited-ocr) — Unlimited-OCR 長文ドキュメント / PDF → テキスト
