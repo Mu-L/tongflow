@@ -181,7 +181,7 @@ Run the preloaded example node by node, or switch to Execute Mode and hit the ru
 ### API plugins
 
 - [tongflow-api-openrouter-free](https://github.com/tong-io/tongflow-api-openrouter-free) — default `gen_text` route via OpenRouter's free models
-- [tongflow-api-gemini](https://github.com/tong-io/tongflow-api-gemini) — Google Gemini for `gen_text` and other Gemini multimodal handlers
+- [tongflow-api-gemini](https://github.com/tong-io/tongflow-api-gemini) — Google Gemini for `gen_text` and image generation / editing / fusion (Nano Banana)
 - [tongflow-api-openai](https://github.com/tong-io/tongflow-api-openai) — OpenAI for `gen_text` and image generation / editing / fusion (`gpt-image-2`)
 - [tongflow-api-bytedance](https://github.com/tong-io/tongflow-api-bytedance) — Volcengine Ark (Doubao Seedance 2.0) for text/image/audio → video
 
@@ -206,6 +206,7 @@ Run the preloaded example node by node, or switch to Execute Mode and hit the ru
 - [tongflow-modal-qwen3tts](https://github.com/tong-io/tongflow-modal-qwen3tts) — Qwen3 text-to-speech
 - [tongflow-modal-whisper](https://github.com/tong-io/tongflow-modal-whisper) — Whisper speech recognition with timestamps (alternative)
 - [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step text-to-music
+- [tongflow-modal-levo](https://github.com/tong-io/tongflow-modal-levo) — LeVo 2 / SongGeneration text-to-music (multilingual, commercial-grade)
 - [tongflow-modal-docling](https://github.com/tong-io/tongflow-modal-docling) — Docling document → text
 - [tongflow-modal-paddle](https://github.com/tong-io/tongflow-modal-paddle) — PaddleOCR document → text
 - [tongflow-modal-unlimited-ocr](https://github.com/tong-io/tongflow-modal-unlimited-ocr) — Unlimited-OCR long-horizon document / PDF → text

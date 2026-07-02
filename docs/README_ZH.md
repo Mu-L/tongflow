@@ -173,7 +173,7 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 ### API 插件
 
 - [tongflow-api-openrouter-free](https://github.com/tong-io/tongflow-api-openrouter-free) — 默认 `gen_text` 路由，使用 OpenRouter 免费模型
-- [tongflow-api-gemini](https://github.com/tong-io/tongflow-api-gemini) — 基于 Google Gemini 的 `gen_text` 及多模态处理
+- [tongflow-api-gemini](https://github.com/tong-io/tongflow-api-gemini) — 基于 Google Gemini 的 `gen_text` 及图像生成 / 编辑 / 融合（Nano Banana）
 - [tongflow-api-openai](https://github.com/tong-io/tongflow-api-openai) — 基于 OpenAI 的 `gen_text` 及图像生成 / 编辑 / 融合（`gpt-image-2`）
 - [tongflow-api-bytedance](https://github.com/tong-io/tongflow-api-bytedance) — 基于火山方舟（豆包 Seedance 2.0）的 文 / 图 / 音 → 视频
 
@@ -198,6 +198,7 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 - [tongflow-modal-qwen3tts](https://github.com/tong-io/tongflow-modal-qwen3tts) — Qwen3 文字转语音
 - [tongflow-modal-whisper](https://github.com/tong-io/tongflow-modal-whisper) — Whisper 语音识别（带时间戳，备选）
 - [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step 文本生音乐
+- [tongflow-modal-levo](https://github.com/tong-io/tongflow-modal-levo) — LeVo 2 / SongGeneration 文本生音乐（多语言、商用级）
 - [tongflow-modal-docling](https://github.com/tong-io/tongflow-modal-docling) — Docling 文档 → 文本
 - [tongflow-modal-paddle](https://github.com/tong-io/tongflow-modal-paddle) — PaddleOCR 文档 → 文本
 - [tongflow-modal-unlimited-ocr](https://github.com/tong-io/tongflow-modal-unlimited-ocr) — Unlimited-OCR 长文档 / PDF → 文本
