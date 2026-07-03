@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11] - 2026-07-03
+
+### Fixed
+
+- **Plugin installs behind corporate proxies / private CAs** — installing a
+  plugin no longer fails with `git failed: unable to verify the first
+  certificate` when the network uses a TLS-inspection proxy or the plugin
+  repo is served under a privately-trusted CA. The desktop app now launches
+  its bundled Node server with `--use-system-ca`, so the OS trust store
+  (macOS Keychain / Windows certificate store) is honored in addition to
+  Node's built-in CA list.
+
 ## [0.1.10] - 2026-07-02
 
 ### Added
