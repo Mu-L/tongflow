@@ -6,6 +6,7 @@
         "tongflow-api-openai",
         "tongflow-api-bytedance",
         "tongflow-api-apimart",
+        "tongflow-api-agnes",
         "tongflow-modal-ffmpeg",
         "tongflow-modal-pyscenedetect",
         "tongflow-modal-z-image",
