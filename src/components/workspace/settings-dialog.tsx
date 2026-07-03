@@ -68,7 +68,9 @@ interface EnvCardGroup {
  * Splits declarations into one "shared" group (keys declared by >=2 installed
  * plugins — e.g. MODAL_TOKEN_ID or HF_TOKEN) plus one group per plugin with
  * its remaining own keys. Merge rule for shared keys: required if any
- * declarer says so; description/url/default from the first declarer.
+ * declarer says so; description/default kept only when every declarer agrees
+ * (a plugin-specific hint would mislead on a shared row); url from the first
+ * declarer.
  */
 function buildEnvCardGroups(
     decls: PluginEnvDecl[],
@@ -81,6 +83,12 @@ function buildEnvCardGroups(
             if (seen) {
                 seen.plugins.push(decl.pluginId);
                 if (v.required) seen.v = { ...seen.v, required: true };
+                if (seen.v.description !== v.description) {
+                    seen.v = { ...seen.v, description: undefined };
+                }
+                if (seen.v.default !== v.default) {
+                    seen.v = { ...seen.v, default: undefined };
+                }
             } else {
                 usage.set(v.key, { v: { ...v }, plugins: [decl.pluginId] });
             }
