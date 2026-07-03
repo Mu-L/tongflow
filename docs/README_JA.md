@@ -177,6 +177,7 @@ TongFlowで生成AIを活用し、創造力を解き放とう！
 - [tongflow-api-openai](https://github.com/tong-io/tongflow-api-openai) — OpenAI ベースの `gen_text` および画像生成 / 編集 / 融合（`gpt-image-2`）
 - [tongflow-api-bytedance](https://github.com/tong-io/tongflow-api-bytedance) — Volcengine Ark（Doubao Seedance 2.0）ベースのテキスト / 画像 / 音声 → 動画
 - [tongflow-api-apimart](https://github.com/tong-io/tongflow-api-apimart) — APIMart ゲートウェイ。ノード上で**モデルを選択**可能：画像生成 / 編集（Z-Image、Seedream、Nano Banana、GPT-Image）、テキスト / 画像 → 動画（Kling、VEO3、Sora2、Seedance）、`gen_text`（GPT-5、Claude、Gemini）、Whisper 文字起こしと TTS
+- [tongflow-api-agnes](https://github.com/tong-io/tongflow-api-agnes) — Agnes AI ゲートウェイ：`gen_text` / テキストツール / 画像理解（`agnes-2.0-flash`）、画像生成 / 編集 / 融合（`agnes-image-2.x-flash`）、テキスト / 画像 / 最初・最後フレーム → 動画（`agnes-video-v2.0`）
 
 ### GPU/CPU プラグイン
 

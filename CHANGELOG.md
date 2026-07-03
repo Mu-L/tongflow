@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.12] - 2026-07-04
+
+### Added
+
+- **Agnes AI official plugin** (`tongflow-api-agnes`) — one API key covers
+  **12 slots** via the OpenAI-compatible [Agnes AI](https://agnes-ai.com)
+  gateway: text generation / splitting / combining and image understanding
+  (`agnes-2.0-flash`, 512K context), image generation / editing
+  (`agnes-image-2.1-flash` / `2.0-flash`, per-node model picker), multi-image
+  fusion (`agnes-image-2.0-flash`), and async text / image / multi-image /
+  first-last-frame → video (`agnes-video-v2.0`, up to ~18 s per clip).
+
 ## [0.1.11] - 2026-07-03
 
 ### Fixed
@@ -182,7 +194,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First public open-source release of TongFlow.
 
-[Unreleased]: https://github.com/tong-io/tongflow/compare/v0.1.10...HEAD
+[Unreleased]: https://github.com/tong-io/tongflow/compare/v0.1.12...HEAD
+[0.1.12]: https://github.com/tong-io/tongflow/compare/v0.1.11...v0.1.12
+[0.1.11]: https://github.com/tong-io/tongflow/compare/v0.1.10...v0.1.11
 [0.1.10]: https://github.com/tong-io/tongflow/compare/v0.1.9...v0.1.10
 [0.1.9]: https://github.com/tong-io/tongflow/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/tong-io/tongflow/compare/v0.1.7...v0.1.8

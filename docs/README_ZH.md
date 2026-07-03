@@ -177,6 +177,7 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 - [tongflow-api-openai](https://github.com/tong-io/tongflow-api-openai) — 基于 OpenAI 的 `gen_text` 及图像生成 / 编辑 / 融合（`gpt-image-2`）
 - [tongflow-api-bytedance](https://github.com/tong-io/tongflow-api-bytedance) — 基于火山方舟（豆包 Seedance 2.0）的 文 / 图 / 音 → 视频
 - [tongflow-api-apimart](https://github.com/tong-io/tongflow-api-apimart) — APIMart 聚合网关，支持节点上**按模型选择**：图像生成 / 编辑（Z-Image、Seedream、Nano Banana、GPT-Image）、文 / 图 → 视频（可灵、VEO3、Sora2、Seedance）、`gen_text`（GPT-5、Claude、Gemini）、Whisper 转录与 TTS
+- [tongflow-api-agnes](https://github.com/tong-io/tongflow-api-agnes) — Agnes AI 网关：`gen_text` / 文本工具 / 图像理解（`agnes-2.0-flash`）、图像生成 / 编辑 / 融合（`agnes-image-2.x-flash`）、文 / 图 / 首尾帧 → 视频（`agnes-video-v2.0`）
 
 ### GPU/CPU 插件
 
