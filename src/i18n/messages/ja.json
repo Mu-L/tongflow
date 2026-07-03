@@ -222,6 +222,7 @@
             "base": {
                 "moreActions": "その他のオプション",
                 "execute": "実行",
+                "cancelExecution": "実行をキャンセル",
                 "removeComment": "コメントを削除",
                 "commentPlaceholder": "ユーザー向けのコメントを追加...",
                 "clickToAddComment": "クリックしてコメントを追加...",

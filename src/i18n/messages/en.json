@@ -222,6 +222,7 @@
             "base": {
                 "moreActions": "More options",
                 "execute": "Execute",
+                "cancelExecution": "Cancel execution",
                 "removeComment": "Remove comment",
                 "commentPlaceholder": "Add a comment for users...",
                 "clickToAddComment": "Click to add a comment...",

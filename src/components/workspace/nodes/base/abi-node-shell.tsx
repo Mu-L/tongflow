@@ -104,6 +104,7 @@ export function AbiNodeShell<F extends NodeSlot>({
             progressLabel={exec.progressLabel}
             isExecuteMode={exec.isExecuteMode}
             onExecute={exec.run}
+            onCancel={exec.canCancel ? exec.cancel : undefined}
             executeLabel={executeLabel}
             executeIcon={executeIcon}
             executeDisabled={executeDisabled || !exec.canRun}

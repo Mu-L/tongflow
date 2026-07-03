@@ -222,6 +222,7 @@
             "base": {
                 "moreActions": "추가 옵션",
                 "execute": "실행",
+                "cancelExecution": "실행 취소",
                 "removeComment": "댓글 제거",
                 "commentPlaceholder": "사용자를 위한 댓글 추가...",
                 "clickToAddComment": "클릭하여 댓글 추가...",

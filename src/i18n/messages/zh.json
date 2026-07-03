@@ -222,6 +222,7 @@
             "base": {
                 "moreActions": "更多操作",
                 "execute": "执行",
+                "cancelExecution": "取消执行",
                 "removeComment": "移除注释",
                 "commentPlaceholder": "为用户添加注释...",
                 "clickToAddComment": "点击添加注释...",
