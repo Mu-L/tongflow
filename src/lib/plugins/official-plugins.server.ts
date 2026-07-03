@@ -61,6 +61,24 @@ export function listOfficialPlugins(): {
     };
 }
 
+/**
+ * Installed plugins under the plugins dir that are not in the official
+ * manifest — i.e. community plugins cloned from a custom git URL.
+ */
+export function listInstalledCommunityPlugins(): string[] {
+    const official = new Set(loadOfficialPluginManifest().plugins);
+    let entries: string[];
+    try {
+        entries = fs.readdirSync(pluginsDir());
+    } catch {
+        // Plugins dir not created yet — nothing installed.
+        return [];
+    }
+    return entries
+        .filter((id) => !official.has(id) && isPluginInstalled(id))
+        .sort();
+}
+
 /** Update status for one installed plugin, from comparing local vs remote HEAD. */
 export interface PluginUpdateInfo {
     id: string;

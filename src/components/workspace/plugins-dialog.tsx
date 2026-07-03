@@ -7,10 +7,21 @@ import {
     Download,
     Loader2,
     RefreshCw,
+    Trash2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -42,6 +53,8 @@ interface OfficialPlugin {
 interface OfficialResponse {
     org: string;
     plugins: OfficialPlugin[];
+    /** Installed community plugins (custom git clones outside the manifest). */
+    community: string[];
 }
 
 interface InstallResult {
@@ -68,6 +81,11 @@ export function PluginsDialog() {
     const [loading, setLoading] = useState(false);
     const [org, setOrg] = useState("");
     const [plugins, setPlugins] = useState<OfficialPlugin[]>([]);
+    const [community, setCommunity] = useState<string[]>([]);
+    // Plugin id awaiting uninstall confirmation, or null when closed.
+    const [confirmUninstall, setConfirmUninstall] = useState<string | null>(
+        null,
+    );
     // Per-plugin in-flight state, keyed by plugin id.
     const [busy, setBusy] = useState<Record<string, boolean>>({});
     // Per-plugin update status: true = newer commit upstream, false = up to date,
@@ -86,6 +104,7 @@ export function PluginsDialog() {
             );
             setOrg(data.org);
             setPlugins(data.plugins);
+            setCommunity(data.community ?? []);
         } catch (error) {
             logger.error("Failed to load official plugins:", error);
         } finally {
@@ -158,6 +177,24 @@ export function PluginsDialog() {
             }
         },
         [reportResult, fetchOfficial, checkUpdates],
+    );
+
+    const uninstall = useCallback(
+        async (id: string) => {
+            setBusy((b) => ({ ...b, [id]: true }));
+            try {
+                await apiPost("/api/plugins/uninstall", { id });
+                toast.success(t("uninstallSuccess", { id }));
+                // Drop the plugin from node pickers without a full app reload.
+                void refreshPluginsRegistry();
+                await fetchOfficial();
+            } catch (error) {
+                logger.error("Plugin uninstall failed:", error);
+            } finally {
+                setBusy((b) => ({ ...b, [id]: false }));
+            }
+        },
+        [t, fetchOfficial],
     );
 
     const installCustom = useCallback(async () => {
@@ -327,6 +364,22 @@ export function PluginsDialog() {
                                                 </span>
                                             </Button>
                                         )}
+                                        {p.installed && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                disabled={busy[p.id]}
+                                                onClick={() =>
+                                                    setConfirmUninstall(p.id)
+                                                }
+                                                title={t("uninstall")}
+                                                aria-label={t("uninstall")}
+                                                className="h-8 w-8 shrink-0 text-muted-foreground hover:text-red-500"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        )}
                                     </div>
                                 ))
                             )}
@@ -360,9 +413,80 @@ export function PluginsDialog() {
                                 )}
                                 {t("cloneButton")}
                             </Button>
+
+                            {community.length > 0 && (
+                                <div className="space-y-1.5 pt-2">
+                                    <p className="text-xs font-medium text-muted-foreground">
+                                        {t("installedCommunity")}
+                                    </p>
+                                    <div className="max-h-[35vh] space-y-1.5 overflow-y-auto pr-1">
+                                        {community.map((id) => (
+                                            <div
+                                                key={id}
+                                                className="flex items-center gap-2 rounded-lg border px-3 py-2"
+                                            >
+                                                <div className="min-w-0 flex-1 truncate text-sm font-medium">
+                                                    {id}
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    disabled={busy[id]}
+                                                    onClick={() =>
+                                                        setConfirmUninstall(id)
+                                                    }
+                                                    title={t("uninstall")}
+                                                    aria-label={t("uninstall")}
+                                                    className="h-8 w-8 shrink-0 text-muted-foreground hover:text-red-500"
+                                                >
+                                                    {busy[id] ? (
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="h-4 w-4" />
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </TabsContent>
                 </Tabs>
+
+                <AlertDialog
+                    open={confirmUninstall !== null}
+                    onOpenChange={(isOpen) => {
+                        if (!isOpen) setConfirmUninstall(null);
+                    }}
+                >
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                {t("uninstallConfirmTitle")}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                {t("uninstallConfirmDescription", {
+                                    id: confirmUninstall ?? "",
+                                })}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                            <AlertDialogAction
+                                className="bg-red-500 text-white hover:bg-red-600"
+                                onClick={() => {
+                                    const id = confirmUninstall;
+                                    setConfirmUninstall(null);
+                                    if (id) void uninstall(id);
+                                }}
+                            >
+                                {t("uninstall")}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </DialogContent>
         </Dialog>
     );

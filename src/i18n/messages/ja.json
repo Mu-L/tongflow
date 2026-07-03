@@ -14,7 +14,13 @@
         "installSuccess": "{id} をインストールしました",
         "updateSuccess": "{id} を更新しました",
         "notRecognized": "{id} をクローンしましたが、スキャナーが認識できませんでした。ディレクトリ名と必要なファイルを確認してください。",
-        "openRepo": "GitHub で表示"
+        "openRepo": "GitHub で表示",
+        "uninstall": "アンインストール",
+        "uninstallSuccess": "{id} をアンインストールしました",
+        "uninstallConfirmTitle": "プラグインをアンインストールしますか？",
+        "uninstallConfirmDescription": "{id} フォルダーをディスクから削除します。後でいつでも再インストールできます。",
+        "installedCommunity": "インストール済みのコミュニティプラグイン",
+        "cancel": "キャンセル"
     },
     "Settings": {
         "title": "設定",
@@ -222,6 +228,7 @@
             "base": {
                 "moreActions": "その他のオプション",
                 "execute": "実行",
+                "cancelExecution": "実行をキャンセル",
                 "removeComment": "コメントを削除",
                 "commentPlaceholder": "ユーザー向けのコメントを追加...",
                 "clickToAddComment": "クリックしてコメントを追加...",

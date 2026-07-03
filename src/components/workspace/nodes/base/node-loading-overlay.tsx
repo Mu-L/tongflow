@@ -1,4 +1,5 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Square } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
@@ -6,13 +7,17 @@ interface NodeLoadingOverlayProps {
     loading: boolean;
     elapsedSeconds: number;
     progressLabel?: string | null;
+    /** When set, hovering the spinner reveals a stop button that cancels the run. */
+    onCancel?: () => void;
 }
 
 export function NodeLoadingOverlay({
     loading,
     elapsedSeconds,
     progressLabel,
+    onCancel,
 }: NodeLoadingOverlayProps) {
+    const t = useTranslations("Workspace.nodes.base");
     if (!loading) return null;
 
     return (
@@ -51,7 +56,23 @@ export function NodeLoadingOverlay({
                         {progressLabel}
                     </div>
                 )}
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                {onCancel ? (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onCancel();
+                        }}
+                        title={t("cancelExecution")}
+                        aria-label={t("cancelExecution")}
+                        className="nodrag group/cancel relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-red-500/10 dark:hover:bg-red-500/15"
+                    >
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-500 transition-opacity duration-150 group-hover/cancel:opacity-0" />
+                        <Square className="absolute h-4 w-4 fill-red-500 text-red-500 opacity-0 transition-opacity duration-150 group-hover/cancel:opacity-100" />
+                    </button>
+                ) : (
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                )}
                 <div className="mt-1 text-lg font-semibold text-gray-700 dark:text-gray-300">
                     {elapsedSeconds}s
                 </div>

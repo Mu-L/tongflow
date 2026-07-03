@@ -67,6 +67,11 @@ export type BaseNodeShellProps = HTMLAttributes<HTMLDivElement> & {
      * wires it to this callback. If omitted, no execute button is rendered.
      */
     onExecute?: () => void;
+    /**
+     * When set while loading, the loading overlay exposes a cancel affordance
+     * wired to this callback (cancels the node's in-flight tasks).
+     */
+    onCancel?: () => void;
     executeLabel?: string;
     executeIcon?: ReactNode;
     executeDisabled?: boolean;
@@ -101,6 +106,7 @@ export const BaseNodeShell = forwardRef<HTMLDivElement, BaseNodeShellProps>(
             progressLabel = null,
             isExecuteMode = false,
             onExecute,
+            onCancel,
             executeLabel,
             executeIcon,
             executeDisabled,
@@ -182,6 +188,7 @@ export const BaseNodeShell = forwardRef<HTMLDivElement, BaseNodeShellProps>(
                             loading={loading}
                             elapsedSeconds={elapsedSeconds}
                             progressLabel={progressLabel}
+                            onCancel={onCancel}
                         />
 
                         {/* Stack effect background cards */}

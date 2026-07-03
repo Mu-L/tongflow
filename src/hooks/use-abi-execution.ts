@@ -75,6 +75,10 @@ export interface UseAbiExecutionOptions<F extends NodeSlot> {
 export interface UseAbiExecutionReturn {
     /** Execute one batch (single click). */
     run: () => Promise<void>;
+    /** Cancel the in-flight batch created by this node (no-op when idle). */
+    cancel: () => Promise<void>;
+    /** True while this node owns cancellable in-flight tasks. */
+    canCancel: boolean;
     loading: boolean;
     elapsedSeconds: number;
     /** Live runner status text from SSE (label / feature / message). Null when no message yet. */
@@ -283,7 +287,11 @@ export function useAbiExecution<F extends NodeSlot>(
     );
 
     const expands = useFlow((s) => s.expands);
-    const { isLoading: taskLoading, createBatchTasks } = useBatchTaskManager();
+    const {
+        isLoading: taskLoading,
+        createBatchTasks,
+        cancelTasks,
+    } = useBatchTaskManager();
     const loading = taskLoading || nodeExecutionStatus === "running";
 
     const { pluginOptions, resolveActivePluginId, resolveActiveModel } =
@@ -447,6 +455,10 @@ export function useAbiExecution<F extends NodeSlot>(
 
     return {
         run,
+        cancel: cancelTasks,
+        // Only the node's own batch can be cancelled here; workflow-level runs
+        // (nodeExecutionStatusMap) are cancelled from the smart island instead.
+        canCancel: taskLoading,
         loading,
         elapsedSeconds,
         progressLabel,

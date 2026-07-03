@@ -14,7 +14,13 @@
         "installSuccess": "Installed {id}",
         "updateSuccess": "Updated {id}",
         "notRecognized": "Cloned {id}, but the scanner did not recognize it — check the directory name and required files.",
-        "openRepo": "View on GitHub"
+        "openRepo": "View on GitHub",
+        "uninstall": "Uninstall",
+        "uninstallSuccess": "Uninstalled {id}",
+        "uninstallConfirmTitle": "Uninstall plugin?",
+        "uninstallConfirmDescription": "This removes the {id} folder from disk. You can reinstall it anytime.",
+        "installedCommunity": "Installed community plugins",
+        "cancel": "Cancel"
     },
     "Settings": {
         "title": "Settings",
@@ -222,6 +228,7 @@
             "base": {
                 "moreActions": "More options",
                 "execute": "Execute",
+                "cancelExecution": "Cancel execution",
                 "removeComment": "Remove comment",
                 "commentPlaceholder": "Add a comment for users...",
                 "clickToAddComment": "Click to add a comment...",
