@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { PluginsDialog } from "@/components/workspace/plugins-dialog";
 import { SettingsDialog } from "@/components/workspace/settings-dialog";
+import { UpdateButton } from "@/components/workspace/update-button";
 
 const LOCALE_OPTIONS = [
     { code: "zh", label: "中文" },
@@ -147,6 +148,7 @@ export function WorkspaceNav() {
     const t = useTranslations("Navigation");
     return (
         <div className="flex items-center gap-2">
+            <UpdateButton className={navBtnClass} />
             <PluginsDialog />
             <SettingsDialog />
             <ThemeToggleButton />

@@ -43,6 +43,19 @@
     "Index": {
         "title": "New Idea"
     },
+    "Updater": {
+        "title": "Updates",
+        "currentVersion": "Current version",
+        "checking": "Checking for updates…",
+        "upToDate": "You're on the latest version",
+        "available": "New version {version} available",
+        "downloading": "Downloading update…",
+        "downloaded": "Update downloaded — restart to install",
+        "error": "Update check failed",
+        "checkNow": "Check for updates",
+        "download": "Download",
+        "restart": "Restart to update"
+    },
     "Navigation": {
         "toggleTheme": "Toggle theme",
         "language": "Language",
