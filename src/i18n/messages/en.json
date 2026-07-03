@@ -24,14 +24,21 @@
     },
     "Settings": {
         "title": "Settings",
-        "description": "Environment variables passed to plugins (e.g. API keys). Each plugin's README documents the keys it needs.",
+        "description": "Environment variables passed to plugins (e.g. API keys). Installed plugins declare their keys below; anything else goes under custom variables.",
         "keyPlaceholder": "KEY",
         "valuePlaceholder": "value",
         "addRow": "Add variable",
         "removeRow": "Remove",
         "toggleReveal": "Show / hide value",
         "save": "Save",
-        "saved": "Settings saved"
+        "saved": "Settings saved",
+        "setBadge": "{set}/{total} set",
+        "advanced": "Advanced ({count})",
+        "sharedSectionTitle": "Shared",
+        "customSectionTitle": "Custom variables",
+        "customSectionHint": "Variables not declared by any installed plugin.",
+        "getKey": "Get key",
+        "requiredHint": "Required"
     },
     "Index": {
         "title": "New Idea"

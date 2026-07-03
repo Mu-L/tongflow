@@ -24,14 +24,21 @@
     },
     "Settings": {
         "title": "설정",
-        "description": "플러그인에 전달되는 환경 변수입니다(예: API 키). 각 플러그인의 README에 필요한 키가 문서화되어 있습니다.",
+        "description": "플러그인에 전달되는 환경 변수입니다(예: API 키). 설치된 플러그인이 필요로 하는 키는 아래에 표시되며, 그 외 변수는 사용자 지정 변수에 들어갑니다.",
         "keyPlaceholder": "KEY",
         "valuePlaceholder": "값",
         "addRow": "변수 추가",
         "removeRow": "제거",
         "toggleReveal": "값 표시 / 숨기기",
         "save": "저장",
-        "saved": "설정이 저장되었습니다"
+        "saved": "설정이 저장되었습니다",
+        "setBadge": "{set}/{total} 설정됨",
+        "advanced": "고급 ({count})",
+        "sharedSectionTitle": "공유",
+        "customSectionTitle": "사용자 지정 변수",
+        "customSectionHint": "설치된 어떤 플러그인도 선언하지 않은 변수입니다.",
+        "getKey": "키 발급",
+        "requiredHint": "필수"
     },
     "Index": {
         "title": "새 아이디어"
