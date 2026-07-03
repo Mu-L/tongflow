@@ -1,3 +1,4 @@
+import path from "node:path";
 import { BrowserWindow } from "electron";
 import { logFilePath, recentLogs } from "./logging";
 
@@ -58,7 +59,12 @@ export function createMainWindow(url: string): BrowserWindow {
         minHeight: 640,
         show: false,
         backgroundColor: "#0b0b0f",
-        webPreferences: { contextIsolation: true, nodeIntegration: false },
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false,
+            // Exposes window.tongflowDesktop (updater state/actions) to the UI.
+            preload: path.join(__dirname, "preload.js"),
+        },
     });
     win.once("ready-to-show", () => win.show());
     win.webContents.on(

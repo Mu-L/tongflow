@@ -36,6 +36,19 @@
     "Index": {
         "title": "新しいアイデア"
     },
+    "Updater": {
+        "title": "アップデート",
+        "currentVersion": "現在のバージョン",
+        "checking": "更新を確認中…",
+        "upToDate": "最新バージョンです",
+        "available": "新しいバージョン {version} が利用可能です",
+        "downloading": "更新をダウンロード中…",
+        "downloaded": "更新のダウンロードが完了しました。再起動してインストールします",
+        "error": "更新の確認に失敗しました",
+        "checkNow": "更新を確認",
+        "download": "ダウンロード",
+        "restart": "再起動して更新"
+    },
     "Navigation": {
         "toggleTheme": "テーマ切り替え",
         "language": "言語",
