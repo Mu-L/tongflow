@@ -40,7 +40,12 @@ export async function startServer(
         PYTHON: venvPython(),
     };
 
-    child = spawn(bundledNode(), [serverEntry()], {
+    // --use-system-ca: Node only trusts its bundled Mozilla CA list by default,
+    // so HTTPS from the server (e.g. isomorphic-git cloning plugins) fails with
+    // "unable to verify the first certificate" behind corporate TLS-inspection
+    // proxies or private CAs. The flag adds the OS trust store (supported by
+    // the bundled Node ≥ 22.15).
+    child = spawn(bundledNode(), ["--use-system-ca", serverEntry()], {
         cwd: appResourcesDir(),
         env,
         windowsHide: true,
