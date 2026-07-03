@@ -74,9 +74,12 @@ The exact scan rules and the annotations a handler must carry are in
 ## 3. Directory & naming conventions
 
 A plugin is a directory under `plugins/`; the directory name **is** the plugin id. **There is
-no manifest file** — nothing to register, declare, or list. The scanner derives everything from
-the SDK decorator + type annotations in your Python (the slot bindings — see
-[§5](#5-what-registers-a-handler)).
+no registration manifest** — handlers are never registered or listed anywhere; the scanner
+derives everything from the SDK decorator + type annotations in your Python (the slot
+bindings — see [§5](#5-what-registers-a-handler)). A plugin *may* additionally ship an optional
+`tongflow.plugin.json` that declares the env vars it reads, purely so the Settings dialog can
+render them as a pre-filled card (see [§6.1](#61-declaring-environment-variables--tongflowpluginjson));
+it plays no part in discovery or execution.
 
 The naming convention the scanner enforces:
 
@@ -167,7 +170,7 @@ Helpers in [`sdk/tongflow/protocol.py`](../sdk/tongflow/protocol.py):
 
 ## 5. What registers a handler
 
-There is no registration list and no manifest. The scanner discovers a slot handler **purely
+There is no registration list and no registration manifest. The scanner discovers a slot handler **purely
 from the SDK annotations on your function** — it matches exactly three things, all from
 `tongflow`:
 
@@ -257,6 +260,43 @@ progress("Generating frames", percent=40)
 
 It writes a sentinel-framed line to stderr that the platform forwards to the task stream — it
 works identically from a local entry or from inside a Modal method.
+
+### 6.1 Declaring environment variables — `tongflow.plugin.json`
+
+Users supply env vars (API keys, tokens, tuning knobs) through the Settings dialog; the platform
+injects the stored values into your plugin's process on every run. To have the dialog render
+your plugin as a card with its keys pre-filled, ship an optional **`tongflow.plugin.json`** at
+the plugin root:
+
+```json
+{
+    "env": [
+        { "key": "OPENAI_API_KEY", "required": true, "description": "OpenAI API key", "url": "https://platform.openai.com/api-keys" },
+        { "key": "OPENAI_BASE_URL", "default": "https://api.openai.com/v1", "description": "OpenAI-compatible base URL" },
+        { "key": "OPENAI_CHAT_MODEL", "default": "gpt-4o-mini" }
+    ]
+}
+```
+
+Field semantics:
+
+- **`key`** — the env var name (`UPPER_SNAKE`), exactly as your code reads it via
+  `os.environ.get(...)`.
+- **`required`** — required keys render flat in the card with a required marker; everything
+  else is collapsed under an "Advanced" toggle.
+- **`default`** — the value your code falls back to when the var is unset; shown as the input
+  placeholder. Declare it on optional tuning knobs so users see the effective default.
+- **`description`** — a short hint rendered under the input.
+- **`url`** — where to obtain the credential (e.g. the provider's API-keys page); rendered as a
+  link next to the key.
+
+Keys declared by **two or more installed plugins** (e.g. `MODAL_TOKEN_ID` / `MODAL_TOKEN_SECRET`
+for every Modal plugin, or `HF_TOKEN`) are automatically hoisted into a single "Shared" card
+listing the plugins that use them — the value is stored once and reaches all of them.
+
+The file is optional and presentation-only: a plugin without one still runs exactly the same,
+its users just set the keys under "Custom variables" instead. An unreadable or invalid file is
+logged and ignored — it never breaks the Settings dialog.
 
 ---
 

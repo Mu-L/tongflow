@@ -24,14 +24,21 @@
     },
     "Settings": {
         "title": "設定",
-        "description": "プラグインに渡す環境変数（API キーなど）。必要なキーは各プラグインの README を参照してください。",
+        "description": "プラグインに渡す環境変数（API キーなど）。インストール済みプラグインが必要とするキーは下に表示され、それ以外はカスタム変数に入ります。",
         "keyPlaceholder": "KEY",
         "valuePlaceholder": "値",
         "addRow": "変数を追加",
         "removeRow": "削除",
         "toggleReveal": "値の表示 / 非表示",
         "save": "保存",
-        "saved": "設定を保存しました"
+        "saved": "設定を保存しました",
+        "setBadge": "{set}/{total} 設定済み",
+        "advanced": "詳細設定（{count}）",
+        "sharedSectionTitle": "共有",
+        "customSectionTitle": "カスタム変数",
+        "customSectionHint": "どのインストール済みプラグインにも宣言されていない変数。",
+        "getKey": "キーを取得",
+        "requiredHint": "必須"
     },
     "Index": {
         "title": "新しいアイデア"

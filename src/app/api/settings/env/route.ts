@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { loadPluginEnvDecls } from "@/lib/plugins/plugin-env-manifests.server";
 import {
     type EnvStore,
     loadEnvStore,
@@ -9,11 +10,13 @@ export const runtime = "nodejs";
 
 /**
  * GET /api/settings/env
- * Returns the user-managed environment key/value map (settings.json).
+ * Returns the user-managed environment key/value map (settings.json) plus
+ * the env vars declared by installed plugins (`tongflow.plugin.json`), so
+ * the settings dialog gets values and declarations in one fetch.
  */
 export async function GET() {
     return NextResponse.json(
-        { env: loadEnvStore() },
+        { env: loadEnvStore(), pluginEnv: loadPluginEnvDecls() },
         { headers: { "Cache-Control": "no-store" } },
     );
 }

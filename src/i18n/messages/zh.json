@@ -24,14 +24,21 @@
     },
     "Settings": {
         "title": "设置",
-        "description": "传递给插件的环境变量（如 API Key）。各插件的 README 会说明它需要哪些 Key。",
+        "description": "传递给插件的环境变量（如 API Key）。已安装插件所需的 Key 已在下方列出，其余变量放在自定义变量区。",
         "keyPlaceholder": "KEY",
         "valuePlaceholder": "值",
         "addRow": "添加变量",
         "removeRow": "删除",
         "toggleReveal": "显示 / 隐藏值",
         "save": "保存",
-        "saved": "设置已保存"
+        "saved": "设置已保存",
+        "setBadge": "已填 {set}/{total}",
+        "advanced": "高级（{count}）",
+        "sharedSectionTitle": "共享",
+        "customSectionTitle": "自定义变量",
+        "customSectionHint": "未被任何已安装插件声明的变量。",
+        "getKey": "获取 Key",
+        "requiredHint": "必填"
     },
     "Index": {
         "title": "新创意"
