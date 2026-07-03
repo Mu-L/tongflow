@@ -14,7 +14,13 @@
         "installSuccess": "已安装 {id}",
         "updateSuccess": "已更新 {id}",
         "notRecognized": "已克隆 {id}，但扫描器未识别——请检查目录名和必需文件。",
-        "openRepo": "在 GitHub 上查看"
+        "openRepo": "在 GitHub 上查看",
+        "uninstall": "卸载",
+        "uninstallSuccess": "已卸载 {id}",
+        "uninstallConfirmTitle": "卸载插件？",
+        "uninstallConfirmDescription": "将从磁盘删除 {id} 文件夹，之后可以随时重新安装。",
+        "installedCommunity": "已安装的社区插件",
+        "cancel": "取消"
     },
     "Settings": {
         "title": "设置",

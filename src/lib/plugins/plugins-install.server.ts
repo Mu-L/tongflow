@@ -2,8 +2,10 @@ import "server-only";
 
 import fs, { existsSync } from "node:fs";
 import { join } from "node:path";
+import { and, eq, inArray } from "drizzle-orm";
 import * as git from "isomorphic-git";
 import http from "isomorphic-git/http/node";
+import { getDb, tasks } from "@/db";
 import { logger } from "@/lib/logger";
 import {
     isPluginInstalled,
@@ -39,6 +41,10 @@ export class PluginInstallError extends Error {
         super(message);
         this.name = "PluginInstallError";
     }
+}
+
+export interface UninstallResult {
+    id: string;
 }
 
 /**
@@ -153,6 +159,46 @@ export async function installPlugin(params: {
     const recognized = Boolean(registry.plugins[id]);
 
     return { id, action, recognized };
+}
+
+/**
+ * Remove an installed plugin's directory and rescan the registry.
+ * Refuses while the plugin still has pending/processing tasks.
+ */
+export async function uninstallPlugin(id: string): Promise<UninstallResult> {
+    // Also guards against path traversal — ids never contain "/" or "..".
+    assertValidPluginId(id);
+
+    const dir = join(pluginsDir(), id);
+    if (!existsSync(dir)) {
+        throw new PluginInstallError(`Plugin is not installed: ${id}`, 404);
+    }
+
+    const db = await getDb();
+    const active = await db
+        .select({ id: tasks.id })
+        .from(tasks)
+        .where(
+            and(
+                eq(tasks.pluginId, id),
+                inArray(tasks.status, ["pending", "processing"]),
+            ),
+        )
+        .limit(1);
+    if (active.length > 0) {
+        throw new PluginInstallError(
+            `Plugin ${id} still has running tasks — wait for them to finish or cancel them first.`,
+            409,
+        );
+    }
+
+    fs.rmSync(dir, { recursive: true, force: true });
+    logger.info(`[plugins] uninstalled: ${id}`);
+
+    // Rescan so the removed plugin disappears from node pickers immediately.
+    invalidatePluginsRegistry();
+
+    return { id };
 }
 
 export { isPluginInstalled };
