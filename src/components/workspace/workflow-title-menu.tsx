@@ -14,6 +14,16 @@ import type { ChangeEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useShallow } from "zustand/react/shallow";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -84,6 +94,7 @@ export function WorkflowTitleMenu() {
         workflowDescription || "",
     );
     const [saving, setSaving] = useState(false);
+    const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
 
     const importFileRef = useRef<HTMLInputElement>(null);
 
@@ -178,16 +189,22 @@ export function WorkflowTitleMenu() {
         setIsSaveDialogOpen(true);
     };
 
-    // Clear the workflow
+    // Clear the workflow. Uses an in-app dialog instead of native confirm():
+    // on Electron/macOS a native confirm() breaks renderer keyboard focus,
+    // leaving inputs unable to receive keystrokes afterwards.
     const handleClear = () => {
-        if (confirm(t("confirmClear"))) {
-            setNodes([]);
-            setEdges([]);
-            setWorkflowName(tIndex("title"));
-            setWorkflowDescription("");
-            setWorkflowId(null);
-            toast.success(t("cleared"));
-        }
+        setMenuOpen(false);
+        setIsClearConfirmOpen(true);
+    };
+
+    const confirmClear = () => {
+        setNodes([]);
+        setEdges([]);
+        setWorkflowName(tIndex("title"));
+        setWorkflowDescription("");
+        setWorkflowId(null);
+        setIsClearConfirmOpen(false);
+        toast.success(t("cleared"));
     };
 
     // Export two flavors:
@@ -405,6 +422,27 @@ export function WorkflowTitleMenu() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Clear confirmation */}
+            <AlertDialog
+                open={isClearConfirmOpen}
+                onOpenChange={setIsClearConfirmOpen}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t("clear")}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t("confirmClear")}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmClear}>
+                            {t("clear")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             <input
                 ref={importFileRef}

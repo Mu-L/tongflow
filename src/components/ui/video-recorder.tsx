@@ -3,6 +3,7 @@
 import { Camera, Circle, Square } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { showErrorToast } from "@/components/ui/error-toast";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -90,7 +91,8 @@ export const VideoRecorder = ({ onRecord, className }: VideoRecorderProps) => {
             }, 1000);
         } catch (error) {
             logger.error("Failed to start recording:", error);
-            alert(t("videoPermissionError"));
+            // Avoid native alert(): it breaks renderer keyboard focus on Electron/macOS.
+            showErrorToast({ message: t("videoPermissionError") });
         }
     }, [onRecord, t]);
 
