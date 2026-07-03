@@ -36,6 +36,19 @@
     "Index": {
         "title": "새 아이디어"
     },
+    "Updater": {
+        "title": "업데이트",
+        "currentVersion": "현재 버전",
+        "checking": "업데이트 확인 중…",
+        "upToDate": "최신 버전입니다",
+        "available": "새 버전 {version} 사용 가능",
+        "downloading": "업데이트 다운로드 중…",
+        "downloaded": "업데이트 다운로드 완료 — 다시 시작하여 설치",
+        "error": "업데이트 확인 실패",
+        "checkNow": "업데이트 확인",
+        "download": "다운로드",
+        "restart": "다시 시작하여 업데이트"
+    },
     "Navigation": {
         "toggleTheme": "테마 전환",
         "language": "언어",

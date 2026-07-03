@@ -4,6 +4,7 @@ import { ensureUserDirs } from "./fs-setup";
 import { initLogFile, logFilePath, logLine, recentLogs } from "./logging";
 import { ensurePythonEnv } from "./python-manager";
 import { startServer, stopServer } from "./server-manager";
+import { initUpdater } from "./updater";
 import {
     createMainWindow,
     createSplash,
@@ -74,14 +75,14 @@ function onServerCrash(code: number | null): void {
     }
 }
 
-/** electron-updater is optional; only runs in packaged builds with a feed. */
+/** Updater IPC bridge + background checks. Never blocks or crashes startup. */
 async function maybeCheckForUpdates(): Promise<void> {
-    if (!app.isPackaged) return;
     try {
-        const { autoUpdater } = await import("electron-updater");
-        await autoUpdater.checkForUpdatesAndNotify();
+        await initUpdater(() => mainWindow, logLine);
     } catch (e) {
-        console.warn("[updater] skipped:", e);
+        logLine(
+            `[updater] skipped: ${e instanceof Error ? e.message : String(e)}`,
+        );
     }
 }
 
