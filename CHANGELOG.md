@@ -18,6 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`agnes-image-2.1-flash` / `2.0-flash`, per-node model picker), multi-image
   fusion (`agnes-image-2.0-flash`), and async text / image / multi-image /
   first-last-frame → video (`agnes-video-v2.0`, up to ~18 s per clip).
+- **Desktop auto-update** — the app checks for new releases and updates
+  itself via an in-app update button; no more manual installer downloads.
+- **Uninstall plugins** — installed plugins can now be removed from the
+  plugin manager.
+- **Cancel running nodes** — a running node can be cancelled from its
+  loading overlay.
+
+### Changed
+
+- **Per-plugin env var cards** — Settings renders each plugin's declared
+  environment variables (`tongflow.plugin.json`) as a pre-filled card;
+  shared keys are hoisted into a single "Shared" card.
+- **In-app dialogs** — native `confirm`/`alert` popups replaced with
+  in-app dialogs.
 
 ## [0.1.11] - 2026-07-03
 
