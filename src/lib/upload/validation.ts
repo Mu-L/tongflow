@@ -96,18 +96,6 @@ export interface FileValidationResult extends ValidationResult {
  * Validate whether the file meets upload limits
  */
 export async function validateFile(file: File): Promise<FileValidationResult> {
-    // Unified 50MB file size limit
-    const MAX_FILE_SIZE = 50 * 1024 * 1024;
-
-    if (file.size > MAX_FILE_SIZE) {
-        return {
-            allowed: false,
-            message: getClientTranslator("Upload")("sizeLimit50MB"),
-            maxAllowed: MAX_FILE_SIZE,
-            fileInfo: { size: file.size },
-        };
-    }
-
     // Read media file information (only to return metadata, not for limits)
     if (isImageFile(file)) {
         try {
