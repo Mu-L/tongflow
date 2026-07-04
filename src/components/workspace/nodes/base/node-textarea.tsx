@@ -459,7 +459,10 @@ const NodeTextarea = forwardRef<HTMLTextAreaElement, NodeTextareaProps>(
                         onClick={handleSelect}
                         onKeyUp={handleSelect}
                         className={cn(
-                            "resize-none",
+                            // field-sizing-content (ui/textarea) auto-grows with
+                            // input; cap it so long prompts scroll instead of
+                            // stretching the node. Callers may override via className.
+                            "resize-none max-h-40 overflow-y-auto",
                             hasButtons && "pr-12",
                             className,
                         )}
