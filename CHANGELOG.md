@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-07-04
+
 ### Added
 
 - **Audio understanding** — new `audio-describe` ABI slot and canvas node:
@@ -24,6 +26,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   melody prompt (`melody_wavs`, first 10 s). Requires `tongflow==0.2.1`
   (published) and redeployed `tongflow-modal-ace-step` /
   `tongflow-modal-levo` plugins.
+
+### Changed
+
+- **Uploads: 50 MB file-size limit removed** — large media files can now be
+  added to the canvas directly.
+- Python SDK **0.2.1** / **0.2.2** published to PyPI (generated models and
+  `NodeSlots` for the two new capabilities above). Official plugin repos
+  created for **LeVo**, **Bernini**, **FastWan**, and **SenseNova-U1**.
+
+### Fixed
+
+- **Upload failures are no longer silent** — per-file upload errors are
+  surfaced instead of quietly dropping the file.
+- **Node prompt boxes no longer stretch endlessly** — long input now stops
+  at a fixed height and scrolls (the auto-growing textarea previously
+  expanded the whole node with no scrollbar).
+- **Gemini plugin worked around Google's model retirement** — the default
+  `gemini-2.0-flash` now 404s upstream; bumped to `gemini-2.5-flash` so the
+  plugin works out of the box again.
 
 ## [0.1.12] - 2026-07-04
 
