@@ -1226,6 +1226,265 @@
             }
         },
         {
+            "nodeSlot": "music-repaint",
+            "inputs": {
+                "type": "object",
+                "required": ["audio", "start_time", "end_time"],
+                "properties": {
+                    "audio": {
+                        "$ref": "#/$defs/Asset"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "lyrics": {
+                        "type": "string"
+                    },
+                    "start_time": {
+                        "type": "number"
+                    },
+                    "end_time": {
+                        "type": "number"
+                    },
+                    "strength": {
+                        "type": "number"
+                    },
+                    "seed": {
+                        "type": "integer"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "audio": {
+                        "$ref": "#/$defs/AudioRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "music-cover",
+            "inputs": {
+                "type": "object",
+                "required": ["audio"],
+                "properties": {
+                    "audio": {
+                        "$ref": "#/$defs/Asset"
+                    },
+                    "ref_audio": {
+                        "$ref": "#/$defs/Asset"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "lyrics": {
+                        "type": "string"
+                    },
+                    "strength": {
+                        "type": "number"
+                    },
+                    "seed": {
+                        "type": "integer"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "audio": {
+                        "$ref": "#/$defs/AudioRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "music-extract",
+            "inputs": {
+                "type": "object",
+                "required": ["audio", "track"],
+                "properties": {
+                    "audio": {
+                        "$ref": "#/$defs/Asset"
+                    },
+                    "track": {
+                        "type": "string"
+                    },
+                    "seed": {
+                        "type": "integer"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "audio": {
+                        "$ref": "#/$defs/AudioRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "music-lego",
+            "inputs": {
+                "type": "object",
+                "required": ["audio", "track"],
+                "properties": {
+                    "audio": {
+                        "$ref": "#/$defs/Asset"
+                    },
+                    "track": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "lyrics": {
+                        "type": "string"
+                    },
+                    "seed": {
+                        "type": "integer"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "audio": {
+                        "$ref": "#/$defs/AudioRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "music-complete",
+            "inputs": {
+                "type": "object",
+                "required": ["audio"],
+                "properties": {
+                    "audio": {
+                        "$ref": "#/$defs/Asset"
+                    },
+                    "tracks": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "seed": {
+                        "type": "integer"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "audio": {
+                        "$ref": "#/$defs/AudioRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "music-brief",
+            "inputs": {
+                "type": "object",
+                "required": ["text"],
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "instrumental": {
+                        "type": "boolean"
+                    },
+                    "language": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "lyrics": {
+                        "type": "string"
+                    },
+                    "tags": {
+                        "type": "string"
+                    },
+                    "bpm": {
+                        "type": "number"
+                    },
+                    "keyscale": {
+                        "type": "string"
+                    },
+                    "duration": {
+                        "type": "number"
+                    },
+                    "language": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
             "nodeSlot": "audio-image-gen-video",
             "inputs": {
                 "type": "object",

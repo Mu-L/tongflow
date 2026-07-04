@@ -132,13 +132,18 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 
 #### 音频
 
-- ✅ **音乐生成**: 从文本生成音乐。
+- ✅ **音乐生成**: 从文本生成音乐，可选参考音频引导。
+- ✅ **音频理解**: 用文字描述一段音频（音乐 / 语音 / 环境音）。
+- ✅ **音乐重绘**: 重新生成歌曲中指定的时间段。
+- ✅ **音乐翻唱**: 按描述或参考曲目改编歌曲风格。
+- ✅ **加轨 / 补全编曲**: 在现有音乐上生成新乐轨，或补全缺失的声部。
+- ✅ **音乐企划**: 一句话灵感 → 歌词、风格标签、BPM、调式、时长。
 - ✅ **语音合成**: 文字转语音——预设风格、声音克隆（参考音频）或指令驱动。
 - ✅ **语音识别**: 转录音频或视频中的语音。
 - ⬜ **降噪**: 对音频降噪处理。
 - ⬜ **说话人分离**: 按说话人分离音频。
 - ⬜ **音色转换**: 使用参考样本替换或克隆音色。
-- ⬜ **多轨 / 人声伴奏分离**
+- ✅ **多轨 / 人声伴奏分离**: 分离人声、鼓、贝斯、吉他等 12 种乐轨。
 
 ### 组合
 
@@ -199,7 +204,7 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 - [tongflow-modal-qwen3asr](https://github.com/tong-io/tongflow-modal-qwen3asr) — Qwen3 语音识别
 - [tongflow-modal-qwen3tts](https://github.com/tong-io/tongflow-modal-qwen3tts) — Qwen3 文字转语音
 - [tongflow-modal-whisper](https://github.com/tong-io/tongflow-modal-whisper) — Whisper 语音识别（带时间戳，备选）
-- [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step 文本生音乐
+- [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step 1.5 音乐全家桶：文本生音乐（sft / base / turbo 可选）、重绘、翻唱、分轨提取、加轨、补全编曲、音乐企划与音乐理解
 - [tongflow-modal-levo](https://github.com/tong-io/tongflow-modal-levo) — LeVo 2 / SongGeneration 文本生音乐（多语言、商用级）
 - [tongflow-modal-docling](https://github.com/tong-io/tongflow-modal-docling) — Docling 文档 → 文本
 - [tongflow-modal-paddle](https://github.com/tong-io/tongflow-modal-paddle) — PaddleOCR 文档 → 文本

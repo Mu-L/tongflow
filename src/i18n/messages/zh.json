@@ -190,7 +190,13 @@
             "lipSync": "视频对口型",
             "lipDub": "配音对口型",
             "cloneVoice": "克隆语音",
-            "speechGenVideo": "音频生成视频"
+            "speechGenVideo": "音频生成视频",
+            "repaintMusic": "重绘片段",
+            "coverMusic": "翻唱改风格",
+            "extractStem": "分离音轨",
+            "addTrack": "加轨",
+            "completeMusic": "补全编曲",
+            "musicBrief": "音乐企划"
         },
         "toast": {
             "executing": "执行中...",
@@ -358,6 +364,12 @@
                         "image-describe": "图像理解",
                         "video-describe": "视频理解",
                         "audio-describe": "音频理解",
+                        "music-repaint": "音乐重绘",
+                        "music-cover": "音乐翻唱",
+                        "music-extract": "分离音轨",
+                        "music-lego": "添加乐轨",
+                        "music-complete": "补全编曲",
+                        "music-brief": "音乐企划",
                         "audio-image-gen-video": "语音+图生视频",
                         "speech-text-gen-video": "语音+文生视频",
                         "video-image-gen-video-mix": "视频+图混合",
@@ -461,7 +473,13 @@
                 "getFirstFrame": "首帧截图",
                 "getLastFrame": "尾帧截图",
                 "extractAudioTrack": "提取音轨",
-                "removeVideoAudio": "去除音频（无声视频）"
+                "removeVideoAudio": "去除音频（无声视频）",
+                "musicRepaint": "音乐重绘",
+                "musicCover": "音乐翻唱",
+                "musicExtract": "分离音轨",
+                "musicLego": "添加乐轨",
+                "musicComplete": "补全编曲",
+                "musicBrief": "音乐企划"
             },
             "options": {
                 "portrait": "竖屏",
@@ -510,7 +528,13 @@
                 "getFirstFrame": "截取首帧",
                 "getLastFrame": "截取尾帧",
                 "extractAudioTrack": "提取音轨",
-                "removeVideoAudio": "去除音频"
+                "removeVideoAudio": "去除音频",
+                "repaintMusic": "开始重绘",
+                "coverMusic": "生成翻唱",
+                "extractStem": "开始分离",
+                "addTrack": "生成乐轨",
+                "completeMusic": "开始补全",
+                "musicBrief": "生成企划"
             },
             "params": {
                 "prompt": "提示词",
@@ -713,6 +737,35 @@
                 "language": "语言",
                 "keyscale": "调式",
                 "auto": "自动"
+            },
+            "musicTasks": {
+                "promptLabel": "描述",
+                "promptPlaceholder": "描述音乐风格、情绪、乐器…",
+                "lyricsLabel": "歌词",
+                "lyricsPlaceholder": "歌词（可选）…",
+                "startTime": "开始（秒）",
+                "endTime": "结束（秒）",
+                "strength": "强度",
+                "track": "乐轨",
+                "tracks": "要添加的乐轨",
+                "instrumental": "纯音乐",
+                "ideaPlaceholder": "用一句话描述你想要的歌曲…",
+                "sourceAudio": "原曲",
+                "refAudio": "参考音频",
+                "trackOptions": {
+                    "vocals": "人声",
+                    "backing_vocals": "和声",
+                    "drums": "鼓",
+                    "percussion": "打击乐",
+                    "bass": "贝斯",
+                    "guitar": "吉他",
+                    "keyboard": "键盘",
+                    "synth": "合成器",
+                    "strings": "弦乐",
+                    "brass": "铜管",
+                    "woodwinds": "木管",
+                    "fx": "音效"
+                }
             },
             "speechGenVideo": {
                 "loading": "加载中...",

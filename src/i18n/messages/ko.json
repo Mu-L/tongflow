@@ -190,7 +190,13 @@
             "lipSync": "립싱크",
             "lipDub": "립 더빙",
             "cloneVoice": "음성 복제",
-            "speechGenVideo": "오디오로 비디오 생성"
+            "speechGenVideo": "오디오로 비디오 생성",
+            "repaintMusic": "리페인트",
+            "coverMusic": "커버",
+            "extractStem": "스템 추출",
+            "addTrack": "트랙 추가",
+            "completeMusic": "편곡 완성",
+            "musicBrief": "음악 브리프"
         },
         "toast": {
             "executing": "실행 중...",
@@ -358,6 +364,12 @@
                         "image-describe": "이미지 이해",
                         "video-describe": "비디오 이해",
                         "audio-describe": "오디오 이해",
+                        "music-repaint": "음악 리페인트",
+                        "music-cover": "음악 커버",
+                        "music-extract": "스템 추출",
+                        "music-lego": "트랙 추가",
+                        "music-complete": "편곡 완성",
+                        "music-brief": "음악 브리프",
                         "audio-image-gen-video": "음성+이미지-비디오",
                         "speech-text-gen-video": "음성+텍스트-비디오",
                         "video-image-gen-video-mix": "비디오+이미지 믹스",
@@ -461,7 +473,13 @@
                 "getFirstFrame": "첫 프레임",
                 "getLastFrame": "마지막 프레임",
                 "extractAudioTrack": "오디오 트랙 추출",
-                "removeVideoAudio": "오디오 제거(무음 비디오)"
+                "removeVideoAudio": "오디오 제거(무음 비디오)",
+                "musicRepaint": "음악 리페인트",
+                "musicCover": "음악 커버",
+                "musicExtract": "스템 추출",
+                "musicLego": "트랙 추가",
+                "musicComplete": "편곡 완성",
+                "musicBrief": "음악 브리프"
             },
             "options": {
                 "portrait": "세로",
@@ -510,7 +528,13 @@
                 "getFirstFrame": "첫 프레임 가져오기",
                 "getLastFrame": "마지막 프레임 가져오기",
                 "extractAudioTrack": "오디오 추출",
-                "removeVideoAudio": "오디오 제거"
+                "removeVideoAudio": "오디오 제거",
+                "repaintMusic": "리페인트 시작",
+                "coverMusic": "커버 생성",
+                "extractStem": "분리 시작",
+                "addTrack": "트랙 생성",
+                "completeMusic": "보완 시작",
+                "musicBrief": "브리프 생성"
             },
             "params": {
                 "prompt": "프롬프트",
@@ -713,6 +737,35 @@
                 "language": "언어",
                 "keyscale": "키 스케일",
                 "auto": "자동"
+            },
+            "musicTasks": {
+                "promptLabel": "캡션",
+                "promptPlaceholder": "음악 스타일, 분위기, 악기 등을 설명하세요...",
+                "lyricsLabel": "가사",
+                "lyricsPlaceholder": "가사(선택)...",
+                "startTime": "시작(초)",
+                "endTime": "종료(초)",
+                "strength": "강도",
+                "track": "트랙",
+                "tracks": "추가할 트랙",
+                "instrumental": "연주곡",
+                "ideaPlaceholder": "원하는 곡을 한 문장으로 설명하세요...",
+                "sourceAudio": "원곡",
+                "refAudio": "참조 오디오",
+                "trackOptions": {
+                    "vocals": "보컬",
+                    "backing_vocals": "백킹 보컬",
+                    "drums": "드럼",
+                    "percussion": "퍼커션",
+                    "bass": "베이스",
+                    "guitar": "기타",
+                    "keyboard": "키보드",
+                    "synth": "신스",
+                    "strings": "스트링",
+                    "brass": "브라스",
+                    "woodwinds": "목관",
+                    "fx": "이펙트"
+                }
             },
             "speechGenVideo": {
                 "loading": "불러오는 중...",
