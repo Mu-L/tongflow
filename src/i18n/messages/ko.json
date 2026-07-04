@@ -920,11 +920,11 @@
     },
     "Upload": {
         "failed": "업로드에 실패했습니다. 나중에 다시 시도해 주세요",
+        "fileFailed": "파일 \"{name}\" 업로드에 실패했습니다: {reason}",
         "partialFailed": "일부 또는 모든 파일 업로드에 실패했습니다",
         "maxFilesExceeded": "최대 {max}개의 파일만 허용됩니다",
         "fileTooLarge": "파일 \"{name}\"이(가) 너무 큽니다(최대 {max}MB)",
         "fileTypeNotAccepted": "파일 \"{name}\" 유형이 허용되지 않습니다",
-        "sizeLimit50MB": "파일 크기가 제한을 초과합니다. 최대 허용 크기는 50MB입니다.",
         "readImageFailed": "이미지 정보를 읽지 못했습니다",
         "readVideoFailed": "비디오 정보를 읽지 못했습니다"
     },

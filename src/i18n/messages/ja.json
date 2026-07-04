@@ -834,11 +834,11 @@
     },
     "Upload": {
         "failed": "アップロードに失敗しました。後で再試行してください",
+        "fileFailed": "ファイル \"{name}\" のアップロードに失敗しました：{reason}",
         "partialFailed": "一部またはすべてのファイルのアップロードに失敗しました",
         "maxFilesExceeded": "最大 {max} 個のファイルまで許可されています",
         "fileTooLarge": "ファイル \"{name}\" が大きすぎます（最大 {max}MB）",
         "fileTypeNotAccepted": "ファイル \"{name}\" の種類はサポートされていません",
-        "sizeLimit50MB": "ファイルサイズが上限を超えています。最大 50MB まで許可されています。",
         "readImageFailed": "画像情報の読み取りに失敗しました",
         "readVideoFailed": "動画情報の読み取りに失敗しました"
     },

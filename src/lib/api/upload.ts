@@ -37,7 +37,12 @@ export async function getPresignedUploadUrl(
 
     const data = await apiClient<{ fileKey: string; url: string }>(
         "/api/upload",
-        { method: "POST", body: formData } as RequestInit,
+        {
+            method: "POST",
+            body: formData,
+            // Large files need more than the default 30s timeout
+            timeout: 10 * 60 * 1000,
+        } as RequestInit,
     );
 
     return {

@@ -920,11 +920,11 @@
     },
     "Upload": {
         "failed": "Upload failed, please retry later",
+        "fileFailed": "Failed to upload \"{name}\": {reason}",
         "partialFailed": "Some or all files failed to upload",
         "maxFilesExceeded": "Maximum {max} files allowed",
         "fileTooLarge": "File \"{name}\" is too large (max {max}MB)",
         "fileTypeNotAccepted": "File \"{name}\" type not accepted",
-        "sizeLimit50MB": "File size exceeds the limit. Maximum allowed is 50MB.",
         "readImageFailed": "Failed to read image information",
         "readVideoFailed": "Failed to read video information"
     },
