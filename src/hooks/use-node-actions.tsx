@@ -656,6 +656,15 @@ export function useNodeActions(args: UseNodeActionsArgs): UseNodeActionsResult {
                     <ActionItem
                         buttons={[
                             {
+                                text: t("describeReverse"),
+                                id: "desc-audio",
+                                nodeType: "audioDescribeNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "audioDescribeNode", data },
+                                    ]),
+                            },
+                            {
                                 text: t("speechRecognize"),
                                 nodeType: "audioGenTextSpeechRecognizeNode",
                                 onClick: () =>

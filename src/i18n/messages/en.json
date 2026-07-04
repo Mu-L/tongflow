@@ -357,6 +357,7 @@
                         "video-upscale": "Video upscale",
                         "image-describe": "Image understanding",
                         "video-describe": "Video understanding",
+                        "audio-describe": "Audio understanding",
                         "audio-image-gen-video": "Speech+image to video",
                         "speech-text-gen-video": "Speech+text to video",
                         "video-image-gen-video-mix": "Video+image mix",
@@ -437,6 +438,7 @@
                 "removeWatermark": "Remove Watermark",
                 "separateAudio": "Split Audio & Video",
                 "imageGenText": "Image Description",
+                "audioDescribe": "Audio Description",
                 "imageGenImage": "Image Edit",
                 "videoEdit": "Video Edit",
                 "imageGenModel": "Image to 3D Model",
@@ -492,6 +494,7 @@
                 "compressVideo": "Compress Video",
                 "extractAudio": "Start Split",
                 "describeImage": "Describe Image",
+                "describeAudio": "Describe Audio",
                 "editImage": "Edit Image",
                 "editVideo": "Edit Video",
                 "generate3DModel": "Generate 3D Model",
@@ -740,6 +743,10 @@
             "imageGenText": {
                 "promptLabel": "Custom Prompt",
                 "promptPlaceholder": "Leave empty for default prompt, or enter custom instructions, e.g.: Describe the main subject, style, or on-image text..."
+            },
+            "audioDescribe": {
+                "promptLabel": "Custom Prompt",
+                "promptPlaceholder": "Leave empty for default prompt, or enter custom instructions, e.g.: Describe the genre, mood, instruments, or vocals..."
             },
             "textGenText": {
                 "instructions": "Instructions"

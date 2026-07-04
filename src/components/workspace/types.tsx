@@ -49,6 +49,7 @@ import LinkNode from "./nodes/modality/link-node";
 import ModelNode from "./nodes/modality/model-node";
 import TextNode from "./nodes/modality/text-node";
 import VideoNode from "./nodes/modality/video-node";
+import AudioDescribeNode from "./nodes/transfer/audio-describe";
 import AudioGenTextSpeechRecognizeNode from "./nodes/transfer/audio-gen-text-speech-recognize";
 import ConvertVoiceNode from "./nodes/transfer/convert-voice";
 import DenoiseAudioNode from "./nodes/transfer/denoise-audio";
@@ -129,6 +130,7 @@ export const NODE_TYPES: NodeTypes = {
     separateAudioTrackNode: SeparateAudioTrackNode,
     separateSpeakerNode: SeparateSpeakerNode,
     convertVoiceNode: ConvertVoiceNode,
+    audioDescribeNode: AudioDescribeNode,
     imageGenTextNode: ImageGenTextNode,
     videoGenTextNode: VideoGenTextNode,
     videoGenTextSpeechRecognizeNode: VideoGenTextSpeechRecognizeNode,
@@ -220,6 +222,7 @@ export const NODE_CATEGORIES = {
         "separateAudioTrackNode",
         "separateSpeakerNode",
         "convertVoiceNode",
+        "audioDescribeNode",
         "imageGenTextNode",
         "videoGenTextNode",
         "videoGenTextSpeechRecognizeNode",

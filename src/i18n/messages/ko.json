@@ -357,6 +357,7 @@
                         "video-upscale": "비디오 업스케일",
                         "image-describe": "이미지 이해",
                         "video-describe": "비디오 이해",
+                        "audio-describe": "오디오 이해",
                         "audio-image-gen-video": "음성+이미지-비디오",
                         "speech-text-gen-video": "음성+텍스트-비디오",
                         "video-image-gen-video-mix": "비디오+이미지 믹스",
@@ -437,6 +438,7 @@
                 "removeWatermark": "워터마크 제거",
                 "separateAudio": "오디오 & 비디오 분리",
                 "imageGenText": "이미지 설명",
+                "audioDescribe": "오디오 이해",
                 "imageGenImage": "이미지 편집",
                 "videoEdit": "비디오 편집",
                 "imageGenModel": "이미지-3D 모델",
@@ -492,6 +494,7 @@
                 "compressVideo": "비디오 압축",
                 "extractAudio": "분리 시작",
                 "describeImage": "이미지 설명",
+                "describeAudio": "오디오 설명",
                 "editImage": "이미지 편집",
                 "editVideo": "비디오 편집",
                 "generate3DModel": "3D 모델 생성",
@@ -740,6 +743,10 @@
             "imageGenText": {
                 "promptLabel": "사용자 정의 프롬프트",
                 "promptPlaceholder": "기본 프롬프트는 비워 두거나 사용자 정의 지시 사항을 입력하세요. 예: 주요 피사체, 스타일 또는 이미지 내 텍스트 설명..."
+            },
+            "audioDescribe": {
+                "promptLabel": "커스텀 프롬프트",
+                "promptPlaceholder": "비워 두면 기본 프롬프트를 사용합니다. 장르, 분위기, 악기, 보컬 설명 등 커스텀 지시를 입력할 수도 있습니다…"
             },
             "textGenText": {
                 "instructions": "지시 사항"

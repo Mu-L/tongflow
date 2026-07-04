@@ -357,6 +357,7 @@
                         "video-upscale": "動画アップスケール",
                         "image-describe": "画像理解",
                         "video-describe": "動画理解",
+                        "audio-describe": "音声理解",
                         "audio-image-gen-video": "音声+画像から動画",
                         "speech-text-gen-video": "音声+テキストから動画",
                         "video-image-gen-video-mix": "動画+画像ミックス",
@@ -437,6 +438,7 @@
                 "removeWatermark": "透かし削除",
                 "separateAudio": "映像・音声の分離",
                 "imageGenText": "画像説明",
+                "audioDescribe": "音声理解",
                 "imageGenImage": "画像編集",
                 "videoEdit": "動画編集",
                 "imageGenModel": "画像から3Dモデル",
@@ -492,6 +494,7 @@
                 "compressVideo": "動画を圧縮",
                 "extractAudio": "分離を開始",
                 "describeImage": "画像を説明",
+                "describeAudio": "音声を説明",
                 "editImage": "画像を編集",
                 "editVideo": "動画を編集",
                 "generate3DModel": "3Dモデルを生成",
@@ -654,6 +657,10 @@
             "imageGenText": {
                 "promptLabel": "カスタムプロンプト",
                 "promptPlaceholder": "デフォルトを使う場合は空白のまま。例：被写体・雰囲気・画像内の文字のみを説明..."
+            },
+            "audioDescribe": {
+                "promptLabel": "カスタムプロンプト",
+                "promptPlaceholder": "空欄でデフォルトプロンプトを使用。ジャンル・雰囲気・楽器・ボーカルの説明など、カスタム指示も入力可能…"
             },
             "textGenText": {
                 "instructions": "指示"
