@@ -54,6 +54,7 @@ export const NODE_TYPE_TO_ABI_FEATURE: Readonly<Record<string, NodeSlot>> = {
     separateAudioTrackNode: "separate_audio_track",
     separateSpeakerNode: "separate_speaker",
     convertVoiceNode: "convert_voice",
+    audioDescribeNode: "audio-describe",
     imageGenTextNode: "image-gen-text",
     videoGenTextNode: "video-gen-text",
     videoGenTextSpeechRecognizeNode: "transcribe",

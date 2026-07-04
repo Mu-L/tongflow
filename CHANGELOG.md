@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Audio understanding** — new `audio-describe` ABI slot and canvas node:
+  select an audio node and hit **Describe** on the smart island to get a
+  natural-language description of the clip (genre, mood, instruments,
+  vocals, events), with an optional custom prompt. Implemented by three
+  official plugins: **Gemini** (native audio in `generateContent`),
+  **Agnes** (`agnes-2.0-flash`, OpenAI-style `input_audio` part), and
+  **Gemma 4** (GPU, existing multimodal pipeline). Requires
+  `tongflow==0.2.2`.
 - **Reference audio for music generation** — the music node (`gen-music`)
   gains an optional `ref_audio` input handle: connect an audio node to
   condition the song on a reference track. ACE-Step uses it for

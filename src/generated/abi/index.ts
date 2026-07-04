@@ -1780,6 +1780,57 @@ export type VideoDescribeOutput = FromSchema<
     typeof _slot_video_describe_outputs
 >;
 
+const _slot_audio_describe_inputs = {
+    type: "object",
+    required: ["audio"],
+    properties: {
+        text: {
+            type: "string",
+        },
+        userPrompt: {
+            type: "string",
+        },
+        audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type AudioDescribeInput = FromSchema<typeof _slot_audio_describe_inputs>;
+const _slot_audio_describe_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        text: {
+            type: "string",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type AudioDescribeOutput = FromSchema<
+    typeof _slot_audio_describe_outputs
+>;
+
 const _slot_audio_image_gen_video_inputs = {
     type: "object",
     required: ["image", "audio"],
@@ -3320,6 +3371,7 @@ export type NodeSlot =
     | "video-edit"
     | "image-describe"
     | "video-describe"
+    | "audio-describe"
     | "audio-image-gen-video"
     | "speech-text-gen-video"
     | "video-image-gen-video-mix"
@@ -3371,6 +3423,7 @@ export type SlotInputsMap = {
     "video-edit": VideoEditInput;
     "image-describe": ImageDescribeInput;
     "video-describe": VideoDescribeInput;
+    "audio-describe": AudioDescribeInput;
     "audio-image-gen-video": AudioImageGenVideoInput;
     "speech-text-gen-video": SpeechTextGenVideoInput;
     "video-image-gen-video-mix": VideoImageGenVideoMixInput;
@@ -3422,6 +3475,7 @@ export type SlotOutputsMap = {
     "video-edit": VideoEditOutput;
     "image-describe": ImageDescribeOutput;
     "video-describe": VideoDescribeOutput;
+    "audio-describe": AudioDescribeOutput;
     "audio-image-gen-video": AudioImageGenVideoOutput;
     "speech-text-gen-video": SpeechTextGenVideoOutput;
     "video-image-gen-video-mix": VideoImageGenVideoMixOutput;
@@ -4595,6 +4649,40 @@ export const ABI_NODES = {
                     type: "string",
                 },
                 video: {
+                    $ref: "#/$defs/Asset",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                text: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "audio-describe": {
+        inputs: {
+            type: "object",
+            required: ["audio"],
+            properties: {
+                text: {
+                    type: "string",
+                },
+                userPrompt: {
+                    type: "string",
+                },
+                audio: {
                     $ref: "#/$defs/Asset",
                 },
             },
