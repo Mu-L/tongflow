@@ -834,6 +834,7 @@
     },
     "Upload": {
         "failed": "アップロードに失敗しました。後で再試行してください",
+        "fileFailed": "ファイル \"{name}\" のアップロードに失敗しました：{reason}",
         "partialFailed": "一部またはすべてのファイルのアップロードに失敗しました",
         "maxFilesExceeded": "最大 {max} 個のファイルまで許可されています",
         "fileTooLarge": "ファイル \"{name}\" が大きすぎます（最大 {max}MB）",

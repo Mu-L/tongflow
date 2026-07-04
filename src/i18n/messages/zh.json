@@ -920,6 +920,7 @@
     },
     "Upload": {
         "failed": "上传失败，请稍后重试",
+        "fileFailed": "文件 \"{name}\" 上传失败：{reason}",
         "partialFailed": "部分或全部文件上传失败",
         "maxFilesExceeded": "最多允许 {max} 个文件",
         "fileTooLarge": "文件 \"{name}\" 过大（上限 {max}MB）",

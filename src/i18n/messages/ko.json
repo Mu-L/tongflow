@@ -920,6 +920,7 @@
     },
     "Upload": {
         "failed": "업로드에 실패했습니다. 나중에 다시 시도해 주세요",
+        "fileFailed": "파일 \"{name}\" 업로드에 실패했습니다: {reason}",
         "partialFailed": "일부 또는 모든 파일 업로드에 실패했습니다",
         "maxFilesExceeded": "최대 {max}개의 파일만 허용됩니다",
         "fileTooLarge": "파일 \"{name}\"이(가) 너무 큽니다(최대 {max}MB)",

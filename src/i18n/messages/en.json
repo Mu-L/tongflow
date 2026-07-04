@@ -920,6 +920,7 @@
     },
     "Upload": {
         "failed": "Upload failed, please retry later",
+        "fileFailed": "Failed to upload \"{name}\": {reason}",
         "partialFailed": "Some or all files failed to upload",
         "maxFilesExceeded": "Maximum {max} files allowed",
         "fileTooLarge": "File \"{name}\" is too large (max {max}MB)",

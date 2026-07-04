@@ -148,6 +148,16 @@ export function useMultipleUpload(options?: UseMultipleUploadOptions) {
                             `Failed to upload file ${file.name}:`,
                             err,
                         );
+                        // apiClient already toasts HTTP/network errors;
+                        // client-side validation errors would otherwise be silent
+                        if (err instanceof UploadValidationError) {
+                            showErrorToast({
+                                message: t("fileFailed", {
+                                    name: file.name,
+                                    reason: err.message,
+                                }),
+                            });
+                        }
                     }
 
                     completed++;
@@ -156,6 +166,19 @@ export function useMultipleUpload(options?: UseMultipleUploadOptions) {
                     );
                     setState((prev) => ({ ...prev, progress }));
                     options?.onProgress?.(progress);
+                }
+
+                if (results.length === 0) {
+                    // Every failed file already produced a toast above or in
+                    // apiClient, so surface the error state without re-toasting
+                    const error = new Error(t("failed"));
+                    setState((prev) => ({
+                        ...prev,
+                        isUploading: false,
+                        error,
+                    }));
+                    options?.onError?.(error);
+                    return [];
                 }
 
                 setState((prev) => ({
