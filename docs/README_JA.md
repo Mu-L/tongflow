@@ -135,10 +135,10 @@ TongFlowで生成AIを活用し、創造力を解き放とう！
 - ✅ **音楽生成**: テキストから音楽を生成。
 - ✅ **音声合成**: テキストから音声へ——プリセットスタイル、声のクローン（参照音声）、または指示駆動。
 - ✅ **音声認識**: 音声または動画中の発話を文字起こし。
-- ⬜ **ノイズ除去**: 音声のノイズを除去。
+- ✅ **ノイズ除去**: 音声のノイズを除去。
 - ⬜ **話者分離**: 話者ごとに音声を分離。
 - ⬜ **音色変換**: 参照サンプルを使って音色を置き換えまたはクローン。
-- ⬜ **マルチトラック / ボーカル・伴奏分離**
+- ✅ **マルチトラック / ボーカル・伴奏分離**
 
 ### 結合
 
@@ -193,7 +193,10 @@ TongFlowで生成AIを活用し、創造力を解き放とう！
 - [tongflow-modal-wan-animate](https://github.com/tong-io/tongflow-modal-wan-animate) — Wan-Animate キャラクター置換とモーション転送（動画 + 参照）
 - [tongflow-modal-scail2](https://github.com/tong-io/tongflow-modal-scail2) — SCAIL-2 制御可能なキャラクターアニメーション（画像 + 駆動動画；wan-animate と同じ 2 スロット）
 - [tongflow-modal-bernini](https://github.com/tong-io/tongflow-modal-bernini) — Bernini-R 1.3B 統合動画レンダラー（テキスト/画像 → 画像/動画、動画編集、字幕 / ウォーターマーク除去）
+- [tongflow-modal-sam3](https://github.com/tong-io/tongflow-modal-sam3) — SAM 3 / SAM 3.1 テキスト誘導マッティング：記述した概念の全インスタンスを画像から切り抜き（透過 PNG）、動画では全編トラッキング（グリーンバック出力）
 - [tongflow-modal-triposplat](https://github.com/tong-io/tongflow-modal-triposplat) — TripoSplat 1 枚の画像から 3D ガウシアンスプラット
+- [tongflow-modal-sam-3d-objects](https://github.com/tong-io/tongflow-modal-sam-3d-objects) — SAM 3D Objects 1 枚の画像から前景オブジェクトの 3D ガウシアンスプラットを再構築（自動マスク、オクルージョンに強い；代替）
+- [tongflow-modal-sam-3d-body](https://github.com/tong-io/tongflow-modal-sam-3d-body) — SAM 3D Body 1 枚の画像から全身 3D 人体メッシュ GLB（複数人、MHR リグ；代替）
 - [tongflow-modal-seedvr2](https://github.com/tong-io/tongflow-modal-seedvr2) — SeedVR2 画像 / 動画の超解像
 - [tongflow-modal-gemma4](https://github.com/tong-io/tongflow-modal-gemma4) — Gemma-4 マルチモーダルテキスト（画像 / 動画理解）
 - [tongflow-modal-qwen3asr](https://github.com/tong-io/tongflow-modal-qwen3asr) — Qwen3 音声認識
@@ -201,6 +204,7 @@ TongFlowで生成AIを活用し、創造力を解き放とう！
 - [tongflow-modal-whisper](https://github.com/tong-io/tongflow-modal-whisper) — Whisper 音声認識（タイムスタンプ付き、代替）
 - [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step テキストから音楽生成
 - [tongflow-modal-levo](https://github.com/tong-io/tongflow-modal-levo) — LeVo 2 / SongGeneration テキストから音楽生成（多言語・商用グレード）
+- [tongflow-modal-sam-audio](https://github.com/tong-io/tongflow-modal-sam-audio) — SAM-Audio テキスト指示による音源分離：ノイズ除去、ボーカル分離、自由記述での任意サウンド抽出（「背景のピアノ」）
 - [tongflow-modal-docling](https://github.com/tong-io/tongflow-modal-docling) — Docling ドキュメント → テキスト
 - [tongflow-modal-paddle](https://github.com/tong-io/tongflow-modal-paddle) — PaddleOCR ドキュメント → テキスト
 - [tongflow-modal-unlimited-ocr](https://github.com/tong-io/tongflow-modal-unlimited-ocr) — Unlimited-OCR 長文ドキュメント / PDF → テキスト
