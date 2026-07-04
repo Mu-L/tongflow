@@ -609,6 +609,7 @@
             "music": {
                 "handleStyle": "스타일",
                 "handleLyric": "가사",
+                "referenceAudio": "참조 오디오",
                 "inputLyrics": "가사 입력",
                 "audioDuration": "오디오 길이",
                 "currentDuration": "현재 길이:",

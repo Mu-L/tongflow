@@ -23,6 +23,7 @@ import { coerceBaseNodeData } from "@/lib/workflow/flow-node-data";
 import type { TongflowPluginNodeProps } from "@/types/tongflow-flow";
 
 import { AbiNodeShell } from "../base/abi-node-shell";
+import { MediaThumbnail } from "../base/media-thumbnail";
 
 function buildLanguageOptions(tLang: (key: string) => string) {
     return [
@@ -160,21 +161,36 @@ const TextGenMusicNode = ({ selected, data }: TextGenMusicNodeProps) => {
     const nodeId = useNodeId();
     const edges = useStore((state) => state.edges as Edge[]);
 
-    const { tagsSourceId, lyricsSourceId } = useMemo(() => {
-        if (!nodeId) return { tagsSourceId: null, lyricsSourceId: null };
+    const { tagsSourceId, lyricsSourceId, refAudioSourceId } = useMemo(() => {
+        if (!nodeId) {
+            return {
+                tagsSourceId: null,
+                lyricsSourceId: null,
+                refAudioSourceId: null,
+            };
+        }
         let tagsSrc: string | null = null;
         let lyricsSrc: string | null = null;
+        let refAudioSrc: string | null = null;
         for (const e of edges) {
             if (e.target !== nodeId) continue;
             if (e.targetHandle === "in:tags") tagsSrc = e.source;
             else if (e.targetHandle === "in:lyrics") lyricsSrc = e.source;
+            else if (e.targetHandle === "in:ref_audio") refAudioSrc = e.source;
         }
-        return { tagsSourceId: tagsSrc, lyricsSourceId: lyricsSrc };
+        return {
+            tagsSourceId: tagsSrc,
+            lyricsSourceId: lyricsSrc,
+            refAudioSourceId: refAudioSrc,
+        };
     }, [edges, nodeId]);
 
     const upstreamIds = useMemo(
-        () => [tagsSourceId, lyricsSourceId].filter((v): v is string => !!v),
-        [tagsSourceId, lyricsSourceId],
+        () =>
+            [tagsSourceId, lyricsSourceId, refAudioSourceId].filter(
+                (v): v is string => !!v,
+            ),
+        [tagsSourceId, lyricsSourceId, refAudioSourceId],
     );
     const upstreamNodes = useNodesData(upstreamIds);
 
@@ -191,6 +207,13 @@ const TextGenMusicNode = ({ selected, data }: TextGenMusicNodeProps) => {
         if (!n || n.type !== "textNode") return null;
         return coerceBaseNodeData(n.data).texts?.[0] ?? "";
     }, [lyricsSourceId, upstreamNodes]);
+
+    const refAudioKey = useMemo(() => {
+        if (!refAudioSourceId) return undefined;
+        const n = upstreamNodes.find((u) => u.id === refAudioSourceId);
+        if (!n || n.type !== "audioNode") return undefined;
+        return coerceBaseNodeData(n.data).fileKeys?.[0];
+    }, [refAudioSourceId, upstreamNodes]);
 
     const tagsLocal = (form.state.tags as string | undefined) ?? "";
     const lyricsLocal = (form.state.lyrics as string | undefined) ?? "";
@@ -426,6 +449,19 @@ const TextGenMusicNode = ({ selected, data }: TextGenMusicNodeProps) => {
                         </div>
                     </div>
                 </Card>
+
+                {refAudioKey && (
+                    <Card className="p-3">
+                        <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                            {t("music.referenceAudio")}
+                        </Label>
+                        <MediaThumbnail
+                            fileKey={refAudioKey}
+                            label={t("music.referenceAudio")}
+                            type="audio"
+                        />
+                    </Card>
+                )}
             </div>
 
             {tagsExpanded && (

@@ -13,6 +13,7 @@ class GenMusicInput(BaseModel):
     keyscale: str | None = None
     language: str | None = None
     lyrics: str | None = None
+    ref_audio: Asset | None = None
     seed: int | None = None
     songTitle: str | None = None
     tags: str | None = None

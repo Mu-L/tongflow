@@ -609,6 +609,7 @@
             "music": {
                 "handleStyle": "Style",
                 "handleLyric": "Lyrics",
+                "referenceAudio": "Reference audio",
                 "inputLyrics": "Input Lyrics",
                 "audioDuration": "Audio Duration",
                 "currentDuration": "Current Duration:",

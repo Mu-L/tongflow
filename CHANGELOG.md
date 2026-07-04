@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Reference audio for music generation** — the music node (`gen-music`)
+  gains an optional `ref_audio` input handle: connect an audio node to
+  condition the song on a reference track. ACE-Step uses it for
+  style-transfer conditioning (`reference_audio`); LeVo uses it as the
+  melody prompt (`melody_wavs`, first 10 s). Requires `tongflow==0.2.1`
+  (published) and redeployed `tongflow-modal-ace-step` /
+  `tongflow-modal-levo` plugins.
+
 ## [0.1.12] - 2026-07-04
 
 ### Added
