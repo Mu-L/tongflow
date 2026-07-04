@@ -357,6 +357,7 @@
                         "video-upscale": "视频超分",
                         "image-describe": "图像理解",
                         "video-describe": "视频理解",
+                        "audio-describe": "音频理解",
                         "audio-image-gen-video": "语音+图生视频",
                         "speech-text-gen-video": "语音+文生视频",
                         "video-image-gen-video-mix": "视频+图混合",
@@ -437,6 +438,7 @@
                 "removeWatermark": "去除水印",
                 "separateAudio": "音视频分离",
                 "imageGenText": "反推描述",
+                "audioDescribe": "音频理解",
                 "imageGenImage": "图片编辑",
                 "videoEdit": "视频编辑",
                 "imageGenModel": "图片生成3D模型",
@@ -492,6 +494,7 @@
                 "compressVideo": "压缩视频",
                 "extractAudio": "开始分离",
                 "describeImage": "描述图片",
+                "describeAudio": "描述音频",
                 "editImage": "编辑图片",
                 "editVideo": "编辑视频",
                 "generate3DModel": "生成3D模型",
@@ -740,6 +743,10 @@
             "imageGenText": {
                 "promptLabel": "自定义提示词",
                 "promptPlaceholder": "留空使用默认提示词，或输入自定义指令，例如：只描述画面主体、风格、文字内容..."
+            },
+            "audioDescribe": {
+                "promptLabel": "自定义提示词",
+                "promptPlaceholder": "留空使用默认提示词，或输入自定义指令，例如：描述这段音频的曲风、情绪、乐器或人声…"
             },
             "textGenText": {
                 "instructions": "指令"

@@ -46,6 +46,7 @@ class NodeSlots:
     VIDEO_EDIT: Final[str] = 'video-edit'
     IMAGE_DESCRIBE: Final[str] = 'image-describe'
     VIDEO_DESCRIBE: Final[str] = 'video-describe'
+    AUDIO_DESCRIBE: Final[str] = 'audio-describe'
     AUDIO_IMAGE_GEN_VIDEO: Final[str] = 'audio-image-gen-video'
     SPEECH_TEXT_GEN_VIDEO: Final[str] = 'speech-text-gen-video'
     VIDEO_IMAGE_GEN_VIDEO_MIX: Final[str] = 'video-image-gen-video-mix'
@@ -97,6 +98,7 @@ ALL_NODE_SLOTS: Final[tuple[str, ...]] = (
     'video-edit',
     'image-describe',
     'video-describe',
+    'audio-describe',
     'audio-image-gen-video',
     'speech-text-gen-video',
     'video-image-gen-video-mix',
