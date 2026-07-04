@@ -844,6 +844,9 @@
                     },
                     "seed": {
                         "type": "integer"
+                    },
+                    "ref_audio": {
+                        "$ref": "#/$defs/Asset"
                     }
                 },
                 "additionalProperties": false

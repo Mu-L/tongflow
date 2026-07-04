@@ -1211,6 +1211,23 @@ const _slot_gen_music_inputs = {
         seed: {
             type: "integer",
         },
+        ref_audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
     },
     additionalProperties: false,
 } as const;
@@ -4262,6 +4279,9 @@ export const ABI_NODES = {
                 },
                 seed: {
                     type: "integer",
+                },
+                ref_audio: {
+                    $ref: "#/$defs/Asset",
                 },
             },
             additionalProperties: false,
