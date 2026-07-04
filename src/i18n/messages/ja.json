@@ -609,6 +609,7 @@
             "music": {
                 "handleStyle": "スタイル",
                 "handleLyric": "歌詞",
+                "referenceAudio": "参照音声",
                 "inputLyrics": "歌詞を入力",
                 "fromUpstreamReadonly": "上流から（読み取り専用）",
                 "lyricsPlaceholder": "歌詞入力未接続時に入力",

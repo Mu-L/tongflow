@@ -609,6 +609,7 @@
             "music": {
                 "handleStyle": "曲风",
                 "handleLyric": "歌词",
+                "referenceAudio": "参考音频",
                 "inputLyrics": "输入歌词",
                 "audioDuration": "音频时长",
                 "currentDuration": "当前时长:",
