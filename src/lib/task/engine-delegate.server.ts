@@ -12,7 +12,8 @@ import { getDb, tasks } from "@/db";
 import { logger } from "@/lib/logger";
 import { resolveBasePython } from "@/lib/plugins/plugin-python-env.server";
 import { PYTHON_UTF8_ENV, resolvePythonLite } from "@/lib/plugins/python-lite";
-import { dataDir, pluginsDir, resourcesDir } from "@/lib/runtime/paths.server";
+import { pluginsDir, resourcesDir } from "@/lib/runtime/paths.server";
+import { getScope, scopedDataDirFor } from "@/lib/runtime/scope.server";
 import { withStoredEnv } from "@/lib/settings/env-store.server";
 import {
     type SerializedWorkflowFailure,
@@ -125,7 +126,9 @@ export async function executeWorkflowViaEngine(
 
         const python = resolveBasePython() ?? (await resolvePythonLite());
         const sdkDir = join(resourcesDir(), "sdk");
-        const uploadsBase = join(dataDir(), "uploads");
+        const scope = await getScope();
+        const dataRoot = scopedDataDirFor(scope);
+        const uploadsBase = join(dataRoot, "uploads");
         const outDir = join(uploadsBase, "tasks", taskId);
 
         const request = {
@@ -135,7 +138,7 @@ export async function executeWorkflowViaEngine(
                 // abi_path omitted on purpose: the engine falls back to the ABI
                 // bundled in the SDK, which always exists in the resources dir.
                 plugins_dir: pluginsDir(),
-                data_dir: dataDir(),
+                data_dir: dataRoot,
                 out_dir: outDir,
                 file_key_base: uploadsBase,
                 // Disk outputs: the canvas reads results via /api/uploads/<file_key>.
@@ -145,11 +148,19 @@ export async function executeWorkflowViaEngine(
             },
         };
 
-        const env = withStoredEnv({
+        // In a scoped (cloud) run, point the Modal deploy cache into the
+        // user's data dir so needsDeploy plugins deploy into that user's own
+        // account.
+        const env = await withStoredEnv({
             ...PYTHON_UTF8_ENV,
             PYTHONPATH: [sdkDir, process.env.PYTHONPATH?.trim()]
                 .filter((x): x is string => Boolean(x))
                 .join(delimiter),
+            ...(scope
+                ? {
+                      TONGFLOW_MODAL_CACHE_DIR: join(dataRoot, "modal-cache"),
+                  }
+                : {}),
         });
 
         await new Promise<void>((resolve, reject) => {

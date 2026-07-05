@@ -1,14 +1,11 @@
 /**
  * GET /api/uploads/[...path]
- * Serve uploaded files from local storage.
+ * Serve uploaded files via the storage driver (local disk by default).
  */
 
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { type NextRequest, NextResponse } from "next/server";
-import { dataDir } from "@/lib/runtime/paths.server";
-
-const UPLOAD_DIR = path.join(dataDir(), "uploads");
+import { getStorage } from "@/lib/file/storage.server";
 
 const MIME_TYPES: Record<string, string> = {
     ".jpg": "image/jpeg",
@@ -39,18 +36,10 @@ export async function GET(
 ) {
     try {
         const { path: pathSegments } = await params;
-        const filePath = path.join(UPLOAD_DIR, ...pathSegments);
+        const fileKey = pathSegments.join("/");
 
-        // Prevent directory traversal
-        if (!filePath.startsWith(UPLOAD_DIR)) {
-            return NextResponse.json(
-                { error: "Invalid path" },
-                { status: 400 },
-            );
-        }
-
-        const buffer = await readFile(filePath);
-        const ext = path.extname(filePath).toLowerCase();
+        const buffer = await getStorage().readFile(fileKey);
+        const ext = path.extname(fileKey).toLowerCase();
         const contentType = MIME_TYPES[ext] || "application/octet-stream";
 
         return new NextResponse(new Uint8Array(buffer), {
