@@ -626,6 +626,15 @@ export function useNodeActions(args: UseNodeActionsArgs): UseNodeActionsResult {
                                         { type: "textGenVideoNode", data },
                                     ]),
                             },
+                            {
+                                text: t("musicBrief"),
+                                id: "music-brief",
+                                nodeType: "musicBriefNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "musicBriefNode", data },
+                                    ]),
+                            },
                         ]}
                     />
                 );
@@ -723,6 +732,51 @@ export function useNodeActions(args: UseNodeActionsArgs): UseNodeActionsResult {
                                 onClick: () =>
                                     expands(id, [
                                         { type: "convertVoiceNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("repaintMusic"),
+                                id: "repaint-music",
+                                nodeType: "musicRepaintNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "musicRepaintNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("coverMusic"),
+                                id: "cover-music",
+                                nodeType: "musicCoverNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "musicCoverNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("extractStem"),
+                                id: "extract-stem",
+                                nodeType: "musicExtractNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "musicExtractNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("addTrack"),
+                                id: "add-track",
+                                nodeType: "musicLegoNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "musicLegoNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("completeMusic"),
+                                id: "complete-music",
+                                nodeType: "musicCompleteNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "musicCompleteNode", data },
                                     ]),
                             },
                             ...audioGroupButtons,

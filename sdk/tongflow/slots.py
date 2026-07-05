@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import contextvars
 import functools
 import inspect
 import types
@@ -31,6 +32,20 @@ from typing import Any, TypeVar, cast
 from pydantic import BaseModel
 
 F = TypeVar("F", bound=Callable[..., object])
+
+# Per-request model selection (router-style plugins). The platform's envelope
+# carries `model` top-level; bridges that forward it to a remote backend tuck
+# it into the prompt dict under this reserved key, and the @node_slot wrapper
+# pops it back out before constructing the typed input.
+MODEL_KEY = "_model"
+_current_model: contextvars.ContextVar[str | None] = contextvars.ContextVar(
+    "tongflow_current_model", default=None
+)
+
+
+def current_model() -> str | None:
+    """The model chosen on the node for this request, or None for default."""
+    return _current_model.get()
 
 
 def _basemodel_from_annotation(ann: object) -> type[BaseModel] | None:
@@ -150,8 +165,12 @@ def node_slot(*slots: str) -> Callable[[F], F]:
         is_method = _is_method(fn)
 
         def _marshal(input: Any) -> Any:
-            if input_cls is not None and isinstance(input, dict):
-                return _deep_construct(input_cls, input)
+            if isinstance(input, dict):
+                # Reserved routing key, never an ABI field: reset per call so a
+                # previous request's selection can't leak into this one.
+                _current_model.set(input.pop(MODEL_KEY, None))
+                if input_cls is not None:
+                    return _deep_construct(input_cls, input)
             return input
 
         def _finalize(result: Any) -> Any:
