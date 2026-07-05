@@ -15,14 +15,14 @@ import { getStorage } from "@/lib/file/storage.server";
 import { runWithScope } from "@/lib/runtime/scope.server";
 import { bindingForEngineAssetToken } from "@/lib/task/engine-asset-tokens.server";
 
-function bindingFrom(request: NextRequest) {
+async function bindingFrom(request: NextRequest) {
     const header = request.headers.get("authorization") ?? "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : "";
-    return token ? bindingForEngineAssetToken(token) : null;
+    return token ? await bindingForEngineAssetToken(token) : null;
 }
 
 export async function GET(request: NextRequest) {
-    const binding = bindingFrom(request);
+    const binding = await bindingFrom(request);
     if (!binding) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-    const binding = bindingFrom(request);
+    const binding = await bindingFrom(request);
     if (!binding) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

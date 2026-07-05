@@ -1,9 +1,7 @@
 import "server-only";
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import path from "node:path";
 import { decodeEnvStore, encodeEnvStore } from "@ext/settings-codec";
-import { scopedDataDir } from "@/lib/runtime/scope.server";
+import { readSettingsBlob, writeSettingsBlob } from "@ext/settings-store";
 
 /**
  * Generic, platform-agnostic environment store.
@@ -14,21 +12,18 @@ import { scopedDataDir } from "@/lib/runtime/scope.server";
  * environment of spawned plugin processes at execution time, so edits take
  * effect without restarting the server.
  *
- * The file lives in the scoped data dir (per-user in a cloud shell) and its
- * raw contents pass through the `@ext/settings-codec` hooks — identity by
- * default, encryption in a cloud shell.
+ * Two seams compose here: `@ext/settings-store` persists the raw blob
+ * (default: settings.json in the scoped data dir) and `@ext/settings-codec`
+ * encodes/decodes it (default: identity; a cloud shell encrypts BYOK keys).
  */
 
 export type EnvStore = Record<string, string>;
 
-async function storeFile(): Promise<string> {
-    return path.join(await scopedDataDir(), "settings.json");
-}
-
 /** Read the stored env map. Returns `{}` when absent or unreadable. */
 export async function loadEnvStore(): Promise<EnvStore> {
     try {
-        const raw = readFileSync(await storeFile(), "utf8");
+        const raw = await readSettingsBlob();
+        if (raw == null) return {};
         const parsed = JSON.parse(await decodeEnvStore(raw)) as unknown;
         if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
             return {};
@@ -49,15 +44,13 @@ export async function loadEnvStore(): Promise<EnvStore> {
 
 /** Persist the env map, overwriting the previous contents. */
 export async function saveEnvStore(env: EnvStore): Promise<void> {
-    const dir = await scopedDataDir();
-    mkdirSync(dir, { recursive: true });
     const clean: EnvStore = {};
     for (const [k, v] of Object.entries(env)) {
         const key = k.trim();
         if (key && typeof v === "string") clean[key] = v;
     }
     const encoded = await encodeEnvStore(JSON.stringify(clean, null, 2));
-    writeFileSync(path.join(dir, "settings.json"), encoded, "utf8");
+    await writeSettingsBlob(encoded);
 }
 
 /**
