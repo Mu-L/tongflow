@@ -140,7 +140,7 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 - ✅ **音乐企划**: 一句话灵感 → 歌词、风格标签、BPM、调式、时长。
 - ✅ **语音合成**: 文字转语音——预设风格、声音克隆（参考音频）或指令驱动。
 - ✅ **语音识别**: 转录音频或视频中的语音。
-- ⬜ **降噪**: 对音频降噪处理。
+- ✅ **降噪**: 对音频降噪处理。
 - ⬜ **说话人分离**: 按说话人分离音频。
 - ⬜ **音色转换**: 使用参考样本替换或克隆音色。
 - ✅ **多轨 / 人声伴奏分离**: 分离人声、鼓、贝斯、吉他等 12 种乐轨。
@@ -198,7 +198,10 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 - [tongflow-modal-wan-animate](https://github.com/tong-io/tongflow-modal-wan-animate) — Wan-Animate 换角色与动作迁移（视频 + 参考）
 - [tongflow-modal-scail2](https://github.com/tong-io/tongflow-modal-scail2) — SCAIL-2 可控角色动画（角色图 + 驱动视频；与 wan-animate 相同的两个槽位）
 - [tongflow-modal-bernini](https://github.com/tong-io/tongflow-modal-bernini) — Bernini-R 1.3B 统一视频渲染器（文/图 → 图/视频、视频编辑、去字幕 / 去水印）
+- [tongflow-modal-sam3](https://github.com/tong-io/tongflow-modal-sam3) — SAM 3 / SAM 3.1 文本引导抠像：按描述抠出图像中某概念的全部实例（透明 PNG），或在视频中全程跟踪（绿幕输出）
 - [tongflow-modal-triposplat](https://github.com/tong-io/tongflow-modal-triposplat) — TripoSplat 单图生成 3D 高斯泼溅
+- [tongflow-modal-sam-3d-objects](https://github.com/tong-io/tongflow-modal-sam-3d-objects) — SAM 3D Objects 单图重建前景物体 3D 高斯泼溅（自动抠前景，抗遮挡；备选）
+- [tongflow-modal-sam-3d-body](https://github.com/tong-io/tongflow-modal-sam-3d-body) — SAM 3D Body 单图重建全身人体 3D 网格 GLB（多人、MHR 骨骼；备选）
 - [tongflow-modal-seedvr2](https://github.com/tong-io/tongflow-modal-seedvr2) — SeedVR2 图像 / 视频超分辨率
 - [tongflow-modal-gemma4](https://github.com/tong-io/tongflow-modal-gemma4) — Gemma-4 多模态文本（图像 / 视频理解）
 - [tongflow-modal-qwen3asr](https://github.com/tong-io/tongflow-modal-qwen3asr) — Qwen3 语音识别
@@ -206,6 +209,7 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 - [tongflow-modal-whisper](https://github.com/tong-io/tongflow-modal-whisper) — Whisper 语音识别（带时间戳，备选）
 - [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step 1.5 音乐全家桶：文本生音乐（sft / base / turbo 可选）、重绘、翻唱、分轨提取、加轨、补全编曲、音乐企划与音乐理解
 - [tongflow-modal-levo](https://github.com/tong-io/tongflow-modal-levo) — LeVo 2 / SongGeneration 文本生音乐（多语言、商用级）
+- [tongflow-modal-sam-audio](https://github.com/tong-io/tongflow-modal-sam-audio) — SAM-Audio 文本提示声音分离：降噪、人声分离、按自由描述提取任意声音（“背景里的钢琴”）
 - [tongflow-modal-docling](https://github.com/tong-io/tongflow-modal-docling) — Docling 文档 → 文本
 - [tongflow-modal-paddle](https://github.com/tong-io/tongflow-modal-paddle) — PaddleOCR 文档 → 文本
 - [tongflow-modal-unlimited-ocr](https://github.com/tong-io/tongflow-modal-unlimited-ocr) — Unlimited-OCR 长文档 / PDF → 文本
