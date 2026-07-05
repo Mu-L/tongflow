@@ -237,7 +237,11 @@ export function WorkspaceNav() {
     return (
         <div className="flex items-center gap-2">
             <UpdateButton className={navBtnClass} />
-            <PluginsDialog />
+            {/* Managed platforms (cloud) provision plugins themselves —
+                hide the install entry there. Inlined at build time. */}
+            {process.env.NEXT_PUBLIC_MANAGED_PLUGINS !== "1" && (
+                <PluginsDialog />
+            )}
             <SettingsDialog />
             <ThemeToggleButton />
             <LocaleMenu />
