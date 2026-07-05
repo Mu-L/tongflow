@@ -72,13 +72,18 @@ const localDriver: StorageDriver = {
     },
 };
 
-let driver: StorageDriver = localDriver;
+// The registry lives on globalThis: instrumentation.ts (where shells
+// register their driver) is compiled as a separate bundle from route
+// handlers, so a module-level variable would not be shared between them.
+const DRIVER_KEY = Symbol.for("tongflow.storage.driver");
+
+type DriverGlobal = { [DRIVER_KEY]?: StorageDriver };
 
 /** Replace the storage backend (cloud shells call this at startup). */
 export function registerStorageDriver(next: StorageDriver): void {
-    driver = next;
+    (globalThis as DriverGlobal)[DRIVER_KEY] = next;
 }
 
 export function getStorage(): StorageDriver {
-    return driver;
+    return (globalThis as DriverGlobal)[DRIVER_KEY] ?? localDriver;
 }
