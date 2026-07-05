@@ -61,3 +61,10 @@ __pycache__/
 /src/app/(ext)/
 /src/middleware.ts
 /src/instrumentation.ts
+
+# Cloud shell build artifacts for serverless targets (linked in at build
+# time, like src/ext/ above)
+/wrangler.jsonc
+/open-next.config.ts
+/worker-entry.ts
+/.open-next/

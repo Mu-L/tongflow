@@ -20,6 +20,7 @@ export interface TaskEvent {
 
 export {
     abortTask,
+    directStreamUrl,
     emitTaskEvent,
     isTaskRunning,
     notifyTask,

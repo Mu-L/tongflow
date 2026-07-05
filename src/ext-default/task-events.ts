@@ -71,6 +71,17 @@ export function runningTaskCount(): number {
 }
 
 /**
+ * Optional direct SSE stream for a task. The default backend has none
+ * (events stream in-process through the SSE route); a cloud shell can
+ * return an absolute URL of an external event stream (e.g. a remote
+ * executor's SSE endpoint) and the SSE route will 302 the browser to it —
+ * progress then flows executor -> browser directly.
+ */
+export async function directStreamUrl(_taskId: string): Promise<string | null> {
+    return null;
+}
+
+/**
  * Convenience function for sending task notifications (replaces the Python notifyTask)
  */
 export function notifyTask(

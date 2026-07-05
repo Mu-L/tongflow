@@ -4,7 +4,12 @@ import { isTerminalStatus } from "@/constants/task-status";
 import { jsonStringifyForSse } from "@/lib/json-sse";
 import { logger } from "@/lib/logger";
 import { getScope, runWithScope } from "@/lib/runtime/scope.server";
-import { isTaskRunning, onTaskEvent, type TaskEvent } from "@/lib/task/emitter";
+import {
+    directStreamUrl,
+    isTaskRunning,
+    onTaskEvent,
+    type TaskEvent,
+} from "@/lib/task/emitter";
 
 /**
  * GET /api/task/wait?taskId=xxx&reconnect=false
@@ -30,11 +35,24 @@ export async function GET(request: NextRequest) {
         });
     }
 
-    const encoder = new TextEncoder();
-
     // Resolve the tenant scope while the request context is still available;
     // the execution below outlives it, so pin the scope via ALS.
     const scope = await getScope();
+
+    // Direct stream mode (remote executors): kick off execution, then 302
+    // the EventSource to the external SSE endpoint — progress flows from
+    // the executor to the browser without passing through this server.
+    const direct = await directStreamUrl(taskId);
+    if (direct) {
+        if (!reconnect) {
+            runWithScope(scope, () => dispatchTask(taskId)).catch((error) => {
+                logger.error(`[SSE] Failed to start task ${taskId}:`, error);
+            });
+        }
+        return Response.redirect(direct, 302);
+    }
+
+    const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
         start(controller) {
