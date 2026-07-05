@@ -26,14 +26,16 @@ const SeparateAudioTrackNode = ({
             if (task?.status === "COMPLETED") {
                 const audioKeys = task?.data?.uploadedFiles as string[];
                 if (audioKeys && audioKeys.length > 0) {
+                    // Legacy stem uploads embed "_vocals" in the file key;
+                    // plugins that return a single AudioRef use opaque keys,
+                    // so fall back to every audio output in that case.
                     const vocals = audioKeys.filter((fileKey) =>
                         fileKey.includes("_vocals"),
                     );
-                    if (vocals.length > 0) {
-                        expands("", [
-                            { type: "audioNode", data: { fileKeys: vocals } },
-                        ]);
-                    }
+                    const keys = vocals.length > 0 ? vocals : audioKeys;
+                    expands("", [
+                        { type: "audioNode", data: { fileKeys: keys } },
+                    ]);
                 }
                 return true;
             }
