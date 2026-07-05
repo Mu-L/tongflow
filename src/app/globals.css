@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Cloud shell sources: these dirs are gitignored (linked in at build
+   time), so Tailwind's automatic source detection skips them — declare
+   them explicitly or shell-only utility classes are never generated. */
+@source "../ext";
+@source "./(ext)";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
