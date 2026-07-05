@@ -19,7 +19,8 @@
             }
         ],
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@ext/*": ["./src/ext/*", "./src/ext-default/*"]
         }
     },
     "include": [

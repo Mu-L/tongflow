@@ -16,7 +16,7 @@ export const runtime = "nodejs";
  */
 export async function GET() {
     return NextResponse.json(
-        { env: loadEnvStore(), pluginEnv: loadPluginEnvDecls() },
+        { env: await loadEnvStore(), pluginEnv: loadPluginEnvDecls() },
         { headers: { "Cache-Control": "no-store" } },
     );
 }
@@ -51,6 +51,6 @@ export async function PUT(request: NextRequest) {
         if (typeof v === "string") env[k] = v;
     }
 
-    saveEnvStore(env);
-    return NextResponse.json({ env: loadEnvStore() });
+    await saveEnvStore(env);
+    return NextResponse.json({ env: await loadEnvStore() });
 }

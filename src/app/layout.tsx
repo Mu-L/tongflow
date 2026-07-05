@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ExtSlot from "@ext/ui-slot";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "react-hot-toast";
@@ -64,6 +65,7 @@ export default async function RootLayout({
                     </ErrorBoundary>
                     <Toaster position="top-center" />
                     <TaskFailureToaster />
+                    <ExtSlot />
                 </NextIntlClientProvider>
             </body>
         </html>

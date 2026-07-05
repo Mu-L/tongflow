@@ -71,7 +71,9 @@
             "processing": "Processing",
             "failed": "Failed",
             "pending": "Pending"
-        }
+        },
+        "wechatGroup": "WeChat community group",
+        "wechatGroupHint": "Scan the QR code with WeChat to join the community group"
     },
     "Workspace": {
         "edges": {

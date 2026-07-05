@@ -1,8 +1,7 @@
 import "server-only";
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import path from "node:path";
-import { dataDir } from "@/lib/runtime/paths.server";
+import { decodeEnvStore, encodeEnvStore } from "@ext/settings-codec";
+import { readSettingsBlob, writeSettingsBlob } from "@ext/settings-store";
 
 /**
  * Generic, platform-agnostic environment store.
@@ -12,19 +11,20 @@ import { dataDir } from "@/lib/runtime/paths.server";
  * keys it needs in its own README. The stored values are merged into the
  * environment of spawned plugin processes at execution time, so edits take
  * effect without restarting the server.
+ *
+ * Two seams compose here: `@ext/settings-store` persists the raw blob
+ * (default: settings.json in the scoped data dir) and `@ext/settings-codec`
+ * encodes/decodes it (default: identity; a cloud shell encrypts BYOK keys).
  */
 
 export type EnvStore = Record<string, string>;
 
-function storeFile(): string {
-    return path.join(dataDir(), "settings.json");
-}
-
 /** Read the stored env map. Returns `{}` when absent or unreadable. */
-export function loadEnvStore(): EnvStore {
+export async function loadEnvStore(): Promise<EnvStore> {
     try {
-        const raw = readFileSync(storeFile(), "utf8");
-        const parsed = JSON.parse(raw) as unknown;
+        const raw = await readSettingsBlob();
+        if (raw == null) return {};
+        const parsed = JSON.parse(await decodeEnvStore(raw)) as unknown;
         if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
             return {};
         }
@@ -43,27 +43,26 @@ export function loadEnvStore(): EnvStore {
 }
 
 /** Persist the env map, overwriting the previous contents. */
-export function saveEnvStore(env: EnvStore): void {
-    const dir = dataDir();
-    mkdirSync(dir, { recursive: true });
+export async function saveEnvStore(env: EnvStore): Promise<void> {
     const clean: EnvStore = {};
     for (const [k, v] of Object.entries(env)) {
         const key = k.trim();
         if (key && typeof v === "string") clean[key] = v;
     }
-    writeFileSync(storeFile(), JSON.stringify(clean, null, 2), "utf8");
+    const encoded = await encodeEnvStore(JSON.stringify(clean, null, 2));
+    await writeSettingsBlob(encoded);
 }
 
 /**
  * Build a spawn environment: the stored values override the process env so the
  * UI is the source of truth, while still inheriting PATH and other essentials.
  */
-export function withStoredEnv(
+export async function withStoredEnv(
     extra?: Record<string, string | undefined>,
-): NodeJS.ProcessEnv {
+): Promise<NodeJS.ProcessEnv> {
     return {
         ...process.env,
-        ...loadEnvStore(),
+        ...(await loadEnvStore()),
         ...extra,
     };
 }

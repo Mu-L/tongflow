@@ -71,7 +71,9 @@
             "processing": "処理中",
             "failed": "失敗",
             "pending": "待機中"
-        }
+        },
+        "wechatGroup": "WeChatグループ",
+        "wechatGroupHint": "WeChatでQRコードをスキャンして参加"
     },
     "Workspace": {
         "edges": {
