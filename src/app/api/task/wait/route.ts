@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { isTerminalStatus } from "@/constants/task-status";
 import { jsonStringifyForSse } from "@/lib/json-sse";
 import { logger } from "@/lib/logger";
+import { getScope, runWithScope } from "@/lib/runtime/scope.server";
 import { isTaskRunning, onTaskEvent, type TaskEvent } from "@/lib/task/emitter";
 import { dispatchTask } from "@/lib/task/runner";
 
@@ -30,6 +31,10 @@ export async function GET(request: NextRequest) {
     }
 
     const encoder = new TextEncoder();
+
+    // Resolve the tenant scope while the request context is still available;
+    // the execution below outlives it, so pin the scope via ALS.
+    const scope = await getScope();
 
     const stream = new ReadableStream({
         start(controller) {
@@ -85,30 +90,32 @@ export async function GET(request: NextRequest) {
 
             // Non-reconnect mode: start task execution
             if (!reconnect) {
-                dispatchTask(taskId).catch((error) => {
-                    logger.error(
-                        `[SSE] Failed to start task ${taskId}:`,
-                        error,
-                    );
-                    if (!closed) {
-                        try {
-                            const errEvent = jsonStringifyForSse({
-                                id: taskId,
-                                status: "FAILED",
-                                data: {
-                                    message: "Task failed to start",
-                                    error: String(error),
-                                },
-                            });
-                            controller.enqueue(
-                                encoder.encode(`data: ${errEvent}\n\n`),
-                            );
-                        } catch {
-                            // ignore
+                runWithScope(scope, () => dispatchTask(taskId)).catch(
+                    (error) => {
+                        logger.error(
+                            `[SSE] Failed to start task ${taskId}:`,
+                            error,
+                        );
+                        if (!closed) {
+                            try {
+                                const errEvent = jsonStringifyForSse({
+                                    id: taskId,
+                                    status: "FAILED",
+                                    data: {
+                                        message: "Task failed to start",
+                                        error: String(error),
+                                    },
+                                });
+                                controller.enqueue(
+                                    encoder.encode(`data: ${errEvent}\n\n`),
+                                );
+                            } catch {
+                                // ignore
+                            }
+                            close();
                         }
-                        close();
-                    }
-                });
+                    },
+                );
             }
         },
     });

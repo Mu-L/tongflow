@@ -7,6 +7,11 @@
   are written to ``out_dir`` and the ``file_key`` is a path (relative to
   ``file_key_base`` when set, else absolute), matching the server's
   ``saveFile`` contract so the canvas can read them via ``/api/uploads``.
+- :class:`HttpStore` (``asset_endpoint`` option): the embedding host owns
+  file storage (e.g. a cloud backend writing to object storage). ``put``
+  POSTs raw bytes over loopback HTTP and gets back the host-assigned
+  ``file_key``; ``get`` fetches bytes for any ``file_key`` the host knows.
+  The engine never sees storage credentials.
 
 ``get`` returns the bytes for a key the store owns, else ``None`` (so the
 filesystem/URL resolver in :mod:`assets` handles plain file_keys / URLs).
@@ -14,7 +19,11 @@ filesystem/URL resolver in :mod:`assets` handles plain file_keys / URLs).
 
 from __future__ import annotations
 
+import json
 import os
+import urllib.error
+import urllib.parse
+import urllib.request
 import uuid
 from pathlib import Path
 from typing import Optional, Protocol
@@ -94,3 +103,76 @@ class DiskStore:
     def get(self, file_key: str) -> Optional[bytes]:
         # Disk file_keys are resolved by the filesystem/URL resolver in assets.
         return None
+
+
+class HttpStore:
+    """Host-managed asset store over (loopback) HTTP.
+
+    The host exposes a single endpoint:
+
+    - ``POST <endpoint>?ext=..&mime=..&filename=..`` with raw bytes as the
+      body -> ``{"file_key": "..."}``
+    - ``GET <endpoint>?file_key=..`` -> raw bytes (404 when unknown)
+
+    Authentication is a Bearer token minted by the host per engine run.
+    """
+
+    # Refs the host sink cannot serve; skip the round trip and let the
+    # URL/data resolver in assets handle them.
+    _SKIP_PREFIXES = ("http://", "https://", "data:", "mem://")
+
+    def __init__(self, endpoint: str, token: Optional[str] = None) -> None:
+        self.endpoint = endpoint
+        self.token = token
+
+    def _headers(self) -> dict[str, str]:
+        return {"Authorization": f"Bearer {self.token}"} if self.token else {}
+
+    def put(
+        self,
+        data: bytes,
+        *,
+        mime: Optional[str] = None,
+        filename: Optional[str] = None,
+        ext: str = "bin",
+    ) -> dict[str, str]:
+        params = {"ext": ext.lstrip(".") or "bin"}
+        if mime:
+            params["mime"] = mime
+        if filename:
+            params["filename"] = filename
+        req = urllib.request.Request(
+            f"{self.endpoint}?{urllib.parse.urlencode(params)}",
+            data=bytes(data),
+            method="POST",
+            headers={
+                "Content-Type": "application/octet-stream",
+                **self._headers(),
+            },
+        )
+        with urllib.request.urlopen(req) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+        file_key = payload.get("file_key")
+        if not isinstance(file_key, str) or not file_key:
+            raise RuntimeError("asset endpoint returned no file_key")
+        out: dict[str, str] = {"file_key": file_key}
+        if mime:
+            out["mime"] = mime
+        if filename:
+            out["filename"] = filename
+        return out
+
+    def get(self, file_key: str) -> Optional[bytes]:
+        if file_key.startswith(self._SKIP_PREFIXES):
+            return None
+        req = urllib.request.Request(
+            f"{self.endpoint}?{urllib.parse.urlencode({'file_key': file_key})}",
+            headers=self._headers(),
+        )
+        try:
+            with urllib.request.urlopen(req) as resp:
+                return resp.read()
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return None
+            raise

@@ -1,17 +1,13 @@
 /**
  * POST /api/upload
- * Local file upload endpoint.
- * Saves files to data/uploads/ directory.
+ * File upload endpoint. Persists via the storage driver (local disk by
+ * default, under the scoped uploads directory).
  */
 
-import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { nanoid } from "nanoid";
 import { type NextRequest, NextResponse } from "next/server";
+import { getStorage } from "@/lib/file/storage.server";
 import { logger } from "@/lib/logger";
-import { dataDir } from "@/lib/runtime/paths.server";
-
-const UPLOAD_DIR = path.join(dataDir(), "uploads");
 
 export async function POST(request: NextRequest) {
     try {
@@ -25,17 +21,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Generate unique file key
-        const ext = path.extname(file.name) || "";
-        const fileKey = `${nanoid()}${ext}`;
-
-        // Ensure upload directory exists
-        await mkdir(UPLOAD_DIR, { recursive: true });
-
-        // Write file to disk
-        const filePath = path.join(UPLOAD_DIR, fileKey);
+        const ext = path.extname(file.name).replace(/^\./, "");
         const buffer = Buffer.from(await file.arrayBuffer());
-        await writeFile(filePath, buffer);
+        const fileKey = await getStorage().saveFile(buffer, ext);
 
         const url = `/api/uploads/${fileKey}`;
 

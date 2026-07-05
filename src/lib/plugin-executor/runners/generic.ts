@@ -8,6 +8,7 @@ import { ensurePluginPython } from "@/lib/plugins/plugin-python-env.server";
 import { getPluginConfig } from "@/lib/plugins/plugins-registry.server";
 import { PYTHON_UTF8_ENV } from "@/lib/plugins/python-lite";
 import { pluginsDir, resourcesDir } from "@/lib/runtime/paths.server";
+import { getScope, scopedDataDirFor } from "@/lib/runtime/scope.server";
 import { withStoredEnv } from "@/lib/settings/env-store.server";
 import { notifyTask } from "@/lib/task/emitter";
 import { parseProgressLine } from "../progress-protocol";
@@ -55,9 +56,20 @@ export async function execPlugin<S extends NodeSlot>(
         tongflowSdkDir,
         process.env.PYTHONPATH?.trim(),
     ].filter((x): x is string => Boolean(x));
-    const pythonEnv = withStoredEnv({
+    // In a scoped (cloud) run, point the Modal deploy cache into the user's
+    // data dir so needsDeploy plugins deploy into that user's own account.
+    const scope = await getScope();
+    const pythonEnv = await withStoredEnv({
         ...PYTHON_UTF8_ENV,
         PYTHONPATH: pythonPathParts.join(delimiter),
+        ...(scope
+            ? {
+                  TONGFLOW_MODAL_CACHE_DIR: join(
+                      scopedDataDirFor(scope),
+                      "modal-cache",
+                  ),
+              }
+            : {}),
     });
 
     const payload = {
