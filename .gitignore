@@ -69,3 +69,4 @@ __pycache__/
 /worker-entry.ts
 /.open-next/
 /.dev.vars*
+/.wrangler/
