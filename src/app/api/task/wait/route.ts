@@ -42,12 +42,16 @@ export async function GET(request: NextRequest) {
     // Direct stream mode (remote executors): kick off execution, then 302
     // the EventSource to the external SSE endpoint — progress flows from
     // the executor to the browser without passing through this server.
+    // Dispatch must complete BEFORE the redirect response: serverless
+    // runtimes cancel work still pending when the response returns.
     const direct = await directStreamUrl(taskId);
     if (direct) {
         if (!reconnect) {
-            runWithScope(scope, () => dispatchTask(taskId)).catch((error) => {
+            try {
+                await runWithScope(scope, () => dispatchTask(taskId));
+            } catch (error) {
                 logger.error(`[SSE] Failed to start task ${taskId}:`, error);
-            });
+            }
         }
         return Response.redirect(direct, 302);
     }
