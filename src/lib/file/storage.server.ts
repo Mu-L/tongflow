@@ -1,17 +1,18 @@
 import "server-only";
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { nanoid } from "nanoid";
-import { scopedDataDir } from "@/lib/runtime/scope.server";
+import { storageDriver } from "@ext/storage-driver";
 
 /**
  * Storage driver seam.
  *
- * The default driver stores files on the local disk under the scoped uploads
- * directory (`<scopedDataDir>/uploads/`) — the historical behavior. A cloud
- * shell can register an alternative driver (e.g. R2 via the S3 API) from its
- * instrumentation hook so media bytes never transit the app server.
+ * The driver is resolved statically via `@ext/storage-driver`: the default
+ * (src/ext-default/storage-driver.ts) stores files on the local disk under
+ * the scoped uploads directory — the historical behavior — and a cloud
+ * shell links its own (e.g. object storage) implementation.
+ *
+ * `registerStorageDriver` remains as a runtime override hook (kept on
+ * globalThis because instrumentation is compiled as a separate bundle from
+ * route handlers).
  */
 
 export interface StorageDriver {
@@ -40,50 +41,15 @@ export interface StorageDriver {
     publicUrl?(fileKey: string): Promise<string | null>;
 }
 
-async function uploadsRoot(): Promise<string> {
-    return path.join(await scopedDataDir(), "uploads");
-}
-
-const localDriver: StorageDriver = {
-    async saveFile(data, ext, taskId) {
-        const root = await uploadsRoot();
-        const dir = taskId ? path.join(root, "tasks", taskId) : root;
-        await mkdir(dir, { recursive: true });
-
-        const filename = ext ? `${nanoid()}.${ext}` : nanoid();
-        const filePath = path.join(dir, filename);
-        await writeFile(filePath, data);
-
-        // The fileKey is the path relative to the uploads root.
-        return path.relative(root, filePath);
-    },
-
-    async readFile(fileKey) {
-        const root = await uploadsRoot();
-        const normalized = fileKey.replace(/^\/+/, "").replace(/\\/g, "/");
-        const resolved = path.resolve(
-            root,
-            ...normalized.split("/").filter(Boolean),
-        );
-        if (!resolved.startsWith(root)) {
-            throw new Error("Invalid file key");
-        }
-        return readFile(resolved);
-    },
-};
-
-// The registry lives on globalThis: instrumentation.ts (where shells
-// register their driver) is compiled as a separate bundle from route
-// handlers, so a module-level variable would not be shared between them.
 const DRIVER_KEY = Symbol.for("tongflow.storage.driver");
 
 type DriverGlobal = { [DRIVER_KEY]?: StorageDriver };
 
-/** Replace the storage backend (cloud shells call this at startup). */
+/** Replace the storage backend at runtime (overrides the linked driver). */
 export function registerStorageDriver(next: StorageDriver): void {
     (globalThis as DriverGlobal)[DRIVER_KEY] = next;
 }
 
 export function getStorage(): StorageDriver {
-    return (globalThis as DriverGlobal)[DRIVER_KEY] ?? localDriver;
+    return (globalThis as DriverGlobal)[DRIVER_KEY] ?? storageDriver;
 }
