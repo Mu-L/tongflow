@@ -143,7 +143,7 @@ export async function executeWorkflowViaEngine(
         // (desktop / open-source default): unchanged disk contract.
         const remoteStorage = Boolean(getStorage().remote);
         assetToken = remoteStorage
-            ? issueEngineAssetToken(scope, taskId)
+            ? await issueEngineAssetToken(scope, taskId)
             : null;
         const assetOptions = assetToken
             ? {
@@ -368,7 +368,7 @@ export async function executeWorkflowViaEngine(
             })
             .where(eq(tasks.id, taskId));
     } finally {
-        if (assetToken) revokeEngineAssetToken(assetToken);
+        if (assetToken) await revokeEngineAssetToken(assetToken);
         removeTask(taskId);
     }
 }
