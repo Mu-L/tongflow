@@ -30,6 +30,7 @@ import ImageGenVideoComposeNode from "./nodes/compose/image-gen-video-compose";
 import ImageImageGenVideoNode from "./nodes/compose/image-image-gen-video";
 import ImagesGenVideoNode from "./nodes/compose/images-gen-video";
 import MergeVideoAudioNode from "./nodes/compose/merge-video-audio";
+import MusicCoverNode from "./nodes/compose/music-cover";
 import SpeechImageGenVideoNode from "./nodes/compose/speech-image-gen-video";
 import SpeechTextGenVideoNode from "./nodes/compose/speech-text-gen-video";
 import speechVideoGenVideoNode from "./nodes/compose/speech-video-gen-video";
@@ -38,6 +39,7 @@ import TextGenSpeechCloneComposeNode from "./nodes/compose/text-gen-speech-clone
 import TextsGenTextNode from "./nodes/compose/texts-gen-text";
 import VideoImageGenVideoMixNode from "./nodes/compose/video-image-gen-video-mix";
 import VideoImageGenVideoMoveNode from "./nodes/compose/video-image-gen-video-move";
+import MusicBriefNode from "./nodes/decompose/music-brief";
 import SplitTextNode from "./nodes/decompose/split-text";
 // Decompose nodes
 import SplitVideoNode from "./nodes/decompose/split-video";
@@ -64,6 +66,10 @@ import ImageGenTextNode from "./nodes/transfer/image-gen-text";
 // Transform nodes
 import ImageGenVideoNode from "./nodes/transfer/image-gen-video";
 import LinkGenTextNode from "./nodes/transfer/link-gen-text";
+import MusicCompleteNode from "./nodes/transfer/music-complete";
+import MusicExtractNode from "./nodes/transfer/music-extract";
+import MusicLegoNode from "./nodes/transfer/music-lego";
+import MusicRepaintNode from "./nodes/transfer/music-repaint";
 import RemoveVideoSubtitleNode from "./nodes/transfer/remove-subtitle";
 import RemoveVideoAudioNode from "./nodes/transfer/remove-video-audio";
 import RemoveWatermarkNode from "./nodes/transfer/remove-watermark";
@@ -139,6 +145,10 @@ export const NODE_TYPES: NodeTypes = {
     linkGenTextNode: LinkGenTextNode,
     getFirstFrameNode: GetFirstFrameNode,
     getLastFrameNode: GetLastFrameNode,
+    musicRepaintNode: MusicRepaintNode,
+    musicExtractNode: MusicExtractNode,
+    musicLegoNode: MusicLegoNode,
+    musicCompleteNode: MusicCompleteNode,
 
     // Batch nodes - Implemented
     dropVideoNode: DropVideoNode,
@@ -159,9 +169,11 @@ export const NODE_TYPES: NodeTypes = {
     textAudioGenSpeechNode: TextAudioGenSpeechNode,
     textsGenTextNode: TextsGenTextNode,
     concatVideoComposeNode: ConcatVideoComposeNode,
+    musicCoverNode: MusicCoverNode,
     // Decompose nodes - Implemented
     splitVideoNode: SplitVideoNode,
     splitTextNode: SplitTextNode,
+    musicBriefNode: MusicBriefNode,
 };
 
 /**
@@ -231,6 +243,10 @@ export const NODE_CATEGORIES = {
         "linkGenTextNode",
         "getFirstFrameNode",
         "getLastFrameNode",
+        "musicRepaintNode",
+        "musicExtractNode",
+        "musicLegoNode",
+        "musicCompleteNode",
     ],
     BATCH: ["dropVideoNode", "arrangeNode", "concatVideoNode"],
     COMPOSE: [
@@ -249,6 +265,7 @@ export const NODE_CATEGORIES = {
         "imageGenVideoComposeNode",
         "textsGenTextNode",
         "concatVideoComposeNode",
+        "musicCoverNode",
     ],
-    DECOMPOSE: ["splitVideoNode", "splitTextNode"],
+    DECOMPOSE: ["splitVideoNode", "splitTextNode", "musicBriefNode"],
 } as const;

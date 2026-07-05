@@ -1,53 +1,31 @@
 /**
  * File utility functions
  *
- * Replaces R2 by saving files to the local data/uploads/ directory.
+ * Thin wrappers over the storage driver seam (`storage.server.ts`); the
+ * default driver saves files to the scoped local `uploads/` directory.
  */
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { nanoid } from "nanoid";
-import { dataDir } from "@/lib/runtime/paths.server";
-
-const UPLOADS_DIR = path.join(dataDir(), "uploads");
+import { getStorage } from "@/lib/file/storage.server";
 
 /**
- * Read a file under `data/uploads/` by its fileKey (same as in {@link getFileUrl}).
- * Rejects path traversal.
+ * Read a file under the uploads root by its fileKey (same as in
+ * {@link getFileUrl}). Rejects path traversal.
  */
 export async function readUploadFileByFileKey(
     fileKey: string,
 ): Promise<Buffer> {
-    const normalized = fileKey.replace(/^\/+/, "").replace(/\\/g, "/");
-    const resolved = path.resolve(
-        UPLOADS_DIR,
-        ...normalized.split("/").filter(Boolean),
-    );
-    if (!resolved.startsWith(UPLOADS_DIR)) {
-        throw new Error("Invalid file key");
-    }
-    return readFile(resolved);
+    return getStorage().readFile(fileKey);
 }
 
 /**
- * Save byte data locally and return the fileKey
+ * Save byte data and return the fileKey
  */
 export async function saveFile(
     data: Buffer | Uint8Array,
     ext: string,
     taskId?: string,
 ): Promise<string> {
-    const dir = taskId ? path.join(UPLOADS_DIR, "tasks", taskId) : UPLOADS_DIR;
-
-    await mkdir(dir, { recursive: true });
-
-    const filename = `${nanoid()}.${ext}`;
-    const filePath = path.join(dir, filename);
-
-    await writeFile(filePath, data);
-
-    // Return the path relative to the uploads root directory as the fileKey
-    return path.relative(UPLOADS_DIR, filePath);
+    return getStorage().saveFile(data, ext, taskId);
 }
 
 /**

@@ -71,7 +71,9 @@
             "processing": "処理中",
             "failed": "失敗",
             "pending": "待機中"
-        }
+        },
+        "wechatGroup": "WeChatグループ",
+        "wechatGroupHint": "WeChatでQRコードをスキャンして参加"
     },
     "Workspace": {
         "edges": {
@@ -190,7 +192,13 @@
             "lipSync": "リップシンク",
             "lipDub": "吹き替え・口パク",
             "cloneVoice": "ボイスクローン",
-            "speechGenVideo": "音声から動画生成"
+            "speechGenVideo": "音声から動画生成",
+            "repaintMusic": "リペイント",
+            "coverMusic": "カバー",
+            "extractStem": "ステム抽出",
+            "addTrack": "トラック追加",
+            "completeMusic": "編曲補完",
+            "musicBrief": "音楽ブリーフ"
         },
         "toast": {
             "executing": "実行中...",
@@ -358,6 +366,12 @@
                         "image-describe": "画像理解",
                         "video-describe": "動画理解",
                         "audio-describe": "音声理解",
+                        "music-repaint": "音楽リペイント",
+                        "music-cover": "音楽カバー",
+                        "music-extract": "ステム抽出",
+                        "music-lego": "トラック追加",
+                        "music-complete": "編曲補完",
+                        "music-brief": "音楽ブリーフ",
                         "audio-image-gen-video": "音声+画像から動画",
                         "speech-text-gen-video": "音声+テキストから動画",
                         "video-image-gen-video-mix": "動画+画像ミックス",
@@ -461,7 +475,13 @@
                 "getFirstFrame": "最初のフレーム",
                 "getLastFrame": "最後のフレーム",
                 "extractAudioTrack": "音声抽出",
-                "removeVideoAudio": "音声除去（無音動画）"
+                "removeVideoAudio": "音声除去（無音動画）",
+                "musicRepaint": "音楽リペイント",
+                "musicCover": "音楽カバー",
+                "musicExtract": "ステム抽出",
+                "musicLego": "トラック追加",
+                "musicComplete": "編曲補完",
+                "musicBrief": "音楽ブリーフ"
             },
             "options": {
                 "portrait": "縦向き",
@@ -510,7 +530,13 @@
                 "getFirstFrame": "最初のフレームを取得",
                 "getLastFrame": "最後のフレームを取得",
                 "extractAudioTrack": "音声を抽出",
-                "removeVideoAudio": "音声を除去"
+                "removeVideoAudio": "音声を除去",
+                "repaintMusic": "リペイント開始",
+                "coverMusic": "カバー生成",
+                "extractStem": "抽出開始",
+                "addTrack": "トラック生成",
+                "completeMusic": "補完開始",
+                "musicBrief": "ブリーフ生成"
             },
             "params": {
                 "prompt": "プロンプト",
@@ -627,6 +653,35 @@
                 "keyscale": "キー",
                 "bpm": "BPM",
                 "auto": "自動"
+            },
+            "musicTasks": {
+                "promptLabel": "キャプション",
+                "promptPlaceholder": "音楽のスタイル、雰囲気、楽器などを記述...",
+                "lyricsLabel": "歌詞",
+                "lyricsPlaceholder": "歌詞（任意）...",
+                "startTime": "開始（秒）",
+                "endTime": "終了（秒）",
+                "strength": "強度",
+                "track": "トラック",
+                "tracks": "追加するトラック",
+                "instrumental": "インストゥルメンタル",
+                "ideaPlaceholder": "作りたい曲を一文で記述...",
+                "sourceAudio": "元の曲",
+                "refAudio": "リファレンス音声",
+                "trackOptions": {
+                    "vocals": "ボーカル",
+                    "backing_vocals": "コーラス",
+                    "drums": "ドラム",
+                    "percussion": "パーカッション",
+                    "bass": "ベース",
+                    "guitar": "ギター",
+                    "keyboard": "キーボード",
+                    "synth": "シンセ",
+                    "strings": "ストリングス",
+                    "brass": "ブラス",
+                    "woodwinds": "木管楽器",
+                    "fx": "効果音"
+                }
             },
             "speechGenVideo": {
                 "loading": "読み込み中...",

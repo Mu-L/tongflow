@@ -71,7 +71,9 @@
             "processing": "Processing",
             "failed": "Failed",
             "pending": "Pending"
-        }
+        },
+        "wechatGroup": "WeChat community group",
+        "wechatGroupHint": "Scan the QR code with WeChat to join the community group"
     },
     "Workspace": {
         "edges": {
@@ -190,7 +192,13 @@
             "lipSync": "Lip Sync",
             "lipDub": "Lip Dub",
             "cloneVoice": "Clone Voice",
-            "speechGenVideo": "Audio Generate Video"
+            "speechGenVideo": "Audio Generate Video",
+            "repaintMusic": "Repaint",
+            "coverMusic": "Cover",
+            "extractStem": "Extract Stem",
+            "addTrack": "Add Track",
+            "completeMusic": "Complete",
+            "musicBrief": "Music Brief"
         },
         "toast": {
             "executing": "Executing...",
@@ -358,6 +366,12 @@
                         "image-describe": "Image understanding",
                         "video-describe": "Video understanding",
                         "audio-describe": "Audio understanding",
+                        "music-repaint": "Music repaint",
+                        "music-cover": "Music cover",
+                        "music-extract": "Stem extraction",
+                        "music-lego": "Add track",
+                        "music-complete": "Arrangement completion",
+                        "music-brief": "Music brief",
                         "audio-image-gen-video": "Speech+image to video",
                         "speech-text-gen-video": "Speech+text to video",
                         "video-image-gen-video-mix": "Video+image mix",
@@ -461,7 +475,13 @@
                 "getFirstFrame": "First Frame",
                 "getLastFrame": "Last Frame",
                 "extractAudioTrack": "Extract audio track",
-                "removeVideoAudio": "Remove audio (silent video)"
+                "removeVideoAudio": "Remove audio (silent video)",
+                "musicRepaint": "Repaint Music",
+                "musicCover": "Music Cover",
+                "musicExtract": "Extract Stem",
+                "musicLego": "Add Track",
+                "musicComplete": "Complete Arrangement",
+                "musicBrief": "Music Brief"
             },
             "options": {
                 "portrait": "Portrait",
@@ -510,7 +530,13 @@
                 "getFirstFrame": "Get First Frame",
                 "getLastFrame": "Get Last Frame",
                 "extractAudioTrack": "Extract audio",
-                "removeVideoAudio": "Remove audio"
+                "removeVideoAudio": "Remove audio",
+                "repaintMusic": "Repaint",
+                "coverMusic": "Generate Cover",
+                "extractStem": "Extract",
+                "addTrack": "Generate Track",
+                "completeMusic": "Complete",
+                "musicBrief": "Generate Brief"
             },
             "params": {
                 "prompt": "Prompt",
@@ -713,6 +739,35 @@
                 "language": "Language",
                 "keyscale": "Key Scale",
                 "auto": "Auto"
+            },
+            "musicTasks": {
+                "promptLabel": "Caption",
+                "promptPlaceholder": "Describe the music style, mood, instruments...",
+                "lyricsLabel": "Lyrics",
+                "lyricsPlaceholder": "Lyrics (optional)...",
+                "startTime": "Start (s)",
+                "endTime": "End (s)",
+                "strength": "Strength",
+                "track": "Track",
+                "tracks": "Tracks to add",
+                "instrumental": "Instrumental",
+                "ideaPlaceholder": "One sentence describing the song you want...",
+                "sourceAudio": "Source Audio",
+                "refAudio": "Reference Audio",
+                "trackOptions": {
+                    "vocals": "Vocals",
+                    "backing_vocals": "Backing Vocals",
+                    "drums": "Drums",
+                    "percussion": "Percussion",
+                    "bass": "Bass",
+                    "guitar": "Guitar",
+                    "keyboard": "Keyboard",
+                    "synth": "Synth",
+                    "strings": "Strings",
+                    "brass": "Brass",
+                    "woodwinds": "Woodwinds",
+                    "fx": "FX"
+                }
             },
             "speechGenVideo": {
                 "loading": "Loading...",

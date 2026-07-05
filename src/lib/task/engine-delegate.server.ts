@@ -9,10 +9,12 @@ import {
     WorkflowStatus,
 } from "@/constants/task-status";
 import { getDb, tasks } from "@/db";
+import { getStorage } from "@/lib/file/storage.server";
 import { logger } from "@/lib/logger";
 import { resolveBasePython } from "@/lib/plugins/plugin-python-env.server";
 import { PYTHON_UTF8_ENV, resolvePythonLite } from "@/lib/plugins/python-lite";
-import { dataDir, pluginsDir, resourcesDir } from "@/lib/runtime/paths.server";
+import { pluginsDir, resourcesDir } from "@/lib/runtime/paths.server";
+import { getScope, scopedDataDirFor } from "@/lib/runtime/scope.server";
 import { withStoredEnv } from "@/lib/settings/env-store.server";
 import {
     type SerializedWorkflowFailure,
@@ -20,6 +22,10 @@ import {
     workflowTaskFailureEnvelope,
 } from "@/lib/task/error-envelope";
 import { notifyTask, registerTask, removeTask } from "./emitter";
+import {
+    issueEngineAssetToken,
+    revokeEngineAssetToken,
+} from "./engine-asset-tokens.server";
 
 /**
  * Delegate workflow execution to the SDK engine (`python -m tongflow.engine`),
@@ -115,6 +121,7 @@ export async function executeWorkflowViaEngine(
     inputs: Record<string, unknown>,
 ): Promise<void> {
     const controller = registerTask(taskId);
+    let assetToken: string | null = null;
 
     try {
         const db = await getDb();
@@ -125,8 +132,30 @@ export async function executeWorkflowViaEngine(
 
         const python = resolveBasePython() ?? (await resolvePythonLite());
         const sdkDir = join(resourcesDir(), "sdk");
-        const uploadsBase = join(dataDir(), "uploads");
+        const scope = await getScope();
+        const dataRoot = scopedDataDirFor(scope);
+        const uploadsBase = join(dataRoot, "uploads");
         const outDir = join(uploadsBase, "tasks", taskId);
+
+        // Remote storage driver (cloud): route the engine's asset IO through
+        // the /api/engine-assets loopback sink so files go straight to the
+        // driver's backend and never touch the local disk. Local driver
+        // (desktop / open-source default): unchanged disk contract.
+        const remoteStorage = Boolean(getStorage().remote);
+        assetToken = remoteStorage
+            ? await issueEngineAssetToken(scope, taskId)
+            : null;
+        const assetOptions = assetToken
+            ? {
+                  asset_endpoint: `http://127.0.0.1:${process.env.PORT || "3000"}/api/engine-assets`,
+                  asset_token: assetToken,
+              }
+            : {
+                  out_dir: outDir,
+                  file_key_base: uploadsBase,
+                  // Disk outputs: the canvas reads results via /api/uploads/<file_key>.
+                  inline_outputs: false,
+              };
 
         const request = {
             workflow: JSON.parse(workflowJson),
@@ -135,21 +164,26 @@ export async function executeWorkflowViaEngine(
                 // abi_path omitted on purpose: the engine falls back to the ABI
                 // bundled in the SDK, which always exists in the resources dir.
                 plugins_dir: pluginsDir(),
-                data_dir: dataDir(),
-                out_dir: outDir,
-                file_key_base: uploadsBase,
-                // Disk outputs: the canvas reads results via /api/uploads/<file_key>.
-                inline_outputs: false,
+                data_dir: dataRoot,
+                ...assetOptions,
                 auto_install: true,
                 task_id: taskId,
             },
         };
 
-        const env = withStoredEnv({
+        // In a scoped (cloud) run, point the Modal deploy cache into the
+        // user's data dir so needsDeploy plugins deploy into that user's own
+        // account.
+        const env = await withStoredEnv({
             ...PYTHON_UTF8_ENV,
             PYTHONPATH: [sdkDir, process.env.PYTHONPATH?.trim()]
                 .filter((x): x is string => Boolean(x))
                 .join(delimiter),
+            ...(scope
+                ? {
+                      TONGFLOW_MODAL_CACHE_DIR: join(dataRoot, "modal-cache"),
+                  }
+                : {}),
         });
 
         await new Promise<void>((resolve, reject) => {
@@ -334,6 +368,7 @@ export async function executeWorkflowViaEngine(
             })
             .where(eq(tasks.id, taskId));
     } finally {
+        if (assetToken) await revokeEngineAssetToken(assetToken);
         removeTask(taskId);
     }
 }

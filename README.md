@@ -140,13 +140,18 @@ Run the preloaded example node by node, or switch to Execute Mode and hit the ru
 
 #### Audio
 
-- ✅ **Music generation**: music from text.
+- ✅ **Music generation**: music from text, with optional reference-audio conditioning.
+- ✅ **Audio understanding**: describe a clip (music, speech, or ambient sound) in text.
+- ✅ **Music repaint**: regenerate a chosen time range of a song.
+- ✅ **Music cover**: restyle a song via a caption and/or a reference track.
+- ✅ **Add track / complete arrangement**: generate one new stem over a mix, or fill in missing tracks.
+- ✅ **Music brief**: one-sentence idea → lyrics, style tags, BPM, key, and duration.
 - ✅ **Speech synthesis**: text-to-speech — preset style, voice clone (reference audio), or instruction-driven.
 - ✅ **Speech recognition**: transcribe speech from audio or video.
 - ✅ **Noise reduction**: denoise audio.
 - ⬜ **Speaker diarization**: separate audio by speaker.
 - ⬜ **Voice / timbre replacement**: replace or clone a voice with a reference sample.
-- ✅ **Multi-track / vocal-accompaniment separation**
+- ✅ **Multi-track / vocal-accompaniment separation**: isolate vocals, drums, bass, guitar, and 8 more stems.
 
 ### Combine
 
@@ -210,7 +215,7 @@ Run the preloaded example node by node, or switch to Execute Mode and hit the ru
 - [tongflow-modal-qwen3asr](https://github.com/tong-io/tongflow-modal-qwen3asr) — Qwen3 speech recognition
 - [tongflow-modal-qwen3tts](https://github.com/tong-io/tongflow-modal-qwen3tts) — Qwen3 text-to-speech
 - [tongflow-modal-whisper](https://github.com/tong-io/tongflow-modal-whisper) — Whisper speech recognition with timestamps (alternative)
-- [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step text-to-music
+- [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step 1.5 music suite: text-to-music (sft / base / turbo selectable), repaint, cover, stem extraction, add-track, arrangement completion, music brief, and music understanding
 - [tongflow-modal-levo](https://github.com/tong-io/tongflow-modal-levo) — LeVo 2 / SongGeneration text-to-music (multilingual, commercial-grade)
 - [tongflow-modal-sam-audio](https://github.com/tong-io/tongflow-modal-sam-audio) — SAM-Audio text-prompted sound separation: noise reduction, vocal isolation, and free-text stem extraction ("the piano in the background")
 - [tongflow-modal-docling](https://github.com/tong-io/tongflow-modal-docling) — Docling document → text

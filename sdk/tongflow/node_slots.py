@@ -47,6 +47,12 @@ class NodeSlots:
     IMAGE_DESCRIBE: Final[str] = 'image-describe'
     VIDEO_DESCRIBE: Final[str] = 'video-describe'
     AUDIO_DESCRIBE: Final[str] = 'audio-describe'
+    MUSIC_REPAINT: Final[str] = 'music-repaint'
+    MUSIC_COVER: Final[str] = 'music-cover'
+    MUSIC_EXTRACT: Final[str] = 'music-extract'
+    MUSIC_LEGO: Final[str] = 'music-lego'
+    MUSIC_COMPLETE: Final[str] = 'music-complete'
+    MUSIC_BRIEF: Final[str] = 'music-brief'
     AUDIO_IMAGE_GEN_VIDEO: Final[str] = 'audio-image-gen-video'
     SPEECH_TEXT_GEN_VIDEO: Final[str] = 'speech-text-gen-video'
     VIDEO_IMAGE_GEN_VIDEO_MIX: Final[str] = 'video-image-gen-video-mix'
@@ -99,6 +105,12 @@ ALL_NODE_SLOTS: Final[tuple[str, ...]] = (
     'image-describe',
     'video-describe',
     'audio-describe',
+    'music-repaint',
+    'music-cover',
+    'music-extract',
+    'music-lego',
+    'music-complete',
+    'music-brief',
     'audio-image-gen-video',
     'speech-text-gen-video',
     'video-image-gen-video-mix',
