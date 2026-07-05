@@ -89,6 +89,14 @@ export function isTaskRunning(taskId: string): boolean {
 }
 
 /**
+ * Number of currently running tasks (all scopes) — used e.g. by a cloud
+ * shell's idle self-exit guard.
+ */
+export function runningTaskCount(): number {
+    return runningTasks.size;
+}
+
+/**
  * Convenience function for sending task notifications (replaces the Python notifyTask)
  */
 export function notifyTask(
