@@ -1,75 +1,53 @@
-# TongFlow Desktop
+# TongFlow Desktop (cloud shell)
 
-An Electron shell that runs the TongFlow Next.js standalone server locally with
-a self-contained Node.js runtime and a portable Python environment. Inspired by
-ComfyUI Desktop: the installer bundles the runtimes; a venv is materialized in
-the user data dir on first launch.
+The desktop app is a lightweight [Pake](https://github.com/tw93/Pake) (Tauri) shell
+that loads **https://app.tongflow.com** in a native WebView. It ships no local
+server, database, or Python runtime — all execution happens in the cloud, so the
+installer is ~10 MB instead of the ~200 MB of the retired Electron build
+(≤ v0.1.13, which bundled a local Next.js server and plugin runtime; use
+self-hosting via `pnpm dev` / Docker if you need the fully local experience).
 
-## Architecture
+## Building locally
 
-- **Main process** (`src/main.ts`) — ensures user dirs, builds the Python venv
-  (via bundled `uv` + `python-build-standalone`), starts the Next server with
-  the bundled Node binary, then loads `http://127.0.0.1:<port>`.
-- **Server** runs from `resources/app/server.js` (the Next standalone bundle).
-  Env vars point it at writable/read-only locations:
-  - `TONGFLOW_DATA_DIR` → `<userData>/data` (SQLite + uploads)
-  - `TONGFLOW_PLUGINS_DIR` → `<userData>/plugins`
-  - `TONGFLOW_RESOURCES_DIR` → `resources/app` (drizzle, config, sdk)
-  - `PYTHON` → `<userData>/venv` interpreter
-- **Credentials** (API keys, `MODAL_TOKEN_*`) are entered in the in-app
-  Settings dialog and stored in `<userData>/data/settings.json`; the server
-  merges them into plugin processes at execution time. Nothing is hardcoded.
-
-## Build
-
-From the repo root, first build + seed the web app:
+Prerequisites: Node ≥ 22 and Rust ≥ 1.85 (`rustup` — pake-cli offers to install it).
 
 ```bash
-pnpm install
-pnpm build                    # produces .next/standalone
+npm install -g pake-cli
+
+# From the repo root. First build compiles Tauri and takes ~10 minutes.
+pake https://app.tongflow.com --name TongFlow \
+  --icon desktop/icon.png \
+  --width 1440 --height 900 \
+  --enable-drag-drop \
+  --safe-domain accounts.google.com,github.com,appleid.apple.com,open.weixin.qq.com \
+  --camera --microphone \
+  --user-agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
 ```
 
-No plugins are bundled in any build — the app ships with none and the user
-installs them on demand via the in-app plugin manager.
+Platform notes:
 
-Then in `desktop/`:
+- **macOS universal** build: add `--targets universal` (requires
+  `rustup target add aarch64-apple-darwin x86_64-apple-darwin`).
+- **Windows**: add `--targets x64`; drop the `--user-agent` / `--camera` /
+  `--microphone` flags (they are macOS concerns — the custom Safari UA works
+  around Google's embedded-WebView OAuth block in WKWebView).
+- `--safe-domain` keeps the OAuth redirects (Google / GitHub / Apple / WeChat)
+  inside the app window instead of bouncing to the external browser.
+
+Releases are built by [`.github/workflows/desktop-release.yml`](../.github/workflows/desktop-release.yml)
+on `v*` tags and publish `TongFlow-mac-universal.dmg` and `TongFlow-win-x64.msi`.
+
+## Unsigned builds
+
+Builds are unsigned (same as the old Electron shell). On macOS, first launch
+requires right-click → Open, or:
 
 ```bash
-pnpm install
-pnpm fetch-runtimes           # downloads node + uv + python for this target
-pnpm dist                     # build:main → assemble → electron-builder
+xattr -cr /Applications/TongFlow.app
 ```
 
-Cross-arch on macOS: `TONGFLOW_TARGET_ARCH=x64 pnpm fetch-runtimes` before
-`pnpm dist:mac`. Build/sign macOS artifacts on macOS; Windows `nsis` builds on
-any host.
+## Icon
 
-### Offline first-run (optional)
-
-`pnpm assemble` builds an offline wheelhouse into `resources/wheels` when `uv`
-is on `PATH`. If present, the first-run venv install runs fully offline; if
-absent, dependencies install from PyPI on first launch. Set
-`TONGFLOW_SKIP_WHEELS=1` to skip.
-
-## Release (GitHub Actions)
-
-Releases are built and published automatically by
-[`.github/workflows/desktop-release.yml`](../.github/workflows/desktop-release.yml).
-To cut one:
-
-1. Bump `version` in `desktop/package.json` (e.g. `0.1.0`).
-2. Tag and push: `git tag v0.1.0 && git push origin v0.1.0`.
-
-The workflow builds on three runners — macOS arm64 (`macos-14`), macOS x64
-(`macos-13`), and Windows x64 — fetches the matching runtimes, and has
-`electron-builder` publish the `dmg` / `nsis` artifacts plus the auto-update
-feeds to the GitHub Release `v<version>`. Builds are unsigned by default; add
-`CSC_LINK` / `CSC_KEY_PASSWORD` (+ Apple notarization secrets) to sign.
-
-## Notes
-
-- Native modules (`better-sqlite3`, `sharp`) ship as node-ABI prebuilds inside
-  the Next standalone bundle and run under the bundled Node binary — no
-  `electron-rebuild` needed.
-- Auto-update uses `electron-updater`; configure the `publish` feed in
-  `electron-builder.yml`.
+`icon.png` (1024×1024) is rendered from [`public/logo_icon.svg`](../public/logo_icon.svg)
+composited onto a dark rounded plate. Pake converts it to `.icns` / `.ico`
+per platform automatically.

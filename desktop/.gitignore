@@ -1,8 +1,11 @@
-node_modules/
+# Pake local build output
+*.dmg
+*.msi
+*.app/
+TongFlow-binary
+
+# Leftovers from the retired Electron shell (safe to delete locally)
 dist/
+node_modules/
 release/
-resources/app/
-resources/node/
-resources/uv/
-resources/python/
-resources/wheels/
+resources/
