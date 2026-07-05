@@ -38,15 +38,14 @@ With TongFlow, you can expand your imagination and stretch your ideas with gener
 
 ## How To Start
 
-We provide a ready-to-run TongFlow **desktop app**.
+The TongFlow **desktop app** is a lightweight (~10 MB) shell around the cloud studio at **[app.tongflow.com](https://app.tongflow.com)** — install it, sign in, and start creating. The cloud studio also runs in any modern browser.
 
 ### Step 1 — Install the desktop app
 
 Download the installer for your platform, install it, and open it.
 
-- **macOS (Apple Silicon):** [TongFlow-mac-arm64.dmg](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-mac-arm64.dmg)
-- **macOS (Intel):** [TongFlow-mac-x64.dmg](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-mac-x64.dmg)
-- **Windows:** [TongFlow-win-setup.exe](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-win-setup.exe)
+- **macOS (Universal — Apple Silicon & Intel):** [TongFlow-mac-universal.dmg](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-mac-universal.dmg)
+- **Windows:** [TongFlow-win-x64.msi](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-win-x64.msi)
 
 All builds are on the [Releases](https://github.com/tong-io/tongflow/releases/latest) page.
 
@@ -58,31 +57,11 @@ All builds are on the [Releases](https://github.com/tong-io/tongflow/releases/la
 >
 > Download from this page directly — installers passed through chat apps (e.g. WeChat) may be renamed or re-flagged.
 
-On first open, the canvas is preloaded with an example workflow — the next steps get it ready to run.
+### Step 2 — Sign in and create
 
-### Step 2 — Install plugins
+Sign in with Google, GitHub, Apple, or WeChat and start creating — the cloud studio manages plugins and execution for you.
 
-The app ships with no plugins pre-installed. Open the **plugin manager** (the blocks icon, top-right) and install what you need. Newly installed plugins are usable immediately, no restart.
-
-To run the preloaded **example workflow** (text → image → fusion → video), install these three plugins:
-
-- [tongflow-modal-z-image](https://github.com/tong-io/tongflow-modal-z-image) — text-to-image
-- [tongflow-modal-flux2-klein9b](https://github.com/tong-io/tongflow-modal-flux2-klein9b) — image fusion / blending
-- [tongflow-modal-ltx](https://github.com/tong-io/tongflow-modal-ltx) — image-to-video
-
-These run on [Modal](https://modal.com) (up to **$30/month** of free GPU compute). Add `MODAL_TOKEN_ID` / `MODAL_TOKEN_SECRET` in **Settings**; create a token at [modal.com/settings/tokens](https://modal.com/settings/tokens). Any other platform can publish its own plugins the same way.
-
-Browse the full catalog — the official API plugins (OpenAI / Gemini / OpenRouter) and other GPU/CPU plugins — in the plugin manager.
-
-### Step 3 — Configure credentials
-
-Open **Settings** (the gear icon, top-right) and add the environment variables your plugins need — e.g. `OPENAI_API_KEY` for the API plugins, or the credentials your GPU/CPU plugins require.
-
-> **Plugin credentials live in Settings.** TongFlow is platform-agnostic and hardcodes no provider: the Settings dialog is a generic key/value editor for environment variables passed to plugins. Each plugin's README documents the keys it needs. Values are stored locally and take effect without a restart.
-
-### Step 4 — Run the example workflow
-
-Run the preloaded example node by node, or switch to Execute Mode and hit the run button to run the whole thing in one click.
+> **Prefer a fully local, account-free TongFlow?** That's what self-hosting is for — see [Run from source](#run-from-source) or [Run with Docker](#run-with-docker), then follow [Self-host setup](#self-host-setup-plugins--credentials). (The desktop app up to v0.1.13 bundled this local runtime; those installers remain on the [Releases](https://github.com/tong-io/tongflow/releases) page.)
 
 ## Core Concept
 
@@ -176,7 +155,7 @@ Run the preloaded example node by node, or switch to Execute Mode and hit the ru
 
 ## Official plugins
 
-> The official GPU/CPU plugins currently run on [Modal](https://modal.com) — up to **$30/month** of free GPU compute (H100/A100, etc.). See [Step 2](#step-2--install-plugins) for the `MODAL_TOKEN_*` setup. Any other platform can publish its own plugins the same way.
+> The official GPU/CPU plugins currently run on [Modal](https://modal.com) — up to **$30/month** of free GPU compute (H100/A100, etc.). See [Self-host setup](#self-host-setup-plugins--credentials) for the `MODAL_TOKEN_*` setup. Any other platform can publish its own plugins the same way.
 
 ### API plugins
 
@@ -225,7 +204,7 @@ pnpm start:prod        # builds once, then serves at http://localhost:3000
 
 Requires **Node** (with `pnpm`) and a **Python 3.10+** interpreter on your `PATH` (set `PYTHON` to point at a specific one). Plugins run as local Python processes; TongFlow provisions an isolated venv for them automatically and installs each plugin's `requirements.txt` on first use — no manual Python setup.
 
-Open **`http://localhost:3000`** and the canvas is live. Install/configure plugins exactly as in Steps 2–4 above (credentials go in the in-app **Settings** dialog, or a project `.env`).
+Open **`http://localhost:3000`** and the canvas is live. Then follow [Self-host setup](#self-host-setup-plugins--credentials) (credentials go in the in-app **Settings** dialog, or a project `.env`).
 
 ## Run with Docker
 
@@ -248,6 +227,34 @@ To build the image yourself instead of pulling: `docker build -t tongflow .`
 **Data & credentials.** Everything writable lives in the `/data` volume (SQLite db, uploads, settings). API keys are optional — set them in the in-app **Settings** dialog, or pass them at launch (`-e OPENROUTER_API_KEY=…`); supported keys: `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, `MODAL_TOKEN_ID` / `MODAL_TOKEN_SECRET`.
 
 **Plugins.** The image ships no plugins — install them from the in-app plugin manager (first install needs network access to GitHub). On first run, a plugin provisions a shared Python venv under `/data/.tongflow/plugin-venv` (installs the SDK + the plugin's `requirements.txt` from PyPI), so the first run is slower and needs network. Modal-backed plugins additionally need a Modal token.
+
+## Self-host setup (plugins & credentials)
+
+A self-hosted TongFlow ships with no plugins pre-installed, and the canvas is preloaded with an example workflow. Three steps get it running:
+
+### 1 — Install plugins
+
+Open the **plugin manager** (the blocks icon, top-right) and install what you need. Newly installed plugins are usable immediately, no restart.
+
+To run the preloaded **example workflow** (text → image → fusion → video), install these three plugins:
+
+- [tongflow-modal-z-image](https://github.com/tong-io/tongflow-modal-z-image) — text-to-image
+- [tongflow-modal-flux2-klein9b](https://github.com/tong-io/tongflow-modal-flux2-klein9b) — image fusion / blending
+- [tongflow-modal-ltx](https://github.com/tong-io/tongflow-modal-ltx) — image-to-video
+
+These run on [Modal](https://modal.com) (up to **$30/month** of free GPU compute). Add `MODAL_TOKEN_ID` / `MODAL_TOKEN_SECRET` in **Settings**; create a token at [modal.com/settings/tokens](https://modal.com/settings/tokens). Any other platform can publish its own plugins the same way.
+
+Browse the full catalog — the official API plugins (OpenAI / Gemini / OpenRouter) and other GPU/CPU plugins — in the plugin manager.
+
+### 2 — Configure credentials
+
+Open **Settings** (the gear icon, top-right) and add the environment variables your plugins need — e.g. `OPENAI_API_KEY` for the API plugins, or the credentials your GPU/CPU plugins require.
+
+> **Plugin credentials live in Settings.** TongFlow is platform-agnostic and hardcodes no provider: the Settings dialog is a generic key/value editor for environment variables passed to plugins. Each plugin's README documents the keys it needs. Values are stored locally and take effect without a restart.
+
+### 3 — Run the example workflow
+
+Run the preloaded example node by node, or switch to Execute Mode and hit the run button to run the whole thing in one click.
 
 ## Custom plugins
 

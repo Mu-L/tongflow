@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/tooltip";
 import { PluginsDialog } from "@/components/workspace/plugins-dialog";
 import { SettingsDialog } from "@/components/workspace/settings-dialog";
-import { UpdateButton } from "@/components/workspace/update-button";
 
 const LOCALE_OPTIONS = [
     { code: "zh", label: "中文" },
@@ -236,7 +235,6 @@ function LocaleMenu() {
 export function WorkspaceNav() {
     return (
         <div className="flex items-center gap-2">
-            <UpdateButton className={navBtnClass} />
             {/* Managed platforms (cloud) provision plugins themselves —
                 hide the install entry there. Inlined at build time. */}
             {process.env.NEXT_PUBLIC_MANAGED_PLUGINS !== "1" && (

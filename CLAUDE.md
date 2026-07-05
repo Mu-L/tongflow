@@ -97,7 +97,9 @@ Two independently-versioned artifacts: the **PyPI `tongflow` SDK** and the **des
 
 **Desktop app + GitHub release:**
 
-- [ ] Update [`CHANGELOG.md`](CHANGELOG.md) (Keep a Changelog format) and the app version in [`package.json`](package.json) / [`desktop/package.json`](desktop/package.json) if they're cut.
-- [ ] Tag the release (`git tag vX.Y.Z`); [`.github/workflows/desktop-release.yml`](.github/workflows/desktop-release.yml) builds the macOS (arm64/x64) and Windows installers.
-- [ ] Publish a GitHub Release with the installers attached and the CHANGELOG entry as notes.
+The desktop app is a Pake (Tauri) cloud shell for `https://app.tongflow.com` — see [`desktop/README.md`](desktop/README.md). Its version comes from the tag (`--app-version`); there is no desktop package.json.
+
+- [ ] Update [`CHANGELOG.md`](CHANGELOG.md) (Keep a Changelog format) and the app version in [`package.json`](package.json) if it's cut.
+- [ ] Tag the release (`git tag vX.Y.Z`); [`.github/workflows/desktop-release.yml`](.github/workflows/desktop-release.yml) builds `TongFlow-mac-universal.dmg` and `TongFlow-win-x64.msi` into a draft GitHub Release and flips it public. Dry-run first via workflow_dispatch (artifacts only, no release) and manually verify OAuth sign-in (especially Google) in the built shell.
+- [ ] Add the CHANGELOG entry as the release notes.
 - [ ] Note: root `package.json` stays `"private": true` — it is the app, not an npm library; never `npm publish` it.

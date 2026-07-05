@@ -30,15 +30,14 @@
 
 ## 快速开始
 
-我们提供可直接运行的TongFlow**桌面版**。
+TongFlow **桌面版**是一个轻量（约 10 MB）的壳应用，直接加载云端工作室 **[app.tongflow.com](https://app.tongflow.com)** ——安装、登录，即可开始创作。云端工作室也可以直接在浏览器里打开。
 
 ### Step 1 — 安装桌面版
 
 下载对应平台的安装包，安装并打开。
 
-- **macOS（Apple Silicon — M1/M2/M3/M4）：** [TongFlow-mac-arm64.dmg](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-mac-arm64.dmg)
-- **macOS（Intel）：** [TongFlow-mac-x64.dmg](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-mac-x64.dmg)
-- **Windows：** [TongFlow-win-setup.exe](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-win-setup.exe)
+- **macOS（Universal — Apple Silicon 和 Intel 通用）：** [TongFlow-mac-universal.dmg](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-mac-universal.dmg)
+- **Windows：** [TongFlow-win-x64.msi](https://github.com/tong-io/tongflow/releases/latest/download/TongFlow-win-x64.msi)
 
 全部版本见 [Releases](https://github.com/tong-io/tongflow/releases/latest) 页面。
 
@@ -50,31 +49,11 @@
 >
 > 请直接从本页面下载安装包——通过微信等聊天工具转发的安装包可能被改名或重新打上隔离标记。
 
-首次打开时，画布已预加载一个示例工作流——接下来几步把它准备到可运行状态。
+### Step 2 — 登录并开始创作
 
-### Step 2 — 安装插件
+用 Google、GitHub、Apple 或微信登录即可开始创作——插件与执行都由云端托管。
 
-app 默认不预装任何插件。打开**插件管理器**（右上角的方块图标），按需安装。新装的插件即时可用，无需重启。
-
-要运行预加载的**示例工作流**（文本 → 图像 → 融合 → 视频），需安装以下三个插件：
-
-- [tongflow-modal-z-image](https://github.com/tong-io/tongflow-modal-z-image) — 文本生图
-- [tongflow-modal-flux2-klein9b](https://github.com/tong-io/tongflow-modal-flux2-klein9b) — 图像融合 / 混合
-- [tongflow-modal-ltx](https://github.com/tong-io/tongflow-modal-ltx) — 图生视频
-
-这些插件运行在 [Modal](https://modal.com) 上（每月最多 **$30** 免费 GPU 算力）。在**设置**里填入 `MODAL_TOKEN_ID` / `MODAL_TOKEN_SECRET`；可在 [modal.com/settings/tokens](https://modal.com/settings/tokens) 创建 token。任何其他平台都可以用同样方式发布自己的插件。
-
-在插件管理器里可浏览完整目录——官方 API 插件（OpenAI / Gemini / OpenRouter）以及其他 GPU/CPU 插件。
-
-### Step 3 — 配置凭据
-
-打开**设置**（右上角齿轮图标），填入插件需要的环境变量——比如 API 插件用的 `OPENAI_API_KEY`，或 GPU/CPU 插件所需的凭据。
-
-> **插件凭据都在「设置」里。** TongFlow 不绑定任何平台、不硬编码任何 provider：设置对话框是一个通用的环境变量 key/value 编辑器，传给插件使用。各插件需要哪些 key 由它自己的 README 说明。值保存在本地，改动即时生效、无需重启。
-
-### Step 4 — 运行示例工作流
-
-逐个节点执行预加载的示例，也可以切换到执行模式，点击运行按钮即可一键执行。
+> **想要完全本地、无需账号的 TongFlow？** 请使用自托管——参见[从源代码启动](#从源代码启动)或[用 Docker 启动](#用-docker-启动)，然后按照[自托管配置](#自托管配置插件与凭据)完成设置。（v0.1.13 及之前的桌面版内置了完整本地运行时，安装包仍保留在 [Releases](https://github.com/tong-io/tongflow/releases) 页面。）
 
 ## 核心概念
 
@@ -168,7 +147,7 @@ app 默认不预装任何插件。打开**插件管理器**（右上角的方块
 
 ## 官方插件
 
-> 官方 GPU/CPU 插件目前运行在 [Modal](https://modal.com) 上——每月最多 **$30** 免费 GPU 算力（H100/A100 等）。`MODAL_TOKEN_*` 的配置见 [Step 2](#step-2--安装插件)。任何其他平台都可以用同样方式发布自己的插件。
+> 官方 GPU/CPU 插件目前运行在 [Modal](https://modal.com) 上——每月最多 **$30** 免费 GPU 算力（H100/A100 等）。`MODAL_TOKEN_*` 的配置见[自托管配置](#自托管配置插件与凭据)。任何其他平台都可以用同样方式发布自己的插件。
 
 ### API 插件
 
@@ -217,7 +196,7 @@ pnpm start:prod        # 先构建一次,再启动于 http://localhost:3000
 
 需要 **Node**（含 `pnpm`）以及 `PATH` 上有一个 **Python 3.10+** 解释器（可用 `PYTHON` 指定具体的那个）。插件以本地 Python 进程运行；TongFlow 会自动为它们创建隔离的 venv，并在首次使用时安装各插件的 `requirements.txt`——无需手动配置 Python。
 
-打开 **`http://localhost:3000`**，画布已就绪。插件的安装与配置同上面的 Step 2–4（凭据填在 app 内的**设置**对话框，或用项目 `.env`）。
+打开 **`http://localhost:3000`**，画布已就绪。然后按照[自托管配置](#自托管配置插件与凭据)完成设置（凭据填在 app 内的**设置**对话框，或用项目 `.env`）。
 
 ## 用 Docker 启动
 
@@ -240,6 +219,34 @@ docker compose up -d
 **数据与凭据。** 所有可写内容都存放在 `/data` 卷（SQLite 数据库、上传文件、设置）。API key 是可选的——在 app 内的**设置**对话框里填写，或在启动时传入（`-e OPENROUTER_API_KEY=…`）；支持的 key：`OPENROUTER_API_KEY`、`GEMINI_API_KEY`、`OPENAI_API_KEY`、`MODAL_TOKEN_ID` / `MODAL_TOKEN_SECRET`。
 
 **插件。** 镜像不自带任何插件——请从 app 内的插件管理器安装（首次安装需要访问 GitHub 的网络）。首次运行时，插件会在 `/data/.tongflow/plugin-venv` 下创建一个共享的 Python venv（从 PyPI 安装 SDK 以及该插件的 `requirements.txt`），因此首次运行较慢且需要网络。基于 Modal 的插件还需要一个 Modal token。
+
+## 自托管配置（插件与凭据）
+
+自托管的 TongFlow 默认不预装任何插件，画布已预加载一个示例工作流。三步即可跑起来：
+
+### 1 — 安装插件
+
+打开**插件管理器**（右上角的方块图标），按需安装。新装的插件即时可用，无需重启。
+
+要运行预加载的**示例工作流**（文本 → 图像 → 融合 → 视频），需安装以下三个插件：
+
+- [tongflow-modal-z-image](https://github.com/tong-io/tongflow-modal-z-image) — 文本生图
+- [tongflow-modal-flux2-klein9b](https://github.com/tong-io/tongflow-modal-flux2-klein9b) — 图像融合 / 混合
+- [tongflow-modal-ltx](https://github.com/tong-io/tongflow-modal-ltx) — 图生视频
+
+这些插件运行在 [Modal](https://modal.com) 上（每月最多 **$30** 免费 GPU 算力）。在**设置**里填入 `MODAL_TOKEN_ID` / `MODAL_TOKEN_SECRET`；可在 [modal.com/settings/tokens](https://modal.com/settings/tokens) 创建 token。任何其他平台都可以用同样方式发布自己的插件。
+
+在插件管理器里可浏览完整目录——官方 API 插件（OpenAI / Gemini / OpenRouter）以及其他 GPU/CPU 插件。
+
+### 2 — 配置凭据
+
+打开**设置**（右上角齿轮图标），填入插件需要的环境变量——比如 API 插件用的 `OPENAI_API_KEY`，或 GPU/CPU 插件所需的凭据。
+
+> **插件凭据都在「设置」里。** TongFlow 不绑定任何平台、不硬编码任何 provider：设置对话框是一个通用的环境变量 key/value 编辑器，传给插件使用。各插件需要哪些 key 由它自己的 README 说明。值保存在本地，改动即时生效、无需重启。
+
+### 3 — 运行示例工作流
+
+逐个节点执行预加载的示例，也可以切换到执行模式，点击运行按钮即可一键执行。
 
 ## 自定义插件
 
