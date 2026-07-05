@@ -5,10 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-07-06
+
+### Changed
+
+- **The desktop app is now a lightweight cloud shell.** Installers are a
+  ~10 MB [Pake](https://github.com/tw93/Pake) (Tauri) wrapper that loads
+  the cloud studio at [app.tongflow.com](https://app.tongflow.com) — sign
+  in with Google / GitHub / Apple / WeChat and create; plugins and
+  execution are managed in the cloud. Release artifacts are now
+  `TongFlow-mac-universal.dmg` (one build for Apple Silicon + Intel) and
+  `TongFlow-win-x64.msi`. The previous Electron app (≤ v0.1.13), which
+  bundled a local Next.js server, SQLite database, and Python plugin
+  runtime (~200 MB), is no longer shipped — that fully local, account-free
+  experience lives on via self-hosting (`pnpm start:prod` or Docker).
+  Existing local installs keep working; no update is pushed to them.
 
 ### Added
 
+- **Meta SAM suite** — four new official Modal GPU plugins (all require a
+  Hugging Face token for the gated checkpoints):
+  - **tongflow-modal-sam3** — text-guided matting: cut every instance of a
+    described concept out of an image, or track it through a video;
+  - **tongflow-modal-sam-audio** — text-prompted sound separation: noise
+    reduction, vocal isolation, and free-text stem extraction (first
+    official plugins for the noise-reduction and track-separation slots);
+  - **tongflow-modal-sam-3d-objects** — single image → 3D Gaussian splat;
+  - **tongflow-modal-sam-3d-body** — single image → full-body human mesh.
 - **ACE-Step 1.5 music suite** — six new ABI slots with canvas nodes and
   smart-island actions, all served by the reworked `tongflow-modal-ace-step`
   plugin:
@@ -29,9 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **ACE-Step default model upgraded** from `xl-base` to **`xl-sft`** (the
   official best-quality variant); the upstream repo revision is now pinned.
-- Python SDK **0.2.3** published: generated models for the six new slots
-  and a `current_model()` side channel so router-style model selection
-  reaches Modal-backed plugins.
+- Python SDK **0.2.3** / **0.2.5** published: generated models for the six
+  new music slots, a `current_model()` side channel so router-style model
+  selection reaches Modal-backed plugins, and (0.2.5) the merged source of
+  0.2.3 + 0.2.4's `HttpStore`.
 
 ## [0.1.13] - 2026-07-04
 
@@ -273,7 +297,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First public open-source release of TongFlow.
 
-[Unreleased]: https://github.com/tong-io/tongflow/compare/v0.1.12...HEAD
+[0.2.0]: https://github.com/tong-io/tongflow/compare/v0.1.13...v0.2.0
+[0.1.13]: https://github.com/tong-io/tongflow/compare/v0.1.12...v0.1.13
 [0.1.12]: https://github.com/tong-io/tongflow/compare/v0.1.11...v0.1.12
 [0.1.11]: https://github.com/tong-io/tongflow/compare/v0.1.10...v0.1.11
 [0.1.10]: https://github.com/tong-io/tongflow/compare/v0.1.9...v0.1.10
