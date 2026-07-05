@@ -9,6 +9,7 @@ import {
     WorkflowStatus,
 } from "@/constants/task-status";
 import { getDb, tasks } from "@/db";
+import { getStorage } from "@/lib/file/storage.server";
 import { logger } from "@/lib/logger";
 import { resolveBasePython } from "@/lib/plugins/plugin-python-env.server";
 import { PYTHON_UTF8_ENV, resolvePythonLite } from "@/lib/plugins/python-lite";
@@ -21,6 +22,10 @@ import {
     workflowTaskFailureEnvelope,
 } from "@/lib/task/error-envelope";
 import { notifyTask, registerTask, removeTask } from "./emitter";
+import {
+    issueEngineAssetToken,
+    revokeEngineAssetToken,
+} from "./engine-asset-tokens.server";
 
 /**
  * Delegate workflow execution to the SDK engine (`python -m tongflow.engine`),
@@ -116,6 +121,7 @@ export async function executeWorkflowViaEngine(
     inputs: Record<string, unknown>,
 ): Promise<void> {
     const controller = registerTask(taskId);
+    let assetToken: string | null = null;
 
     try {
         const db = await getDb();
@@ -131,6 +137,26 @@ export async function executeWorkflowViaEngine(
         const uploadsBase = join(dataRoot, "uploads");
         const outDir = join(uploadsBase, "tasks", taskId);
 
+        // Remote storage driver (cloud): route the engine's asset IO through
+        // the /api/engine-assets loopback sink so files go straight to the
+        // driver's backend and never touch the local disk. Local driver
+        // (desktop / open-source default): unchanged disk contract.
+        const remoteStorage = Boolean(getStorage().remote);
+        assetToken = remoteStorage
+            ? issueEngineAssetToken(scope, taskId)
+            : null;
+        const assetOptions = assetToken
+            ? {
+                  asset_endpoint: `http://127.0.0.1:${process.env.PORT || "3000"}/api/engine-assets`,
+                  asset_token: assetToken,
+              }
+            : {
+                  out_dir: outDir,
+                  file_key_base: uploadsBase,
+                  // Disk outputs: the canvas reads results via /api/uploads/<file_key>.
+                  inline_outputs: false,
+              };
+
         const request = {
             workflow: JSON.parse(workflowJson),
             inputs,
@@ -139,10 +165,7 @@ export async function executeWorkflowViaEngine(
                 // bundled in the SDK, which always exists in the resources dir.
                 plugins_dir: pluginsDir(),
                 data_dir: dataRoot,
-                out_dir: outDir,
-                file_key_base: uploadsBase,
-                // Disk outputs: the canvas reads results via /api/uploads/<file_key>.
-                inline_outputs: false,
+                ...assetOptions,
                 auto_install: true,
                 task_id: taskId,
             },
@@ -345,6 +368,7 @@ export async function executeWorkflowViaEngine(
             })
             .where(eq(tasks.id, taskId));
     } finally {
+        if (assetToken) revokeEngineAssetToken(assetToken);
         removeTask(taskId);
     }
 }

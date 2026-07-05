@@ -37,8 +37,21 @@ export async function GET(
     try {
         const { path: pathSegments } = await params;
         const fileKey = pathSegments.join("/");
+        const driver = getStorage();
 
-        const buffer = await getStorage().readFile(fileKey);
+        // Remote drivers can hand out a directly-fetchable URL (e.g. a
+        // presigned object-storage URL) so media bytes bypass the app.
+        const directUrl = await driver.publicUrl?.(fileKey);
+        if (directUrl) {
+            return NextResponse.redirect(directUrl, {
+                status: 302,
+                // Shorter than the signed URL's TTL so cached redirects
+                // never point at an expired signature.
+                headers: { "Cache-Control": "private, max-age=3300" },
+            });
+        }
+
+        const buffer = await driver.readFile(fileKey);
         const ext = path.extname(fileKey).toLowerCase();
         const contentType = MIME_TYPES[ext] || "application/octet-stream";
 

@@ -9,7 +9,8 @@ Request shape::
     {"workflow": <executable workflow dict>,
      "inputs": {<name>: ...},
      "options": {"plugins_dir", "data_dir", "out_dir", "abi_path",
-                 "file_key_base", "auto_install", "org", "task_id"}}
+                 "file_key_base", "inline_outputs", "asset_endpoint",
+                 "asset_token", "auto_install", "org", "task_id"}}
 
 The TongFlow desktop app uses this to delegate workflow execution to the SDK
 engine (one execution core) while keeping its own DB / SSE / abort shell. The
@@ -59,6 +60,8 @@ def main() -> int:
             abi_path=opts.get("abi_path"),
             file_key_base=opts.get("file_key_base"),
             inline_outputs=bool(opts.get("inline_outputs", True)),
+            asset_endpoint=opts.get("asset_endpoint"),
+            asset_token=opts.get("asset_token"),
             auto_install=bool(opts.get("auto_install", True)),
             org=opts.get("org") or "https://github.com/tong-io",
             plugin_git_urls=opts.get("plugin_git_urls"),

@@ -37,7 +37,7 @@ from .plugins import (
     prepare_python_env,
     scan_manifest,
 )
-from .store import AssetStore, DiskStore, MemoryStore
+from .store import AssetStore, DiskStore, HttpStore, MemoryStore
 
 EventCb = Callable[[dict[str, Any]], None]
 
@@ -166,6 +166,8 @@ def run_workflow(
     abi_path: Optional[Union[str, Path]] = None,
     file_key_base: Optional[Union[str, Path]] = None,
     inline_outputs: bool = True,
+    asset_endpoint: Optional[str] = None,
+    asset_token: Optional[str] = None,
     auto_install: bool = True,
     org: str = DEFAULT_ORG,
     plugin_git_urls: Optional[dict[str, str]] = None,
@@ -191,6 +193,11 @@ def run_workflow(
             returned as ``{bytesBase64, mime?, filename?}`` — zero files written
             (besides the required plugin clone / venv). When False, outputs are
             written to ``out_dir`` and returned as ``file_key`` paths.
+        asset_endpoint / asset_token: host-managed asset store (loopback HTTP
+            sink, see :class:`~tongflow.engine.store.HttpStore`). When set it
+            overrides ``inline_outputs``: outputs are POSTed to the host and
+            input ``file_key`` refs are fetched from it — the engine touches
+            no asset files on disk.
         auto_install: clone missing plugins and provision a shared venv.
         org / plugin_git_urls: where to clone official / custom plugins from.
         on_progress: optional callback receiving progress event dicts.
@@ -212,9 +219,13 @@ def run_workflow(
     # Output store: in-memory (inline, zero disk) or on-disk (file_key paths,
     # used by the desktop delegation so the canvas reads via /api/uploads).
     out_path = Path(out_dir).resolve() if out_dir else (data_dir / "engine-out")
-    store: AssetStore = (
-        MemoryStore() if inline_outputs else DiskStore(out_path, fk_base)
-    )
+    store: AssetStore
+    if asset_endpoint:
+        store = HttpStore(asset_endpoint, asset_token)
+    elif inline_outputs:
+        store = MemoryStore()
+    else:
+        store = DiskStore(out_path, fk_base)
 
     def emit(event: dict[str, Any]) -> None:
         if on_progress is not None:

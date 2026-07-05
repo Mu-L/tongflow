@@ -26,6 +26,18 @@ export interface StorageDriver {
     ): Promise<string>;
     /** Read bytes by fileKey. Throws on missing files and invalid keys. */
     readFile(fileKey: string): Promise<Buffer>;
+    /**
+     * True when files do not live on the local uploads dir. The engine
+     * delegate then routes the SDK engine's asset IO through the
+     * `/api/engine-assets` loopback sink instead of a local out_dir.
+     */
+    remote?: boolean;
+    /**
+     * Optional directly-fetchable URL for a fileKey (e.g. a presigned
+     * object-storage URL). The uploads route 302s to it when present;
+     * return null to stream bytes via the app instead.
+     */
+    publicUrl?(fileKey: string): Promise<string | null>;
 }
 
 async function uploadsRoot(): Promise<string> {
