@@ -132,13 +132,18 @@ TongFlowで生成AIを活用し、創造力を解き放とう！
 
 #### 音声
 
-- ✅ **音楽生成**: テキストから音楽を生成。
+- ✅ **音楽生成**: テキストから音楽を生成。参照音声による誘導にも対応。
+- ✅ **音声理解**: 音声クリップ（音楽・スピーチ・環境音）をテキストで説明。
+- ✅ **音楽リペイント**: 曲の指定区間を再生成。
+- ✅ **音楽カバー**: 説明文や参照曲でスタイルを変えて再構成。
+- ✅ **トラック追加 / 編曲補完**: 既存ミックスに新しいトラックを生成、または不足パートを補完。
+- ✅ **音楽ブリーフ**: 一文のアイデア → 歌詞・スタイルタグ・BPM・キー・長さ。
 - ✅ **音声合成**: テキストから音声へ——プリセットスタイル、声のクローン（参照音声）、または指示駆動。
 - ✅ **音声認識**: 音声または動画中の発話を文字起こし。
 - ⬜ **ノイズ除去**: 音声のノイズを除去。
 - ⬜ **話者分離**: 話者ごとに音声を分離。
 - ⬜ **音色変換**: 参照サンプルを使って音色を置き換えまたはクローン。
-- ⬜ **マルチトラック / ボーカル・伴奏分離**
+- ✅ **マルチトラック / ボーカル・伴奏分離**: ボーカル・ドラム・ベース・ギターなど 12 種のステムを分離。
 
 ### 結合
 
@@ -199,7 +204,7 @@ TongFlowで生成AIを活用し、創造力を解き放とう！
 - [tongflow-modal-qwen3asr](https://github.com/tong-io/tongflow-modal-qwen3asr) — Qwen3 音声認識
 - [tongflow-modal-qwen3tts](https://github.com/tong-io/tongflow-modal-qwen3tts) — Qwen3 テキストから音声
 - [tongflow-modal-whisper](https://github.com/tong-io/tongflow-modal-whisper) — Whisper 音声認識（タイムスタンプ付き、代替）
-- [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step テキストから音楽生成
+- [tongflow-modal-ace-step](https://github.com/tong-io/tongflow-modal-ace-step) — ACE-Step 1.5 音楽スイート：テキストから音楽（sft / base / turbo 選択可）、リペイント、カバー、ステム抽出、トラック追加、編曲補完、音楽ブリーフ、音楽理解
 - [tongflow-modal-levo](https://github.com/tong-io/tongflow-modal-levo) — LeVo 2 / SongGeneration テキストから音楽生成（多言語・商用グレード）
 - [tongflow-modal-docling](https://github.com/tong-io/tongflow-modal-docling) — Docling ドキュメント → テキスト
 - [tongflow-modal-paddle](https://github.com/tong-io/tongflow-modal-paddle) — PaddleOCR ドキュメント → テキスト

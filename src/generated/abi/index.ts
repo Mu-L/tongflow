@@ -1831,6 +1831,421 @@ export type AudioDescribeOutput = FromSchema<
     typeof _slot_audio_describe_outputs
 >;
 
+const _slot_music_repaint_inputs = {
+    type: "object",
+    required: ["audio", "start_time", "end_time"],
+    properties: {
+        audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        text: {
+            type: "string",
+        },
+        lyrics: {
+            type: "string",
+        },
+        start_time: {
+            type: "number",
+        },
+        end_time: {
+            type: "number",
+        },
+        strength: {
+            type: "number",
+        },
+        seed: {
+            type: "integer",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicRepaintInput = FromSchema<typeof _slot_music_repaint_inputs>;
+const _slot_music_repaint_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        audio: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicRepaintOutput = FromSchema<typeof _slot_music_repaint_outputs>;
+
+const _slot_music_cover_inputs = {
+    type: "object",
+    required: ["audio"],
+    properties: {
+        audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        ref_audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        text: {
+            type: "string",
+        },
+        lyrics: {
+            type: "string",
+        },
+        strength: {
+            type: "number",
+        },
+        seed: {
+            type: "integer",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicCoverInput = FromSchema<typeof _slot_music_cover_inputs>;
+const _slot_music_cover_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        audio: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicCoverOutput = FromSchema<typeof _slot_music_cover_outputs>;
+
+const _slot_music_extract_inputs = {
+    type: "object",
+    required: ["audio", "track"],
+    properties: {
+        audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        track: {
+            type: "string",
+        },
+        seed: {
+            type: "integer",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicExtractInput = FromSchema<typeof _slot_music_extract_inputs>;
+const _slot_music_extract_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        audio: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicExtractOutput = FromSchema<typeof _slot_music_extract_outputs>;
+
+const _slot_music_lego_inputs = {
+    type: "object",
+    required: ["audio", "track"],
+    properties: {
+        audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        track: {
+            type: "string",
+        },
+        text: {
+            type: "string",
+        },
+        lyrics: {
+            type: "string",
+        },
+        seed: {
+            type: "integer",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicLegoInput = FromSchema<typeof _slot_music_lego_inputs>;
+const _slot_music_lego_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        audio: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicLegoOutput = FromSchema<typeof _slot_music_lego_outputs>;
+
+const _slot_music_complete_inputs = {
+    type: "object",
+    required: ["audio"],
+    properties: {
+        audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        tracks: {
+            type: "array",
+            items: {
+                type: "string",
+            },
+        },
+        text: {
+            type: "string",
+        },
+        seed: {
+            type: "integer",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicCompleteInput = FromSchema<typeof _slot_music_complete_inputs>;
+const _slot_music_complete_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        audio: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicCompleteOutput = FromSchema<
+    typeof _slot_music_complete_outputs
+>;
+
+const _slot_music_brief_inputs = {
+    type: "object",
+    required: ["text"],
+    properties: {
+        text: {
+            type: "string",
+            minLength: 1,
+        },
+        instrumental: {
+            type: "boolean",
+        },
+        language: {
+            type: "string",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicBriefInput = FromSchema<typeof _slot_music_brief_inputs>;
+const _slot_music_brief_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        lyrics: {
+            type: "string",
+        },
+        tags: {
+            type: "string",
+        },
+        bpm: {
+            type: "number",
+        },
+        keyscale: {
+            type: "string",
+        },
+        duration: {
+            type: "number",
+        },
+        language: {
+            type: "string",
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type MusicBriefOutput = FromSchema<typeof _slot_music_brief_outputs>;
+
 const _slot_audio_image_gen_video_inputs = {
     type: "object",
     required: ["image", "audio"],
@@ -3372,6 +3787,12 @@ export type NodeSlot =
     | "image-describe"
     | "video-describe"
     | "audio-describe"
+    | "music-repaint"
+    | "music-cover"
+    | "music-extract"
+    | "music-lego"
+    | "music-complete"
+    | "music-brief"
     | "audio-image-gen-video"
     | "speech-text-gen-video"
     | "video-image-gen-video-mix"
@@ -3424,6 +3845,12 @@ export type SlotInputsMap = {
     "image-describe": ImageDescribeInput;
     "video-describe": VideoDescribeInput;
     "audio-describe": AudioDescribeInput;
+    "music-repaint": MusicRepaintInput;
+    "music-cover": MusicCoverInput;
+    "music-extract": MusicExtractInput;
+    "music-lego": MusicLegoInput;
+    "music-complete": MusicCompleteInput;
+    "music-brief": MusicBriefInput;
     "audio-image-gen-video": AudioImageGenVideoInput;
     "speech-text-gen-video": SpeechTextGenVideoInput;
     "video-image-gen-video-mix": VideoImageGenVideoMixInput;
@@ -3476,6 +3903,12 @@ export type SlotOutputsMap = {
     "image-describe": ImageDescribeOutput;
     "video-describe": VideoDescribeOutput;
     "audio-describe": AudioDescribeOutput;
+    "music-repaint": MusicRepaintOutput;
+    "music-cover": MusicCoverOutput;
+    "music-extract": MusicExtractOutput;
+    "music-lego": MusicLegoOutput;
+    "music-complete": MusicCompleteOutput;
+    "music-brief": MusicBriefOutput;
     "audio-image-gen-video": AudioImageGenVideoOutput;
     "speech-text-gen-video": SpeechTextGenVideoOutput;
     "video-image-gen-video-mix": VideoImageGenVideoMixOutput;
@@ -4699,6 +5132,259 @@ export const ABI_NODES = {
                     type: "string",
                 },
                 text: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "music-repaint": {
+        inputs: {
+            type: "object",
+            required: ["audio", "start_time", "end_time"],
+            properties: {
+                audio: {
+                    $ref: "#/$defs/Asset",
+                },
+                text: {
+                    type: "string",
+                },
+                lyrics: {
+                    type: "string",
+                },
+                start_time: {
+                    type: "number",
+                },
+                end_time: {
+                    type: "number",
+                },
+                strength: {
+                    type: "number",
+                },
+                seed: {
+                    type: "integer",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                audio: {
+                    $ref: "#/$defs/AudioRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "music-cover": {
+        inputs: {
+            type: "object",
+            required: ["audio"],
+            properties: {
+                audio: {
+                    $ref: "#/$defs/Asset",
+                },
+                ref_audio: {
+                    $ref: "#/$defs/Asset",
+                },
+                text: {
+                    type: "string",
+                },
+                lyrics: {
+                    type: "string",
+                },
+                strength: {
+                    type: "number",
+                },
+                seed: {
+                    type: "integer",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                audio: {
+                    $ref: "#/$defs/AudioRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "music-extract": {
+        inputs: {
+            type: "object",
+            required: ["audio", "track"],
+            properties: {
+                audio: {
+                    $ref: "#/$defs/Asset",
+                },
+                track: {
+                    type: "string",
+                },
+                seed: {
+                    type: "integer",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                audio: {
+                    $ref: "#/$defs/AudioRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "music-lego": {
+        inputs: {
+            type: "object",
+            required: ["audio", "track"],
+            properties: {
+                audio: {
+                    $ref: "#/$defs/Asset",
+                },
+                track: {
+                    type: "string",
+                },
+                text: {
+                    type: "string",
+                },
+                lyrics: {
+                    type: "string",
+                },
+                seed: {
+                    type: "integer",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                audio: {
+                    $ref: "#/$defs/AudioRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "music-complete": {
+        inputs: {
+            type: "object",
+            required: ["audio"],
+            properties: {
+                audio: {
+                    $ref: "#/$defs/Asset",
+                },
+                tracks: {
+                    type: "array",
+                    items: {
+                        type: "string",
+                    },
+                },
+                text: {
+                    type: "string",
+                },
+                seed: {
+                    type: "integer",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                audio: {
+                    $ref: "#/$defs/AudioRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "music-brief": {
+        inputs: {
+            type: "object",
+            required: ["text"],
+            properties: {
+                text: {
+                    type: "string",
+                    minLength: 1,
+                },
+                instrumental: {
+                    type: "boolean",
+                },
+                language: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                lyrics: {
+                    type: "string",
+                },
+                tags: {
+                    type: "string",
+                },
+                bpm: {
+                    type: "number",
+                },
+                keyscale: {
+                    type: "string",
+                },
+                duration: {
+                    type: "number",
+                },
+                language: {
                     type: "string",
                 },
             },

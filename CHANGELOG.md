@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **ACE-Step 1.5 music suite** — six new ABI slots with canvas nodes and
+  smart-island actions, all served by the reworked `tongflow-modal-ace-step`
+  plugin:
+  - **Music repaint** (`music-repaint`) — regenerate a chosen time range;
+  - **Music cover** (`music-cover`) — restyle a song via caption and/or
+    reference track;
+  - **Stem extraction** (`music-extract`) — isolate one of 12 stems
+    (vocals, drums, bass, guitar, …);
+  - **Add track** (`music-lego`) — generate a new stem over a mix;
+  - **Complete arrangement** (`music-complete`) — fill in missing tracks;
+  - **Music brief** (`music-brief`) — one-sentence idea → lyrics, style
+    tags, BPM, key, and duration (runs on the 5 Hz LM).
+  The plugin also implements **audio-describe** (music understanding via
+  the LM) and exposes a per-node **model dropdown** for the DiT
+  (`xl-sft` default / `xl-base` / `xl-turbo`).
+
+### Changed
+
+- **ACE-Step default model upgraded** from `xl-base` to **`xl-sft`** (the
+  official best-quality variant); the upstream repo revision is now pinned.
+- Python SDK **0.2.3** published: generated models for the six new slots
+  and a `current_model()` side channel so router-style model selection
+  reaches Modal-backed plugins.
+
 ## [0.1.13] - 2026-07-04
 
 ### Added

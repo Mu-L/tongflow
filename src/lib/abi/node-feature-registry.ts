@@ -63,6 +63,10 @@ export const NODE_TYPE_TO_ABI_FEATURE: Readonly<Record<string, NodeSlot>> = {
     linkGenTextNode: "link",
     getFirstFrameNode: "get-first-frame",
     getLastFrameNode: "get-last-frame",
+    musicRepaintNode: "music-repaint",
+    musicExtractNode: "music-extract",
+    musicLegoNode: "music-lego",
+    musicCompleteNode: "music-complete",
 
     // batch/
     dropVideoNode: "drop-video",
@@ -83,10 +87,12 @@ export const NODE_TYPE_TO_ABI_FEATURE: Readonly<Record<string, NodeSlot>> = {
     textAudioGenSpeechNode: "text-audio-gen-speech",
     textsGenTextNode: "combine-text",
     concatVideoComposeNode: "concat-videos",
+    musicCoverNode: "music-cover",
 
     // decompose/
     splitVideoNode: "split-video",
     splitTextNode: "split-text",
+    musicBriefNode: "music-brief",
 };
 
 export function featureForNodeType(
@@ -162,6 +168,11 @@ export const NODE_TYPE_SOURCE_SPEC: Partial<
     // out one extraction per URL stored in the linkNode's `texts`.
     linkGenTextNode: {
         url: batchOn({ nodeType: "linkNode", path: "texts" }),
+    },
+    // `text` is a plain string; promote it to a textNode-sourced handle so an
+    // upstream text node can feed the music brief idea.
+    musicBriefNode: {
+        text: handle({ nodeType: "textNode", path: "texts[0]" }),
     },
 };
 
