@@ -68,3 +68,4 @@ __pycache__/
 /open-next.config.ts
 /worker-entry.ts
 /.open-next/
+/.dev.vars*
