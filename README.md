@@ -59,7 +59,7 @@ All builds are on the [Releases](https://github.com/tong-io/tongflow/releases/la
 
 ### Step 2 — Sign in and create
 
-Sign in with Google, GitHub, Apple, or WeChat and start creating — the cloud studio manages plugins and execution for you.
+Sign in with Google or WeChat and start creating — the cloud studio manages plugins and execution for you.
 
 > **Prefer a fully local, account-free TongFlow?** That's what self-hosting is for — see [Run from source](#run-from-source) or [Run with Docker](#run-with-docker), then follow [Self-host setup](#self-host-setup-plugins--credentials). (The desktop app up to v0.1.13 bundled this local runtime; those installers remain on the [Releases](https://github.com/tong-io/tongflow/releases) page.)
 
