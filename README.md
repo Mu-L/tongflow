@@ -311,10 +311,10 @@ PyPI package). Contributions are covered by our [CLA](CLA.md).
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=tong-io%2Ftongflow&type=date&legend=top-left">
+[<a href="https://www.star-history.com/?repos=tong-io%2Ftongflow&type=date&legend=top-left">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=tong-io/tongflow&type=date&theme=dark&legend=top-left" />
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=tong-io/tongflow&type=date&legend=top-left" />
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=tong-io/tongflow&type=date&legend=top-left" />
  </picture>
-</a>
+</a>](https://www.star-history.com/?repos=tong-io%2Ftongflow&type=date&legend=top-left)
