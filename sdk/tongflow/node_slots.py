@@ -73,6 +73,11 @@ class NodeSlots:
     REMOVE_WATERMARK: Final[str] = 'remove_watermark'
     SUBTITLE_REMOVE: Final[str] = 'subtitle_remove'
     TEXT_AUDIO_GEN_SPEECH: Final[str] = 'text-audio-gen-speech'
+    IMAGE_POSE: Final[str] = 'image-pose'
+    IMAGE_BODY_SEG: Final[str] = 'image-body-seg'
+    IMAGE_NORMAL: Final[str] = 'image-normal'
+    IMAGE_MATTING: Final[str] = 'image-matting'
+    VIDEO_GEN_MODEL: Final[str] = 'video-gen-model'
 
 
 ALL_NODE_SLOTS: Final[tuple[str, ...]] = (
@@ -131,5 +136,10 @@ ALL_NODE_SLOTS: Final[tuple[str, ...]] = (
     'remove_watermark',
     'subtitle_remove',
     'text-audio-gen-speech',
+    'image-pose',
+    'image-body-seg',
+    'image-normal',
+    'image-matting',
+    'video-gen-model',
 )
 

@@ -3756,6 +3756,297 @@ export type TextAudioGenSpeechOutput = FromSchema<
     typeof _slot_text_audio_gen_speech_outputs
 >;
 
+const _slot_image_pose_inputs = {
+    type: "object",
+    required: ["image"],
+    properties: {
+        image: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImagePoseInput = FromSchema<typeof _slot_image_pose_inputs>;
+const _slot_image_pose_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        image: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImagePoseOutput = FromSchema<typeof _slot_image_pose_outputs>;
+
+const _slot_image_body_seg_inputs = {
+    type: "object",
+    required: ["image"],
+    properties: {
+        image: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImageBodySegInput = FromSchema<typeof _slot_image_body_seg_inputs>;
+const _slot_image_body_seg_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        image: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImageBodySegOutput = FromSchema<
+    typeof _slot_image_body_seg_outputs
+>;
+
+const _slot_image_normal_inputs = {
+    type: "object",
+    required: ["image"],
+    properties: {
+        image: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImageNormalInput = FromSchema<typeof _slot_image_normal_inputs>;
+const _slot_image_normal_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        image: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImageNormalOutput = FromSchema<typeof _slot_image_normal_outputs>;
+
+const _slot_image_matting_inputs = {
+    type: "object",
+    required: ["image"],
+    properties: {
+        image: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImageMattingInput = FromSchema<typeof _slot_image_matting_inputs>;
+const _slot_image_matting_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        image: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type ImageMattingOutput = FromSchema<typeof _slot_image_matting_outputs>;
+
+const _slot_video_gen_model_inputs = {
+    type: "object",
+    required: ["video"],
+    properties: {
+        video: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type VideoGenModelInput = FromSchema<
+    typeof _slot_video_gen_model_inputs
+>;
+const _slot_video_gen_model_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        model: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type VideoGenModelOutput = FromSchema<
+    typeof _slot_video_gen_model_outputs
+>;
+
 // --- NodeSlot union ---
 export type NodeSlot =
     | "gen-text"
@@ -3812,7 +4103,12 @@ export type NodeSlot =
     | "convert_voice"
     | "remove_watermark"
     | "subtitle_remove"
-    | "text-audio-gen-speech";
+    | "text-audio-gen-speech"
+    | "image-pose"
+    | "image-body-seg"
+    | "image-normal"
+    | "image-matting"
+    | "video-gen-model";
 
 // --- Lookup maps ---
 export type SlotInputsMap = {
@@ -3871,6 +4167,11 @@ export type SlotInputsMap = {
     remove_watermark: RemoveWatermarkInput;
     subtitle_remove: SubtitleRemoveInput;
     "text-audio-gen-speech": TextAudioGenSpeechInput;
+    "image-pose": ImagePoseInput;
+    "image-body-seg": ImageBodySegInput;
+    "image-normal": ImageNormalInput;
+    "image-matting": ImageMattingInput;
+    "video-gen-model": VideoGenModelInput;
 };
 
 export type SlotOutputsMap = {
@@ -3929,6 +4230,11 @@ export type SlotOutputsMap = {
     remove_watermark: RemoveWatermarkOutput;
     subtitle_remove: SubtitleRemoveOutput;
     "text-audio-gen-speech": TextAudioGenSpeechOutput;
+    "image-pose": ImagePoseOutput;
+    "image-body-seg": ImageBodySegOutput;
+    "image-normal": ImageNormalOutput;
+    "image-matting": ImageMattingOutput;
+    "video-gen-model": VideoGenModelOutput;
 };
 
 export type SlotInput<S extends NodeSlot> = SlotInputsMap[S];
@@ -6212,6 +6518,146 @@ export const ABI_NODES = {
                 },
                 audio: {
                     $ref: "#/$defs/AudioRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "image-pose": {
+        inputs: {
+            type: "object",
+            required: ["image"],
+            properties: {
+                image: {
+                    $ref: "#/$defs/Asset",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                image: {
+                    $ref: "#/$defs/ImageRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "image-body-seg": {
+        inputs: {
+            type: "object",
+            required: ["image"],
+            properties: {
+                image: {
+                    $ref: "#/$defs/Asset",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                image: {
+                    $ref: "#/$defs/ImageRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "image-normal": {
+        inputs: {
+            type: "object",
+            required: ["image"],
+            properties: {
+                image: {
+                    $ref: "#/$defs/Asset",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                image: {
+                    $ref: "#/$defs/ImageRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "image-matting": {
+        inputs: {
+            type: "object",
+            required: ["image"],
+            properties: {
+                image: {
+                    $ref: "#/$defs/Asset",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                image: {
+                    $ref: "#/$defs/ImageRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "video-gen-model": {
+        inputs: {
+            type: "object",
+            required: ["video"],
+            properties: {
+                video: {
+                    $ref: "#/$defs/Asset",
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                model: {
+                    $ref: "#/$defs/ModelRef",
                 },
             },
             additionalProperties: false,

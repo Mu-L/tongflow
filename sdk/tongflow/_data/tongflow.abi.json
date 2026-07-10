@@ -2329,6 +2329,151 @@
                 },
                 "additionalProperties": false
             }
+        },
+        {
+            "nodeSlot": "image-pose",
+            "inputs": {
+                "type": "object",
+                "required": ["image"],
+                "properties": {
+                    "image": {
+                        "$ref": "#/$defs/Asset"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "$ref": "#/$defs/ImageRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "image-body-seg",
+            "inputs": {
+                "type": "object",
+                "required": ["image"],
+                "properties": {
+                    "image": {
+                        "$ref": "#/$defs/Asset"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "$ref": "#/$defs/ImageRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "image-normal",
+            "inputs": {
+                "type": "object",
+                "required": ["image"],
+                "properties": {
+                    "image": {
+                        "$ref": "#/$defs/Asset"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "$ref": "#/$defs/ImageRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "image-matting",
+            "inputs": {
+                "type": "object",
+                "required": ["image"],
+                "properties": {
+                    "image": {
+                        "$ref": "#/$defs/Asset"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "$ref": "#/$defs/ImageRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
+            "nodeSlot": "video-gen-model",
+            "inputs": {
+                "type": "object",
+                "required": ["video"],
+                "properties": {
+                    "video": {
+                        "$ref": "#/$defs/Asset"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "model": {
+                        "$ref": "#/$defs/ModelRef"
+                    }
+                },
+                "additionalProperties": false
+            }
         }
     ]
 }
