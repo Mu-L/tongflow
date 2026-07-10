@@ -5,6 +5,7 @@ import { join } from "node:path";
 import * as git from "isomorphic-git";
 import http from "isomorphic-git/http/node";
 import { logger } from "@/lib/logger";
+import { loadPluginMetaMap } from "@/lib/plugins/plugin-env-manifests.server";
 import { pluginsDir, resourcesDir } from "@/lib/runtime/paths.server";
 
 /**
@@ -20,10 +21,30 @@ export interface OfficialPluginManifest {
 export interface OfficialPluginInfo {
     id: string;
     installed: boolean;
+    /** Presentation metadata (from an installed plugin's manifest). */
+    name?: string;
+    description?: string;
+    /** App-root path or URL to the plugin icon (manifest, else public convention). */
+    icon?: string;
 }
 
 function manifestPath(): string {
     return join(resourcesDir(), "config", "official-plugins.json");
+}
+
+/**
+ * Icon served from the app bundle by convention: `public/plugins/<id>.(svg|png)`.
+ * Available even for not-yet-installed plugins (unlike the per-plugin manifest).
+ * Returns the web path (e.g. `/plugins/<id>.svg`) or null when no file exists.
+ */
+function publicIconPath(id: string): string | null {
+    const dir = join(resourcesDir(), "public", "plugins");
+    for (const ext of ["svg", "png", "webp"]) {
+        if (existsSync(join(dir, `${id}.${ext}`))) {
+            return `/plugins/${id}.${ext}`;
+        }
+    }
+    return null;
 }
 
 export function loadOfficialPluginManifest(): OfficialPluginManifest {
@@ -52,12 +73,22 @@ export function listOfficialPlugins(): {
     plugins: OfficialPluginInfo[];
 } {
     const manifest = loadOfficialPluginManifest();
+    const metaMap = loadPluginMetaMap();
     return {
         org: manifest.org,
-        plugins: manifest.plugins.map((id) => ({
-            id,
-            installed: isPluginInstalled(id),
-        })),
+        plugins: manifest.plugins.map((id) => {
+            const meta = metaMap[id];
+            // Manifest icon wins; otherwise fall back to the public convention
+            // so even not-yet-installed plugins can show an icon.
+            const icon = meta?.icon ?? publicIconPath(id) ?? undefined;
+            return {
+                id,
+                installed: isPluginInstalled(id),
+                name: meta?.name,
+                description: meta?.description,
+                icon,
+            };
+        }),
     };
 }
 

@@ -32,6 +32,12 @@ export const PluginConfigSchema = z.object({
      * such as Modal): its entry.py deploys once before invoking. Informational —
      * the deploy step lives inside the plugin's entry.py. */
     needsDeploy: z.boolean().optional(),
+    /** Presentation-only metadata merged in from `tongflow.plugin.json`'s
+     * top-level `plugin` block (name/description/icon). Not produced by the
+     * scanner; attached by the registry API route for the node picker. */
+    name: z.string().optional(),
+    description: z.string().optional(),
+    icon: z.string().optional(),
 });
 
 export const PluginsRegistrySchema = z.object({

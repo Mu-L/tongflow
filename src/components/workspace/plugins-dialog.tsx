@@ -45,9 +45,40 @@ import { logger } from "@/lib/logger";
 const navBtnClass =
     "h-10 w-10 rounded-xl bg-white border border-gray-100 hover:bg-gray-50 text-gray-500 hover:text-gray-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-400 dark:hover:text-white dark:hover:bg-zinc-700 transition-all duration-200";
 
+/** Plugin icon with a monogram fallback on missing/broken src. */
+function PluginCardIcon({ icon, label }: { icon?: string; label: string }) {
+    const [failed, setFailed] = useState(false);
+    const letter = label.trim().charAt(0).toUpperCase() || "?";
+    if (!icon || failed) {
+        return (
+            <span
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-medium text-muted-foreground"
+                style={{ width: 28, height: 28 }}
+            >
+                {letter}
+            </span>
+        );
+    }
+    return (
+        // Explicit width/height attributes: SVG icons have no intrinsic size,
+        // so they must never rely on CSS alone to stay small.
+        <img
+            src={icon}
+            alt=""
+            width={28}
+            height={28}
+            className="h-7 w-7 shrink-0 rounded-md object-contain"
+            onError={() => setFailed(true)}
+        />
+    );
+}
+
 interface OfficialPlugin {
     id: string;
     installed: boolean;
+    name?: string;
+    description?: string;
+    icon?: string;
 }
 
 interface OfficialResponse {
@@ -285,6 +316,10 @@ export function PluginsDialog() {
                                         key={p.id}
                                         className="flex items-center gap-2 rounded-lg border px-3 py-2"
                                     >
+                                        <PluginCardIcon
+                                            icon={p.icon}
+                                            label={p.name || p.id}
+                                        />
                                         <div className="min-w-0 flex-1">
                                             <a
                                                 href={`${org}/${p.id}`}
@@ -293,8 +328,13 @@ export function PluginsDialog() {
                                                 title={t("openRepo")}
                                                 className="block truncate text-sm font-medium hover:text-primary hover:underline"
                                             >
-                                                {p.id}
+                                                {p.name || p.id}
                                             </a>
+                                            {p.description ? (
+                                                <p className="text-xs text-muted-foreground leading-snug">
+                                                    {p.description}
+                                                </p>
+                                            ) : null}
                                         </div>
                                         {p.installed ? (
                                             updates[p.id] === false ? (
