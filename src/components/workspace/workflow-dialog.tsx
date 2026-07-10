@@ -1,6 +1,6 @@
 "use client";
 
-import type { Edge, Node } from "@xyflow/react";
+import { type Edge, type Node, useReactFlow } from "@xyflow/react";
 import {
     Box,
     Download,
@@ -209,6 +209,7 @@ interface WorkflowDialogProps {
 
 export function WorkflowDialog({ trigger, tooltip }: WorkflowDialogProps) {
     const t = useTranslations("Workspace.dialog");
+    const { fitView } = useReactFlow();
     const [open, setOpen] = useState(false);
     const [workflows, setWorkflows] = useState<Workflow[]>([]);
     const [loading, setLoading] = useState(false);
@@ -285,13 +286,20 @@ export function WorkflowDialog({ trigger, tooltip }: WorkflowDialogProps) {
                 useFlow.getState().setWorkflowId(workflow.id);
                 setOpen(false);
 
+                // `fitView` on <ReactFlow> only runs at mount; switching
+                // workflows swaps nodes without re-fitting, so the freshly
+                // loaded nodes render off-screen. Re-fit once they've mounted.
+                setTimeout(() => {
+                    void fitView({ duration: 400, padding: 0.2 });
+                }, 50);
+
                 toast.success(t("loadSuccess"));
             } catch (error) {
                 logger.error("Failed to load workflow:", error);
                 showErrorToast({ message: t("loadFailed") });
             }
         },
-        [t],
+        [t, fitView],
     );
 
     const renderWorkflowCard = useCallback(
