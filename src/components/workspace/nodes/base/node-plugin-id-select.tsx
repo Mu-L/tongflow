@@ -59,6 +59,7 @@ export function NodePluginIdSelect({
     const isLoading = usePluginsRegistryStore((s) => s.isLoading);
     const isLoaded = usePluginsRegistryStore((s) => s.isLoaded);
     const loadError = usePluginsRegistryStore((s) => s.error);
+    const pluginsMeta = usePluginsRegistryStore((s) => s.registry?.plugins);
 
     const { resolved, pluginOptions } = useResolvedPluginId(
         nodeSlot,
@@ -68,11 +69,16 @@ export function NodePluginIdSelect({
 
     const options = useMemo(
         () =>
-            pluginOptions.map((pid) => ({
-                value: pid,
-                label: pluginDisplayName(pid),
-            })),
-        [pluginOptions],
+            pluginOptions.map((pid) => {
+                const meta = pluginsMeta?.[pid];
+                return {
+                    value: pid,
+                    label: meta?.name || pluginDisplayName(pid),
+                    description: meta?.description,
+                    icon: meta?.icon,
+                };
+            }),
+        [pluginOptions, pluginsMeta],
     );
 
     const title = (

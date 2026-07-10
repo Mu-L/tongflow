@@ -15,6 +15,10 @@ export type PluginsRegistryPayload = {
                 string,
                 { methodName: string; models?: string[] }
             >;
+            /** Presentation metadata merged from `tongflow.plugin.json`. */
+            name?: string;
+            description?: string;
+            icon?: string;
         }
     >;
     errors?: Array<{ pluginId: string; message: string }>;
@@ -127,6 +131,23 @@ export function useNodePluginModels(
         registry?.plugins?.[pluginId]?.methodsByNodeSlot?.[nodeSlot]?.models ??
         [];
     return dedupeIds(models);
+}
+
+export type PluginMeta = {
+    name?: string;
+    description?: string;
+    icon?: string;
+};
+
+/** Presentation metadata (name/description/icon) for a single plugin. */
+export function usePluginMeta(pluginId: string): PluginMeta {
+    const registry = usePluginsRegistryStore((s) => s.registry);
+    const p = registry?.plugins?.[pluginId];
+    return {
+        name: p?.name,
+        description: p?.description,
+        icon: p?.icon,
+    };
 }
 
 /**

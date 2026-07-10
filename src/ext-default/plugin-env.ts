@@ -65,7 +65,10 @@ export function loadPluginEnvDecls(): PluginEnvDecl[] {
             seen.add(v.key);
             return true;
         });
-        if (env.length > 0) decls.push({ pluginId, env });
+        const meta = result.data.plugin;
+        // Emit an entry when the plugin declares env vars OR presentation
+        // metadata, so plugins that ship only name/description/icon still surface.
+        if (env.length > 0 || meta) decls.push({ pluginId, meta, env });
     }
 
     decls.sort((a, b) => a.pluginId.localeCompare(b.pluginId));

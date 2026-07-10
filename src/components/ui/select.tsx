@@ -104,8 +104,13 @@ function SelectLabel({
 function SelectItem({
     className,
     children,
+    endSlot,
     ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>) {
+}: React.ComponentProps<typeof SelectPrimitive.Item> & {
+    /** Rendered as a sibling after the item text (outside `ItemText`, so it is
+     * not cloned into the trigger's selected-value display). */
+    endSlot?: React.ReactNode;
+}) {
     return (
         <SelectPrimitive.Item
             data-slot="select-item"
@@ -121,6 +126,7 @@ function SelectItem({
                 </SelectPrimitive.ItemIndicator>
             </span>
             <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+            {endSlot}
         </SelectPrimitive.Item>
     );
 }
