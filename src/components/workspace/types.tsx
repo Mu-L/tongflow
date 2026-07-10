@@ -59,12 +59,16 @@ import ExtractAudioNode from "./nodes/transfer/extract-audio";
 import FileGenTextNode from "./nodes/transfer/file-gen-text";
 import GetFirstFrameNode from "./nodes/transfer/get-first-frame";
 import GetLastFrameNode from "./nodes/transfer/get-last-frame";
+import ImageBodySegNode from "./nodes/transfer/image-body-seg";
 import ImageGenImageNode from "./nodes/transfer/image-gen-image";
 import ImageGenImageUpscaleNode from "./nodes/transfer/image-gen-image-upscale";
 import ImageGenModelNode from "./nodes/transfer/image-gen-model";
 import ImageGenTextNode from "./nodes/transfer/image-gen-text";
 // Transform nodes
 import ImageGenVideoNode from "./nodes/transfer/image-gen-video";
+import ImageMattingNode from "./nodes/transfer/image-matting";
+import ImageNormalNode from "./nodes/transfer/image-normal";
+import ImagePoseNode from "./nodes/transfer/image-pose";
 import LinkGenTextNode from "./nodes/transfer/link-gen-text";
 import MusicCompleteNode from "./nodes/transfer/music-complete";
 import MusicExtractNode from "./nodes/transfer/music-extract";
@@ -84,6 +88,7 @@ import TextGenSpeechPresetNode from "./nodes/transfer/text-gen-speech-preset";
 import GenTextNode from "./nodes/transfer/text-gen-text";
 import TextGenVideoNode from "./nodes/transfer/text-gen-video";
 import VideoEditNode from "./nodes/transfer/video-edit";
+import VideoGenModelNode from "./nodes/transfer/video-gen-model";
 import VideoGenTextNode from "./nodes/transfer/video-gen-text";
 import VideoGenTextSpeechRecognizeNode from "./nodes/transfer/video-gen-text-speech-recognize";
 import VideoUpscaleNode from "./nodes/transfer/video-upscale";
@@ -116,6 +121,11 @@ export const NODE_TYPES: NodeTypes = {
     imageGenVideoComposeNode: ImageGenVideoComposeNode,
     textGenVideoNode: TextGenVideoNode,
     imageGenModelNode: ImageGenModelNode,
+    imagePoseNode: ImagePoseNode,
+    imageBodySegNode: ImageBodySegNode,
+    imageNormalNode: ImageNormalNode,
+    imageMattingNode: ImageMattingNode,
+    videoGenModelNode: VideoGenModelNode,
     speechGenVideoNode: SpeechGenVideoNode,
     imageGenImageNode: ImageGenImageNode,
     imageGenImageUpscaleNode: ImageGenImageUpscaleNode,
@@ -215,6 +225,11 @@ export const NODE_CATEGORIES = {
         "imageGenVideoNode",
         "textGenVideoNode",
         "imageGenModelNode",
+        "imagePoseNode",
+        "imageBodySegNode",
+        "imageNormalNode",
+        "imageMattingNode",
+        "videoGenModelNode",
         "speechGenVideoNode",
         "imageGenImageNode",
         "imageGenImageUpscaleNode",
