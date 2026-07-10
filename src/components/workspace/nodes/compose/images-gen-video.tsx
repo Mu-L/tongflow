@@ -94,7 +94,7 @@ const ImagesGenVideoNode = ({
             title={t("titles.imagesGenVideo")}
             icon={<Film className="h-5 w-5" />}
             executeLabel={t("actions.generateVideo")}
-            executeDisabled={!allImages || allImages.length < 2}
+            executeDisabled={!allImages || allImages.length < 1}
         >
             <div className="p-4 space-y-4">
                 <AspectRatioPicker
