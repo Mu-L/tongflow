@@ -32,6 +32,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { apiGet, apiPut } from "@/lib/api/client";
+import { openExternalUrl } from "@/lib/desktop/open-external";
 import { logger } from "@/lib/logger";
 import type {
     PluginEnvDecl,
@@ -149,15 +150,18 @@ function DeclaredVarRow({
                     ) : null}
                 </span>
                 {v.url ? (
-                    <a
-                        href={v.url}
-                        target="_blank"
-                        rel="noreferrer"
+                    // A button, not an anchor: the desktop shell's anchor
+                    // interception would keep console URLs with OAuth-ish
+                    // paths inside the WebView (see lib/desktop).
+                    <button
+                        type="button"
                         aria-label={t("getKey")}
+                        title={v.url}
                         className="text-muted-foreground hover:text-foreground"
+                        onClick={() => v.url && openExternalUrl(v.url)}
                     >
                         <ExternalLink className="h-3 w-3" />
-                    </a>
+                    </button>
                 ) : null}
             </div>
             <div className="flex items-center gap-2">
