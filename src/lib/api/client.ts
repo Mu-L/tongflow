@@ -164,7 +164,20 @@ export async function apiClient<T = unknown>(
                     response.status === 401
                         ? t("unauthorized")
                         : t("accessDenied");
-                if (shouldShowErrorToast) {
+                // Cancelable seam for embedding shells: preventDefault means
+                // the shell surfaced the 401 itself (e.g. a sign-in dialog),
+                // so the default toast is suppressed.
+                const handledByShell =
+                    response.status === 401 &&
+                    typeof window !== "undefined" &&
+                    !window.dispatchEvent(
+                        new CustomEvent("tf:unauthorized", {
+                            cancelable: true,
+                        }),
+                    );
+                if (handledByShell) {
+                    errorToastShown = true;
+                } else if (shouldShowErrorToast) {
                     showErrorToast({ message: authErrorMsg });
                     errorToastShown = true;
                 }
