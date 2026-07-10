@@ -864,6 +864,15 @@ export function useNodeActions(args: UseNodeActionsArgs): UseNodeActionsResult {
                                     ]),
                             },
                             {
+                                text: t("captureMotion"),
+                                id: "video-gen-model",
+                                nodeType: "videoGenModelNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "videoGenModelNode", data },
+                                    ]),
+                            },
+                            {
                                 text: t("editVideo"),
                                 id: "video-edit",
                                 nodeType: "videoEditNode",
@@ -996,6 +1005,42 @@ export function useNodeActions(args: UseNodeActionsArgs): UseNodeActionsResult {
                                 onClick: () =>
                                     expands(id, [
                                         { type: "imageGenModelNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("detectPose"),
+                                id: "image-pose",
+                                nodeType: "imagePoseNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "imagePoseNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("segmentBody"),
+                                id: "image-body-seg",
+                                nodeType: "imageBodySegNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "imageBodySegNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("estimateNormal"),
+                                id: "image-normal",
+                                nodeType: "imageNormalNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "imageNormalNode", data },
+                                    ]),
+                            },
+                            {
+                                text: t("extractForeground"),
+                                id: "image-matting",
+                                nodeType: "imageMattingNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "imageMattingNode", data },
                                     ]),
                             },
                             ...imageGroupButtons,

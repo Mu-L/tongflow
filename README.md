@@ -103,6 +103,10 @@ Sign in with Google or WeChat and start creating — the cloud studio manages pl
 - ✅ **Image editing**: inpaint, edit, or redraw with instructions.
 - ✅ **Image understanding**: captions, Q&A, or descriptions from an image.
 - ✅ **Image upscaling**: enlarge for sharper detail.
+- ✅ **Pose detection**: 308-keypoint whole-body skeleton overlay (body, hands, face).
+- ✅ **Body-part segmentation**: 29-class human parsing overlay.
+- ✅ **Surface normals**: per-pixel normal map of people in a photo.
+- ✅ **Human matting**: cut the human foreground out as a transparent PNG.
 
 #### Video
 
@@ -143,6 +147,7 @@ Sign in with Google or WeChat and start creating — the cloud studio manages pl
 ### Other
 
 - ✅ **Image → 3D**: single-view 3D model from an image.
+- ✅ **Video → motion capture**: monocular video to skeletal animation (body + fingers + face channels, GLB).
 - ✅ **Document → text**: extract plain text from documents.
 - ✅ **Link → text**: turn page content into text.
 
@@ -189,6 +194,7 @@ Sign in with Google or WeChat and start creating — the cloud studio manages pl
 - [tongflow-modal-triposplat](https://github.com/tong-io/tongflow-modal-triposplat) — TripoSplat single image → 3D Gaussian splat
 - [tongflow-modal-sam-3d-objects](https://github.com/tong-io/tongflow-modal-sam-3d-objects) — SAM 3D Objects single image → 3D Gaussian splat of the foreground object (auto mask, robust to occlusion/clutter; alternative)
 - [tongflow-modal-sam-3d-body](https://github.com/tong-io/tongflow-modal-sam-3d-body) — SAM 3D Body single image → full-body 3D human mesh GLB (multi-person, MHR rig; alternative)
+- [tongflow-modal-sapiens2](https://github.com/tong-io/tongflow-modal-sapiens2) — Sapiens2 (Meta) human suite: pose detection, body-part segmentation, surface normals, human matting, image → 3D point cloud, and **video motion capture** (skeletal-animation GLB with body, fingers, and face channels)
 - [tongflow-modal-seedvr2](https://github.com/tong-io/tongflow-modal-seedvr2) — SeedVR2 image / video super-resolution
 - [tongflow-modal-gemma4](https://github.com/tong-io/tongflow-modal-gemma4) — Gemma-4 multimodal text (image / video understanding)
 - [tongflow-modal-qwen3asr](https://github.com/tong-io/tongflow-modal-qwen3asr) — Qwen3 speech recognition
