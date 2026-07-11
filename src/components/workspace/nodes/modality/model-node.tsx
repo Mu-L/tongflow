@@ -1,7 +1,15 @@
 "use client";
 
 import { Handle, Position } from "@xyflow/react";
-import { Box, Download, Maximize2, RotateCcw, X } from "lucide-react";
+import {
+    Box,
+    Download,
+    Maximize2,
+    Pause,
+    Play,
+    RotateCcw,
+    X,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -23,6 +31,17 @@ import {
 import { ModalityPlaceholder } from "./modality-placeholder";
 
 type ModelNodeRfProps = RfDataNodeProps<"modelNode">;
+
+// Playback cap for animated models. Continuous rendering only happens for
+// models that actually carry clips, while visible, and only at this rate —
+// static models keep the zero-cost on-demand budget path.
+const ANIMATION_FPS = 30;
+
+// Shared helper: the loaders stash an AnimationMixer on the loaded root.
+const getMixer = (
+    model: THREE.Object3D | null,
+): THREE.AnimationMixer | undefined =>
+    (model?.userData as { mixer?: THREE.AnimationMixer } | undefined)?.mixer;
 
 // Frame camera to bound the mesh
 const _fitCameraToSelection = (
@@ -156,6 +175,11 @@ const FullScreen3DModal = ({
     } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    // Animated-model playback (see ANIMATION_FPS).
+    const [hasAnimation, setHasAnimation] = useState(false);
+    const [playing, setPlaying] = useState(true);
+    const playingRef = useRef(true);
+    const clockRef = useRef<THREE.Clock | null>(null);
     const { url } = useFileAsyncLoader(fileKey, { priority: "high" });
 
     const setupScene = useCallback(() => {
@@ -328,10 +352,25 @@ const FullScreen3DModal = ({
                 controls.saveState(); // baseline for "reset view"
                 controlsRef.current = controls;
                 requestRender();
+                setHasAnimation(Boolean(getMixer(modelRef.current)));
 
-                // requestAnimationFrame driver (renders only while armed).
-                const animate = () => {
+                // requestAnimationFrame driver. Animated models render
+                // continuously while playing (capped at ANIMATION_FPS);
+                // everything else renders only while the budget is armed.
+                const clock = new THREE.Clock();
+                clockRef.current = clock;
+                let lastAnimFrame = 0;
+                const animate = (t = 0) => {
                     animationIdRef.current = requestAnimationFrame(animate);
+                    const mixer = getMixer(modelRef.current);
+                    if (mixer && playingRef.current) {
+                        if (t - lastAnimFrame >= 1000 / ANIMATION_FPS) {
+                            lastAnimFrame = t;
+                            mixer.update(clock.getDelta());
+                            renderer.render(scene, camera);
+                        }
+                        return;
+                    }
                     if (renderBudget > 0) {
                         renderBudget--;
                         renderer.render(scene, camera);
@@ -369,9 +408,11 @@ const FullScreen3DModal = ({
                     controls.dispose();
                     controlsRef.current = null;
                     requestRenderRef.current = null;
+                    clockRef.current = null;
                     if (animationIdRef.current) {
                         cancelAnimationFrame(animationIdRef.current);
                     }
+                    getMixer(modelRef.current)?.stopAllAction();
                     disposeSplat(sceneRef.current, modelRef.current);
                     renderer.dispose();
                 };
@@ -423,6 +464,16 @@ const FullScreen3DModal = ({
         requestRenderRef.current?.();
     };
 
+    const handleTogglePlay = () => {
+        const next = !playingRef.current;
+        // Discard the delta accumulated while paused so playback resumes
+        // where it stopped instead of jumping ahead.
+        if (next) clockRef.current?.getDelta();
+        playingRef.current = next;
+        setPlaying(next);
+        if (!next) requestRenderRef.current?.(2); // draw the paused frame
+    };
+
     const handleDownload = () => {
         if (url) {
             const link = document.createElement("a");
@@ -445,6 +496,24 @@ const FullScreen3DModal = ({
                         {t("model3DPreview")}
                     </h2>
                     <div className="flex items-center gap-2">
+                        {hasAnimation && (
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={handleTogglePlay}
+                                title={
+                                    playing
+                                        ? t("pauseAnimation")
+                                        : t("playAnimation")
+                                }
+                            >
+                                {playing ? (
+                                    <Pause className="h-4 w-4" />
+                                ) : (
+                                    <Play className="h-4 w-4" />
+                                )}
+                            </Button>
+                        )}
                         <Button
                             size="sm"
                             variant="ghost"
@@ -522,6 +591,7 @@ const MiniModelPreview = ({
     url: string;
     fileExtension: string;
 }) => {
+    const t = useTranslations("Workspace.nodes.modal");
     const mountRef = useRef<HTMLDivElement>(null);
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
@@ -529,6 +599,12 @@ const MiniModelPreview = ({
     const modelRef = useRef<THREE.Object3D | null>(null);
     const animationIdRef = useRef<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    // Animated-model playback: plays by default, pauses off-viewport.
+    const [hasAnimation, setHasAnimation] = useState(false);
+    const [playing, setPlaying] = useState(true);
+    const playingRef = useRef(true);
+    const visibleRef = useRef(true);
+    const clockRef = useRef<THREE.Clock | null>(null);
 
     useEffect(() => {
         if (!mountRef.current || !url) return;
@@ -682,10 +758,39 @@ const MiniModelPreview = ({
                 controls.setGizmosVisible(false);
                 controls.addEventListener("change", () => requestRender(2));
                 requestRender();
+                setHasAnimation(Boolean(getMixer(modelRef.current)));
 
-                // Animation Loop (renders only while armed; idles otherwise)
-                const animate = () => {
+                // Off-viewport gate: an animated node scrolled out of the
+                // React Flow viewport must not keep the GPU busy.
+                const clock = new THREE.Clock();
+                clockRef.current = clock;
+                const io = new IntersectionObserver(
+                    (entries) => {
+                        const visible = entries[0]?.isIntersecting ?? true;
+                        // Drop the delta accumulated while hidden so the clip
+                        // resumes instead of fast-forwarding.
+                        if (visible && !visibleRef.current) clock.getDelta();
+                        visibleRef.current = visible;
+                    },
+                    { threshold: 0.05 },
+                );
+                if (mountRef.current) io.observe(mountRef.current);
+
+                // Render driver: animated models draw continuously while
+                // playing and visible (capped at ANIMATION_FPS); otherwise
+                // the on-demand budget path (renders only while armed).
+                let lastAnimFrame = 0;
+                const animate = (frameTime = 0) => {
                     animationIdRef.current = requestAnimationFrame(animate);
+                    const mixer = getMixer(modelRef.current);
+                    if (mixer && playingRef.current && visibleRef.current) {
+                        if (frameTime - lastAnimFrame >= 1000 / ANIMATION_FPS) {
+                            lastAnimFrame = frameTime;
+                            mixer.update(clock.getDelta());
+                            renderer.render(scene, camera);
+                        }
+                        return;
+                    }
                     if (renderBudget > 0) {
                         renderBudget--;
                         renderer.render(scene, camera);
@@ -698,9 +803,12 @@ const MiniModelPreview = ({
                 cleanup = () => {
                     if (animationIdRef.current)
                         cancelAnimationFrame(animationIdRef.current);
+                    io.disconnect();
+                    clockRef.current = null;
                     canvas.removeEventListener("pointerdown", stopProp);
                     canvas.removeEventListener("wheel", stopProp);
                     controls.dispose();
+                    getMixer(modelRef.current)?.stopAllAction();
                     disposeSplat(sceneRef.current, modelRef.current);
                     renderer.dispose();
                 };
@@ -717,6 +825,13 @@ const MiniModelPreview = ({
         };
     }, [url, fileExtension]);
 
+    const handleTogglePlay = () => {
+        const next = !playingRef.current;
+        if (next) clockRef.current?.getDelta(); // resume, don't fast-forward
+        playingRef.current = next;
+        setPlaying(next);
+    };
+
     return (
         <div className="w-full h-48 bg-gray-100 relative nodrag">
             {isLoading && (
@@ -728,6 +843,20 @@ const MiniModelPreview = ({
                 ref={mountRef}
                 className="w-full h-full cursor-grab active:cursor-grabbing"
             />
+            {hasAnimation && (
+                <button
+                    type="button"
+                    onClick={handleTogglePlay}
+                    title={playing ? t("pauseAnimation") : t("playAnimation")}
+                    className="absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+                >
+                    {playing ? (
+                        <Pause className="h-3.5 w-3.5" />
+                    ) : (
+                        <Play className="h-3.5 w-3.5 translate-x-px" />
+                    )}
+                </button>
+            )}
         </div>
     );
 };
@@ -751,20 +880,15 @@ async function loadGLTF(
                 scene.add(model);
                 modelRef.current = model;
 
-                // Attach first glTF mixer clip when available
+                // Attach animation clips via a mixer. The viewers' render
+                // loops drive mixer.update while playing (userData.mixer);
+                // no self-running loop here — the old one leaked past unmount.
                 if (gltf.animations.length > 0) {
                     const mixer = new THREE.AnimationMixer(model);
                     gltf.animations.forEach((clip: any) => {
                         mixer.clipAction(clip).play();
                     });
-
-                    const clock = new THREE.Clock();
-                    const originalAnimate = window.requestAnimationFrame;
-                    const animLoop = () => {
-                        mixer.update(clock.getDelta());
-                        originalAnimate(animLoop);
-                    };
-                    animLoop();
+                    model.userData.mixer = mixer;
                 }
                 resolve();
             },
@@ -893,10 +1017,12 @@ async function loadFBX(
                 scene.add(object);
                 modelRef.current = object;
 
-                // Play first FBX clip if multiple
+                // Play first FBX clip if multiple; the viewers' render loops
+                // drive mixer.update while playing (userData.mixer).
                 if (object.animations && object.animations.length > 0) {
                     const mixer = new THREE.AnimationMixer(object);
                     mixer.clipAction(object.animations[0]).play();
+                    object.userData.mixer = mixer;
                 }
                 resolve();
             },
@@ -958,6 +1084,12 @@ async function loadDAE(
                 const model = collada.scene;
                 scene.add(model);
                 modelRef.current = model;
+                // COLLADA can carry clips too; same mixer convention as glTF.
+                if (model.animations && model.animations.length > 0) {
+                    const mixer = new THREE.AnimationMixer(model);
+                    mixer.clipAction(model.animations[0]).play();
+                    model.userData.mixer = mixer;
+                }
                 resolve();
             },
             undefined,

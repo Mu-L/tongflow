@@ -918,6 +918,8 @@
                 "model3D": "3D Model",
                 "models3D": "3D Models ({count})",
                 "resetView": "Reset view",
+                "playAnimation": "Play animation",
+                "pauseAnimation": "Pause animation",
                 "downloadModel": "Download model",
                 "loading3DModel": "Loading 3D model...",
                 "errorLoadingModel": "Error loading model",
