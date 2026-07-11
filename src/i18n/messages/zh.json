@@ -918,6 +918,8 @@
                 "model3D": "3D模型",
                 "models3D": "3D模型 ({count})",
                 "resetView": "重置视图",
+                "playAnimation": "播放动画",
+                "pauseAnimation": "暂停动画",
                 "downloadModel": "下载模型",
                 "loading3DModel": "正在加载3D模型...",
                 "errorLoadingModel": "模型加载出错",
