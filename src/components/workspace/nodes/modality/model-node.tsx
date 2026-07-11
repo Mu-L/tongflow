@@ -119,12 +119,9 @@ const autoScaleAndCenter = (
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
 
-    // Recenter mesh pivot
-    model.position.x += model.position.x - center.x;
-    model.position.y += model.position.y - center.y;
-    model.position.z += model.position.z - center.z;
-
-    // Normalize scale for consistent lighting response
+    // Normalize scale for consistent lighting response — BEFORE recentering:
+    // scaling happens about the model's own origin, so it displaces the
+    // bounds center and must be accounted for when we pin it to the origin.
     const maxDim = Math.max(size.x, size.y, size.z);
     const targetSize = 8; // Target ~8 world units for preview scale
     let scale = 1;
@@ -132,6 +129,14 @@ const autoScaleAndCenter = (
         scale = targetSize / maxDim;
         model.scale.multiplyScalar(scale);
     }
+
+    // Pin the (post-scale) bounds center to the world origin, which the
+    // camera looks at. The center scales about the model origin: for a model
+    // at position p, the new world center is p + scale * (center - p).
+    const newCenter = model.position
+        .clone()
+        .add(center.clone().sub(model.position).multiplyScalar(scale));
+    model.position.sub(newCenter);
 
     // Front-facing, maximized framing: glTF convention is +z forward, so a
     // camera straight down the +z axis views the model's front. Distance is
