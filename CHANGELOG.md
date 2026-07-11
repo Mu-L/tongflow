@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-07-12
+
+### Added
+
+- **Meta Sapiens2 human suite** (`tongflow-modal-sapiens2`) — five new ABI
+  slots with canvas nodes and smart-island actions, backed by the Sapiens2-1B
+  checkpoints on one Modal L40S (bf16, batched):
+  - **Pose detection** (`image-pose`) — 308-keypoint whole-body skeleton
+    (body, hands, face) on a clean black background;
+  - **Body-part segmentation** (`image-body-seg`) — 29-class human parsing
+    as a pure class-color map;
+  - **Surface normals** (`image-normal`) — per-pixel normal map, background
+    masked;
+  - **Human matting** (`image-matting`) — straight-alpha transparent PNG;
+  - additionally the existing **Image → 3D** slot gains a Sapiens2 pointmap
+    implementation (colored human point cloud GLB).
+- **Video motion capture** (`video-gen-model`) — monocular video → animated
+  3D human GLB on Meta's MHR character (Momentum Human Rig, Apache-2.0),
+  playable directly in the model node and importable into Blender as a
+  skinned armature. Two competing implementations of the same node slot:
+  - **tongflow-modal-sam-3d-body** — per-frame MHR regression (learned
+    prior; body + hands, experimental face/jaw channels driving 72 sparse
+    glTF morph targets);
+  - **tongflow-modal-sapiens2** — geometric engine (308-keypoint pose +
+    pointmap 3D lift, One-Euro smoothing, rest-pose hold for out-of-frame
+    body parts).
+- **Model node: animation playback** — models carrying animation clips now
+  auto-play (30 fps cap, pauses off-viewport and in background tabs) with a
+  play/pause control in the node preview and the fullscreen viewer.
+
+### Changed
+
+- **Model node initial framing** — the camera now homes straight onto the
+  model's front (glTF +z convention) and maximizes the model in the frame
+  (aspect-aware fit); fixed a centering bug that framed tall/offset models
+  poorly and mixer leaks that kept animating after unmount.
+- Python SDK **tongflow 0.2.6** — generated models and `NodeSlots` for the
+  five new ABI slots.
+
 ## [0.2.0] - 2026-07-06
 
 ### Changed
