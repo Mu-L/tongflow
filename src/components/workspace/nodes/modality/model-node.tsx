@@ -127,24 +127,30 @@ const autoScaleAndCenter = (
     // Normalize scale for consistent lighting response
     const maxDim = Math.max(size.x, size.y, size.z);
     const targetSize = 8; // Target ~8 world units for preview scale
+    let scale = 1;
     if (maxDim > 0) {
-        const scale = targetSize / maxDim;
+        scale = targetSize / maxDim;
         model.scale.multiplyScalar(scale);
     }
 
-    // Reposition orbit camera
-    // Derive camera distance via targetSize
-    const fov = camera.fov * (Math.PI / 180);
-    let cameraZ = Math.abs(targetSize / 2 / Math.tan(fov / 2));
-
-    // Add breathing room around framing box
-    cameraZ *= 1.5;
+    // Front-facing, maximized framing: glTF convention is +z forward, so a
+    // camera straight down the +z axis views the model's front. Distance is
+    // the tighter of the vertical/horizontal fit for this canvas aspect
+    // (plus the model's depth half-extent so the near face doesn't clip),
+    // with a slim margin instead of the old 1.5x breathing room.
+    camera.aspect = containerWidth / containerHeight;
+    const halfFov = (camera.fov * (Math.PI / 180)) / 2;
+    const halfH = (size.y * scale) / 2;
+    const halfW = (size.x * scale) / 2;
+    const halfD = (size.z * scale) / 2;
+    const fitDist = Math.max(
+        halfH / Math.tan(halfFov),
+        halfW / (Math.tan(halfFov) * camera.aspect),
+    );
+    const cameraZ = (fitDist + halfD) * 1.12;
 
     camera.position.set(0, 0, cameraZ);
     camera.lookAt(0, 0, 0);
-
-    // Refresh projection matrices
-    camera.aspect = containerWidth / containerHeight;
     camera.updateProjectionMatrix();
 };
 
@@ -732,13 +738,9 @@ const MiniModelPreview = ({
                         height,
                     );
                 }
-                // Nudge to a pleasant elevated 3/4 view before constructing the
-                // controls (Arcball captures this camera pose as its home).
-                const dist = camera.position.length() || 12;
-                camera.position
-                    .set(dist * 0.7, dist * 0.45, dist * 0.7)
-                    .setLength(dist);
-                camera.lookAt(0, 0, 0);
+                // Keep the straight-on front view from autoScaleAndCenter as
+                // the home pose (glTF assets face +z); the old 3/4 nudge left
+                // models sideways and visually smaller in the frame.
 
                 // Virtual-trackball controls: free tumble in any direction, no
                 // pole lock. Same scheme as the fullscreen viewer. Fires "change"
