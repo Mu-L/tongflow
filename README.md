@@ -135,6 +135,7 @@ Sign in with Google or WeChat and start creating — the cloud studio manages pl
 - ⬜ **Speaker diarization**: separate audio by speaker.
 - ⬜ **Voice / timbre replacement**: replace or clone a voice with a reference sample.
 - ✅ **Multi-track / vocal-accompaniment separation**: isolate vocals, drums, bass, guitar, and 8 more stems.
+- ✅ **Open-vocabulary sound separation**: describe any sound in words ("dog barking") and split the audio into that sound and everything else.
 
 ### Combine
 

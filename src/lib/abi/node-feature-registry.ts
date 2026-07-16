@@ -98,6 +98,7 @@ export const NODE_TYPE_TO_ABI_FEATURE: Readonly<Record<string, NodeSlot>> = {
     splitVideoNode: "split-video",
     splitTextNode: "split-text",
     musicBriefNode: "music-brief",
+    separateSoundNode: "separate-sound",
 };
 
 export function featureForNodeType(
@@ -178,6 +179,12 @@ export const NODE_TYPE_SOURCE_SPEC: Partial<
     // upstream text node can feed the music brief idea.
     musicBriefNode: {
         text: handle({ nodeType: "textNode", path: "texts[0]" }),
+    },
+    // `text` describes the sound to isolate; it can be fed from an upstream
+    // textNode or typed manually in the node (edge wins, textarea fallback).
+    separateSoundNode: {
+        audio: handle({ nodeType: "audioNode" }),
+        text: handle({ nodeType: "textNode", path: "texts[0]", manual: true }),
     },
 };
 

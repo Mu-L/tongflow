@@ -50,6 +50,7 @@ class NodeSlots:
     MUSIC_REPAINT: Final[str] = 'music-repaint'
     MUSIC_COVER: Final[str] = 'music-cover'
     MUSIC_EXTRACT: Final[str] = 'music-extract'
+    SEPARATE_SOUND: Final[str] = 'separate-sound'
     MUSIC_LEGO: Final[str] = 'music-lego'
     MUSIC_COMPLETE: Final[str] = 'music-complete'
     MUSIC_BRIEF: Final[str] = 'music-brief'

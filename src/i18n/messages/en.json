@@ -164,6 +164,7 @@
             "speechRecognize": "Speech Recognition",
             "separateAudio": "Separate Vocals",
             "separateSpeaker": "Speaker Separation",
+            "separateSound": "Extract Sound",
             "denoise": "Denoise",
             "convertVoice": "Voice Replacement",
             "filter": "Filter",
@@ -469,6 +470,7 @@
                 "imageUpscale": "HD Upscale",
                 "separateTrack": "Vocal Extract",
                 "separateSpeaker": "Speaker Separation",
+                "separateSound": "Separate Sound",
                 "speechImageGenVideo": "Speech+Image to Video",
                 "concatVideo": "Concat Video",
                 "mergeVideoAudio": "Merge Video Audio",
@@ -549,6 +551,7 @@
                 "repaintMusic": "Repaint",
                 "coverMusic": "Generate Cover",
                 "extractStem": "Extract",
+                "separateSound": "Separate",
                 "addTrack": "Generate Track",
                 "completeMusic": "Complete",
                 "musicBrief": "Generate Brief"
@@ -995,6 +998,10 @@
                 "recordTimbre": "Record voice",
                 "emotion": "Emotion:",
                 "replaceTimbre": "Replace voice"
+            },
+            "separateSound": {
+                "textLabel": "Sound to isolate",
+                "textPlaceholder": "e.g. dog barking, piano, sirens in the background"
             }
         }
     },

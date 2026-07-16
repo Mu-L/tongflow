@@ -40,6 +40,7 @@ import TextsGenTextNode from "./nodes/compose/texts-gen-text";
 import VideoImageGenVideoMixNode from "./nodes/compose/video-image-gen-video-mix";
 import VideoImageGenVideoMoveNode from "./nodes/compose/video-image-gen-video-move";
 import MusicBriefNode from "./nodes/decompose/music-brief";
+import SeparateSoundNode from "./nodes/decompose/separate-sound";
 import SplitTextNode from "./nodes/decompose/split-text";
 // Decompose nodes
 import SplitVideoNode from "./nodes/decompose/split-video";
@@ -184,6 +185,7 @@ export const NODE_TYPES: NodeTypes = {
     splitVideoNode: SplitVideoNode,
     splitTextNode: SplitTextNode,
     musicBriefNode: MusicBriefNode,
+    separateSoundNode: SeparateSoundNode,
 };
 
 /**
@@ -282,5 +284,10 @@ export const NODE_CATEGORIES = {
         "concatVideoComposeNode",
         "musicCoverNode",
     ],
-    DECOMPOSE: ["splitVideoNode", "splitTextNode", "musicBriefNode"],
+    DECOMPOSE: [
+        "splitVideoNode",
+        "splitTextNode",
+        "musicBriefNode",
+        "separateSoundNode",
+    ],
 } as const;

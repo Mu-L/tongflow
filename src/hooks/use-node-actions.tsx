@@ -714,6 +714,15 @@ export function useNodeActions(args: UseNodeActionsArgs): UseNodeActionsResult {
                                     ]),
                             },
                             {
+                                text: t("separateSound"),
+                                id: "separate-sound",
+                                nodeType: "separateSoundNode",
+                                onClick: () =>
+                                    expands(id, [
+                                        { type: "separateSoundNode", data },
+                                    ]),
+                            },
+                            {
                                 text: t("denoise"),
                                 id: "denoise-audio",
                                 nodeType: "denoiseAudioSubtitleNode",
