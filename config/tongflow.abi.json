@@ -1352,6 +1352,57 @@
             }
         },
         {
+            "nodeSlot": "separate-sound",
+            "inputs": {
+                "type": "object",
+                "required": ["audio", "text"],
+                "properties": {
+                    "audio": {
+                        "$ref": "#/$defs/Asset"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "spans": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["start", "end"],
+                            "properties": {
+                                "start": {
+                                    "type": "number"
+                                },
+                                "end": {
+                                    "type": "number"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "additionalProperties": false
+            },
+            "outputs": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "target": {
+                        "$ref": "#/$defs/AudioRef"
+                    },
+                    "residual": {
+                        "$ref": "#/$defs/AudioRef"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        {
             "nodeSlot": "music-lego",
             "inputs": {
                 "type": "object",

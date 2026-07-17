@@ -164,6 +164,7 @@
             "speechRecognize": "음성 인식",
             "separateAudio": "보컬 분리",
             "separateSpeaker": "화자 분리",
+            "separateSound": "소리 추출",
             "denoise": "노이즈 제거",
             "convertVoice": "음성 교체",
             "filter": "필터",
@@ -469,6 +470,7 @@
                 "imageUpscale": "고화질 업스케일",
                 "separateTrack": "보컬 추출",
                 "separateSpeaker": "화자 분리",
+                "separateSound": "소리 분리",
                 "speechImageGenVideo": "음성+이미지-비디오",
                 "concatVideo": "비디오 연결",
                 "mergeVideoAudio": "비디오 오디오 병합",
@@ -549,6 +551,7 @@
                 "repaintMusic": "리페인트 시작",
                 "coverMusic": "커버 생성",
                 "extractStem": "분리 시작",
+                "separateSound": "분리 시작",
                 "addTrack": "트랙 생성",
                 "completeMusic": "보완 시작",
                 "musicBrief": "브리프 생성"
@@ -995,6 +998,10 @@
                 "recordTimbre": "음성 녹음",
                 "emotion": "감정:",
                 "replaceTimbre": "음성 교체"
+            },
+            "separateSound": {
+                "textLabel": "추출할 소리",
+                "textPlaceholder": "예: 개 짖는 소리, 피아노, 배경 사이렌"
             }
         }
     },

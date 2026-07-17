@@ -164,6 +164,7 @@
             "speechRecognize": "语音识别",
             "separateAudio": "人声分离",
             "separateSpeaker": "说话人分离",
+            "separateSound": "提取声音",
             "denoise": "降噪",
             "convertVoice": "人声替换",
             "filter": "筛选",
@@ -469,6 +470,7 @@
                 "imageUpscale": "高清放大",
                 "separateTrack": "人声提取",
                 "separateSpeaker": "说话人分离",
+                "separateSound": "声音分离",
                 "speechImageGenVideo": "语音图片生成视频",
                 "concatVideo": "视频拼接",
                 "mergeVideoAudio": "音视频合并",
@@ -549,6 +551,7 @@
                 "repaintMusic": "开始重绘",
                 "coverMusic": "生成翻唱",
                 "extractStem": "开始分离",
+                "separateSound": "开始分离",
                 "addTrack": "生成乐轨",
                 "completeMusic": "开始补全",
                 "musicBrief": "生成企划"
@@ -995,6 +998,10 @@
                 "recordTimbre": "录制音色",
                 "emotion": "情感：",
                 "replaceTimbre": "替换音色"
+            },
+            "separateSound": {
+                "textLabel": "要提取的声音",
+                "textPlaceholder": "如:狗叫、钢琴、背景里的警笛"
             }
         }
     },

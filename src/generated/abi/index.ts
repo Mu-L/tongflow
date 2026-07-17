@@ -2055,6 +2055,101 @@ const _slot_music_extract_outputs = {
 } as const;
 export type MusicExtractOutput = FromSchema<typeof _slot_music_extract_outputs>;
 
+const _slot_separate_sound_inputs = {
+    type: "object",
+    required: ["audio", "text"],
+    properties: {
+        audio: {
+            type: "object",
+            required: ["bytesBase64"],
+            properties: {
+                bytesBase64: {
+                    type: "string",
+                    minLength: 1,
+                },
+                filename: {
+                    type: "string",
+                },
+                mime: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        text: {
+            type: "string",
+        },
+        spans: {
+            type: "array",
+            items: {
+                type: "object",
+                required: ["start", "end"],
+                properties: {
+                    start: {
+                        type: "number",
+                    },
+                    end: {
+                        type: "number",
+                    },
+                },
+                additionalProperties: false,
+            },
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type SeparateSoundInput = FromSchema<typeof _slot_separate_sound_inputs>;
+const _slot_separate_sound_outputs = {
+    type: "object",
+    required: ["success"],
+    properties: {
+        success: {
+            type: "boolean",
+        },
+        error: {
+            type: "string",
+        },
+        target: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+        residual: {
+            type: "object",
+            required: ["file_key"],
+            properties: {
+                file_key: {
+                    type: "string",
+                    minLength: 1,
+                },
+                mime: {
+                    type: "string",
+                },
+                filename: {
+                    type: "string",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+} as const;
+export type SeparateSoundOutput = FromSchema<
+    typeof _slot_separate_sound_outputs
+>;
+
 const _slot_music_lego_inputs = {
     type: "object",
     required: ["audio", "track"],
@@ -4081,6 +4176,7 @@ export type NodeSlot =
     | "music-repaint"
     | "music-cover"
     | "music-extract"
+    | "separate-sound"
     | "music-lego"
     | "music-complete"
     | "music-brief"
@@ -4144,6 +4240,7 @@ export type SlotInputsMap = {
     "music-repaint": MusicRepaintInput;
     "music-cover": MusicCoverInput;
     "music-extract": MusicExtractInput;
+    "separate-sound": SeparateSoundInput;
     "music-lego": MusicLegoInput;
     "music-complete": MusicCompleteInput;
     "music-brief": MusicBriefInput;
@@ -4207,6 +4304,7 @@ export type SlotOutputsMap = {
     "music-repaint": MusicRepaintOutput;
     "music-cover": MusicCoverOutput;
     "music-extract": MusicExtractOutput;
+    "separate-sound": SeparateSoundOutput;
     "music-lego": MusicLegoOutput;
     "music-complete": MusicCompleteOutput;
     "music-brief": MusicBriefOutput;
@@ -5561,6 +5659,56 @@ export const ABI_NODES = {
                     type: "string",
                 },
                 audio: {
+                    $ref: "#/$defs/AudioRef",
+                },
+            },
+            additionalProperties: false,
+        },
+    },
+    "separate-sound": {
+        inputs: {
+            type: "object",
+            required: ["audio", "text"],
+            properties: {
+                audio: {
+                    $ref: "#/$defs/Asset",
+                },
+                text: {
+                    type: "string",
+                },
+                spans: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        required: ["start", "end"],
+                        properties: {
+                            start: {
+                                type: "number",
+                            },
+                            end: {
+                                type: "number",
+                            },
+                        },
+                        additionalProperties: false,
+                    },
+                },
+            },
+            additionalProperties: false,
+        },
+        outputs: {
+            type: "object",
+            required: ["success"],
+            properties: {
+                success: {
+                    type: "boolean",
+                },
+                error: {
+                    type: "string",
+                },
+                target: {
+                    $ref: "#/$defs/AudioRef",
+                },
+                residual: {
                     $ref: "#/$defs/AudioRef",
                 },
             },
