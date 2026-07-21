@@ -10,7 +10,8 @@ from __future__ import annotations
 from .deploy_marker import deploy
 from .engine import run_workflow
 from .progress import progress
+from .serve import serve_slot
 
-__version__ = "0.2.8"
+__version__ = "0.2.9"
 
-__all__ = ["deploy", "progress", "run_workflow"]
+__all__ = ["deploy", "progress", "run_workflow", "serve_slot"]
