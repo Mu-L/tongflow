@@ -115,7 +115,9 @@ def _sse(event: dict[str, Any]) -> str:
     return f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 
 
-def serve_stream(payload: dict[str, Any], *, invoke: InvokeFn) -> Iterator[str]:
+def serve_stream(
+    payload: dict[str, Any], *, invoke: InvokeFn, task_id: str = ""
+) -> Iterator[str]:
     """Run one ABI slot in this container and stream progress + result as SSE.
 
     Single-container, direct-stream path: the caller (browser or Worker) holds
@@ -124,6 +126,9 @@ def serve_stream(payload: dict[str, Any], *, invoke: InvokeFn) -> Iterator[str]:
     progress sink), then a terminal ``COMPLETED``/``FAILED`` event carrying the
     output refs. A streaming response starts immediately, so it is not bound by
     the 150s request cap — the slot may take as long as the function timeout.
+
+    Each event carries ``id: task_id`` so the browser can attribute it and
+    persist the terminal state (its /api/task/update-status backup).
 
     The payload must NOT carry `_tongflow` (that installs an HTTP sink); here
     the sink is the in-process queue below.
@@ -153,11 +158,11 @@ def serve_stream(payload: dict[str, Any], *, invoke: InvokeFn) -> Iterator[str]:
         if kind == "end":
             return
         if kind == "progress":
-            yield _sse({"status": "RUNNING", "data": data})
+            yield _sse({"id": task_id, "status": "RUNNING", "data": data})
         elif kind == "done":
-            yield _sse({"status": "COMPLETED", "data": data})
+            yield _sse({"id": task_id, "status": "COMPLETED", "data": data})
         elif kind == "error":
-            yield _sse({"status": "FAILED", "data": {"message": "Task execution failed", "error": data}})
+            yield _sse({"id": task_id, "status": "FAILED", "data": {"message": "Task execution failed", "error": data}})
 
 
 def _resolve_method(deploy_file: str, node_slot: str) -> str:
@@ -214,6 +219,6 @@ def serve_stream_from_spec(
             "assetToken": spec["assetToken"],
         }
     except Exception as e:  # noqa: BLE001
-        yield _sse({"status": "FAILED", "data": {"message": "Spec fetch failed", "error": str(e)}})
+        yield _sse({"id": task_id, "status": "FAILED", "data": {"message": "Spec fetch failed", "error": str(e)}})
         return
-    yield from serve_stream(payload, invoke=invoke)
+    yield from serve_stream(payload, invoke=invoke, task_id=task_id)
