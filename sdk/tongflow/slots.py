@@ -31,6 +31,8 @@ from typing import Any, TypeVar, cast
 
 from pydantic import BaseModel
 
+from .progress import set_progress_sink
+
 F = TypeVar("F", bound=Callable[..., object])
 
 # Per-request model selection (router-style plugins). The platform's envelope
@@ -38,6 +40,13 @@ F = TypeVar("F", bound=Callable[..., object])
 # it into the prompt dict under this reserved key, and the @node_slot wrapper
 # pops it back out before constructing the typed input.
 MODEL_KEY = "_model"
+
+# Per-request cloud progress callback ({"progressUrl", "token"}). The
+# orchestrator tucks it into the prompt dict under this reserved key when it
+# runs a plugin remotely; the wrapper pops it out and installs it as the
+# progress sink so `progress()` can push events to the Worker. Never an ABI
+# field. Absent on desktop/local runs.
+TONGFLOW_KEY = "_tongflow"
 _current_model: contextvars.ContextVar[str | None] = contextvars.ContextVar(
     "tongflow_current_model", default=None
 )
@@ -166,9 +175,10 @@ def node_slot(*slots: str) -> Callable[[F], F]:
 
         def _marshal(input: Any) -> Any:
             if isinstance(input, dict):
-                # Reserved routing key, never an ABI field: reset per call so a
-                # previous request's selection can't leak into this one.
+                # Reserved keys, never ABI fields: reset per call so a previous
+                # request's selection/sink can't leak into this one.
                 _current_model.set(input.pop(MODEL_KEY, None))
+                set_progress_sink(input.pop(TONGFLOW_KEY, None))
                 if input_cls is not None:
                     return _deep_construct(input_cls, input)
             return input
