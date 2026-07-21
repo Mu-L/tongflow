@@ -74,6 +74,20 @@ def invoke_plugin(
     env_extra: Optional[dict[str, str]] = None,
     on_progress: Optional[ProgressCb] = None,
 ) -> dict[str, Any]:
+    # Cloud mode: the orchestrator exports a progress callback so plugins that
+    # run remotely (their own Modal function, no stderr path back here) can push
+    # progress straight to the Worker. Tuck it into the prompt under the reserved
+    # `_tongflow` key — entry.py forwards the prompt verbatim to the backend and
+    # @node_slot pops it back out. Absent env → unchanged local behaviour.
+    progress_url = os.environ.get("TONGFLOW_PROGRESS_URL")
+    progress_token = os.environ.get("TONGFLOW_PROGRESS_TOKEN")
+    cloud_progress = bool(progress_url and progress_token)
+    prompt_out = (
+        {**prompt, "_tongflow": {"progressUrl": progress_url, "token": progress_token}}
+        if cloud_progress
+        else prompt
+    )
+
     payload = json.dumps(
         {
             "pluginId": plugin_id,
@@ -82,7 +96,7 @@ def invoke_plugin(
             # Optional per-node model choice for router-style plugins; omitted
             # when unset so the envelope stays stable for existing plugins.
             **({"model": model} if model else {}),
-            "prompt": prompt,
+            "prompt": prompt_out,
         }
     )
 
@@ -114,7 +128,9 @@ def invoke_plugin(
             line = line.rstrip("\n")
             prog = parse_progress_line(line)
             if prog is not None:
-                if on_progress is not None:
+                # In cloud mode progress() already POSTed this event straight to
+                # the Worker, so forwarding the stderr copy too would double it.
+                if on_progress is not None and not cloud_progress:
                     on_progress({"type": "plugin_progress", "pluginId": plugin_id, **prog})
                 continue
             stderr_log.append(line)
