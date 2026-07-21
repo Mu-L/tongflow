@@ -28,8 +28,10 @@ bytes back into refs. The `_tongflow` key rides into the method so
 from __future__ import annotations
 
 import json
+import queue
+import threading
 import urllib.request
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
 from .engine.abi_schema import load_abi_schema, resolve_abi_path
 from .engine.assets import (
@@ -37,6 +39,7 @@ from .engine.assets import (
     materialize_asset_inputs,
 )
 from .engine.store import HttpStore
+from .progress import set_progress_sink
 
 # invoke(method_name, input_dict) -> raw ABI dict. The backend endpoint passes
 # a closure that runs the slot locally in this same container.
@@ -106,3 +109,52 @@ def run_and_report(payload: dict[str, Any], *, invoke: InvokeFn) -> None:
     _post(url, {"token": token, "type": "event",
                 "event": {"status": "COMPLETED", "data": result}})
     _post(url, {"token": token, "type": "completed", "result": result})
+
+
+def _sse(event: dict[str, Any]) -> str:
+    return f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+
+
+def serve_stream(payload: dict[str, Any], *, invoke: InvokeFn) -> Iterator[str]:
+    """Run one ABI slot in this container and stream progress + result as SSE.
+
+    Single-container, direct-stream path: the caller (browser or Worker) holds
+    an ``text/event-stream`` response; the slot runs in a worker thread while
+    this generator yields ``RUNNING`` progress events (fed by an in-process
+    progress sink), then a terminal ``COMPLETED``/``FAILED`` event carrying the
+    output refs. A streaming response starts immediately, so it is not bound by
+    the 150s request cap — the slot may take as long as the function timeout.
+
+    The payload must NOT carry `_tongflow` (that installs an HTTP sink); here
+    the sink is the in-process queue below.
+    """
+    q: "queue.Queue[tuple[str, Any]]" = queue.Queue()
+
+    def _run() -> None:
+        # Same thread as the slot call → the contextvar sink is visible to
+        # progress() invoked inside the slot.
+        set_progress_sink(lambda p: q.put(("progress", p)))
+        try:
+            result = serve_slot(payload, invoke=invoke)
+            q.put(("done", result))
+        except Exception as e:  # noqa: BLE001
+            q.put(("error", str(e)))
+        finally:
+            q.put(("end", None))
+
+    threading.Thread(target=_run, daemon=True).start()
+
+    while True:
+        try:
+            kind, data = q.get(timeout=10)
+        except queue.Empty:
+            yield ": ping\n\n"  # keep the connection alive between events
+            continue
+        if kind == "end":
+            return
+        if kind == "progress":
+            yield _sse({"status": "RUNNING", "data": data})
+        elif kind == "done":
+            yield _sse({"status": "COMPLETED", "data": data})
+        elif kind == "error":
+            yield _sse({"status": "FAILED", "data": {"message": "Task execution failed", "error": data}})
