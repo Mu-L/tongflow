@@ -27,6 +27,8 @@ bytes back into refs. The `_tongflow` key rides into the method so
 
 from __future__ import annotations
 
+import json
+import urllib.request
 from typing import Any, Callable
 
 from .engine.abi_schema import load_abi_schema, resolve_abi_path
@@ -64,3 +66,43 @@ def serve_slot(payload: dict[str, Any], *, invoke: InvokeFn) -> dict[str, Any]:
 
     raw = invoke(method, materialized)
     return convert_asset_outputs_to_file_refs(slot, raw, abi, store)
+
+
+def _post(url: str, body: dict[str, Any]) -> None:
+    try:
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(body).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "tongflow-plugin/1.0",
+            },
+            method="POST",
+        )
+        urllib.request.urlopen(req, timeout=30)  # noqa: S310
+    except Exception:  # noqa: BLE001 - reporting must never crash the worker
+        pass
+
+
+def run_and_report(payload: dict[str, Any], *, invoke: InvokeFn) -> None:
+    """Background single-node runner: execute the slot, then report the
+    terminal state to the Worker callback (``callbackUrl``/``callbackToken``).
+
+    Emits a browser-facing terminal event (``type:"event"``) plus the durable
+    DB update (``type:"completed"``/``"failed"``) — mirroring the executor, so
+    a plugin serving itself needs no bespoke callback code. A slow slot can run
+    past the web-endpoint window because the trigger endpoint only spawns this.
+    """
+    url = payload["callbackUrl"]
+    token = payload["callbackToken"]
+    try:
+        result = serve_slot(payload, invoke=invoke)
+    except Exception as e:  # noqa: BLE001
+        msg = str(e)
+        _post(url, {"token": token, "type": "event",
+                    "event": {"status": "FAILED", "data": {"message": "Task execution failed", "error": msg}}})
+        _post(url, {"token": token, "type": "failed", "error": msg})
+        return
+    _post(url, {"token": token, "type": "event",
+                "event": {"status": "COMPLETED", "data": result}})
+    _post(url, {"token": token, "type": "completed", "result": result})
