@@ -158,3 +158,62 @@ def serve_stream(payload: dict[str, Any], *, invoke: InvokeFn) -> Iterator[str]:
             yield _sse({"status": "COMPLETED", "data": data})
         elif kind == "error":
             yield _sse({"status": "FAILED", "data": {"message": "Task execution failed", "error": data}})
+
+
+def _resolve_method(deploy_file: str, node_slot: str) -> str:
+    """slot -> handler method name, AST-parsed from the plugin's deploy.py."""
+    from pathlib import Path
+
+    from .parse_deploy import _slot_to_ident, parse_deploy_py
+
+    path = Path(deploy_file).resolve()
+    if path.name != "deploy.py":
+        path = path.parent / "deploy.py"
+    scan, err = parse_deploy_py(path)
+    if err or scan is None:
+        raise RuntimeError(err or f"failed to parse {path}")
+    method = scan.methods_by_slot.get(_slot_to_ident(node_slot))
+    if not method:
+        raise RuntimeError(f"no method for nodeSlot={node_slot!r}")
+    return method
+
+
+def serve_stream_from_spec(
+    origin: str,
+    task_id: str,
+    token: str,
+    deploy_file: str,
+    *,
+    invoke: InvokeFn,
+) -> Iterator[str]:
+    """Browser-direct entry: fetch the run spec from the Worker, then stream.
+
+    The browser connects (EventSource) straight to the plugin with only
+    ``taskId``/``token``/``origin`` (an input can't ride in a URL), so the
+    plugin pulls the spec — ``{nodeSlot, input, assetEndpoint, assetToken}`` —
+    from ``GET {origin}/api/executor/spec?taskId=`` (Bearer ``token``, which the
+    Worker verifies), resolves the slot method, and delegates to serve_stream.
+    Spec-fetch errors surface as a terminal FAILED SSE event, not a 500.
+    """
+    try:
+        req = urllib.request.Request(
+            f"{origin}/api/executor/spec?taskId={task_id}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "User-Agent": "tongflow-plugin/1.0",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310
+            spec = json.loads(resp.read().decode())
+        method = _resolve_method(deploy_file, spec["nodeSlot"])
+        payload = {
+            "nodeSlot": spec["nodeSlot"],
+            "method": method,
+            "input": spec.get("input") or {},
+            "assetEndpoint": spec["assetEndpoint"],
+            "assetToken": spec["assetToken"],
+        }
+    except Exception as e:  # noqa: BLE001
+        yield _sse({"status": "FAILED", "data": {"message": "Spec fetch failed", "error": str(e)}})
+        return
+    yield from serve_stream(payload, invoke=invoke)

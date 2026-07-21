@@ -10,9 +10,14 @@ from __future__ import annotations
 from .deploy_marker import deploy
 from .engine import run_workflow
 from .progress import progress
-from .serve import run_and_report, serve_slot, serve_stream
+from .serve import (
+    run_and_report,
+    serve_slot,
+    serve_stream,
+    serve_stream_from_spec,
+)
 
-__version__ = "0.2.11"
+__version__ = "0.2.12"
 
 __all__ = [
     "deploy",
@@ -21,4 +26,5 @@ __all__ = [
     "run_workflow",
     "serve_slot",
     "serve_stream",
+    "serve_stream_from_spec",
 ]
