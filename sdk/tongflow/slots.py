@@ -31,7 +31,7 @@ from typing import Any, TypeVar, cast
 
 from pydantic import BaseModel
 
-from .progress import set_progress_sink
+from .progress import http_progress_sink, set_progress_sink
 
 F = TypeVar("F", bound=Callable[..., object])
 
@@ -175,10 +175,16 @@ def node_slot(*slots: str) -> Callable[[F], F]:
 
         def _marshal(input: Any) -> Any:
             if isinstance(input, dict):
-                # Reserved keys, never ABI fields: reset per call so a previous
-                # request's selection/sink can't leak into this one.
+                # Reserved keys, never ABI fields. `_model` resets per call. A
+                # `_tongflow` callback (executor path) installs an HTTP sink;
+                # when absent we leave the sink untouched so the streaming serve
+                # (which installs an in-process queue sink) isn't clobbered.
                 _current_model.set(input.pop(MODEL_KEY, None))
-                set_progress_sink(input.pop(TONGFLOW_KEY, None))
+                tf = input.pop(TONGFLOW_KEY, None)
+                if isinstance(tf, dict) and tf.get("progressUrl") and tf.get("token"):
+                    set_progress_sink(
+                        http_progress_sink(tf["progressUrl"], tf["token"])
+                    )
                 if input_cls is not None:
                     return _deep_construct(input_cls, input)
             return input

@@ -23,57 +23,61 @@ import json
 import sys
 import threading
 import urllib.request
+from typing import Callable
 
 PROGRESS_SENTINEL = "@@TF_PROGRESS@@"
 
-# Cloud progress callback for the current request: {"progressUrl", "token"} or
-# None. Installed per call by @node_slot (mirrors _current_model), so it never
-# leaks across requests in a reused container.
-_progress_sink: contextvars.ContextVar[dict[str, str] | None] = (
+# Progress sink for the current request: a callable that receives each event
+# payload ({"message", "percent"?}), or None. It is a plain callback so the
+# same plumbing serves both transports — an HTTP POST to the Worker (remote
+# executor path) and an in-process queue (streaming serve, one container).
+# contextvar-scoped so it never leaks across requests in a reused container.
+ProgressSink = Callable[[dict[str, object]], None]
+_progress_sink: contextvars.ContextVar[ProgressSink | None] = (
     contextvars.ContextVar("tongflow_progress_sink", default=None)
 )
 
 
-def set_progress_sink(sink: dict[str, str] | None) -> None:
-    """Install (or clear) the cloud progress callback for this request."""
+def set_progress_sink(sink: ProgressSink | None) -> None:
+    """Install (or clear) the progress sink for this request/thread."""
     _progress_sink.set(sink)
 
 
-def _post_progress(sink: dict[str, str], payload: dict[str, object]) -> None:
-    """Fire-and-forget POST of one progress event to the Worker callback.
+def http_progress_sink(url: str, token: str) -> ProgressSink:
+    """A sink that fire-and-forget POSTs each event to the Worker callback.
 
     Shape matches /api/executor/callback's `type:"event"` contract; the token
     is the per-run signed token that binds scope+taskId server-side. Never
     blocks or raises into the plugin — a dropped event is acceptable.
     """
-    url = sink.get("progressUrl")
-    token = sink.get("token")
-    if not url or not token:
-        return
-    body = json.dumps(
-        {
-            "token": token,
-            "type": "event",
-            "event": {"status": "RUNNING", "data": payload},
-        }
-    ).encode()
 
-    def _send() -> None:
-        try:
-            req = urllib.request.Request(
-                url,
-                data=body,
-                headers={
-                    "Content-Type": "application/json",
-                    "User-Agent": "tongflow-plugin/1.0",
-                },
-                method="POST",
-            )
-            urllib.request.urlopen(req, timeout=15)  # noqa: S310
-        except Exception:  # noqa: BLE001 - progress must never break the run
-            pass
+    def _sink(payload: dict[str, object]) -> None:
+        body = json.dumps(
+            {
+                "token": token,
+                "type": "event",
+                "event": {"status": "RUNNING", "data": payload},
+            }
+        ).encode()
 
-    threading.Thread(target=_send, daemon=True).start()
+        def _send() -> None:
+            try:
+                req = urllib.request.Request(
+                    url,
+                    data=body,
+                    headers={
+                        "Content-Type": "application/json",
+                        "User-Agent": "tongflow-plugin/1.0",
+                    },
+                    method="POST",
+                )
+                urllib.request.urlopen(req, timeout=15)  # noqa: S310
+            except Exception:  # noqa: BLE001 - progress must never break the run
+                pass
+
+        threading.Thread(target=_send, daemon=True).start()
+
+    return _sink
 
 
 def progress(message: str, *, percent: float | None = None) -> None:
@@ -86,8 +90,11 @@ def progress(message: str, *, percent: float | None = None) -> None:
     # with the JSON result on stdout.
     sys.stderr.write(line + "\n")
     sys.stderr.flush()
-    # Cloud: also push straight to the Worker callback (remote plugins have no
-    # stderr path back to the orchestrator).
+    # Cloud: also hand the event to the installed sink (HTTP callback or the
+    # streaming serve's queue). Remote plugins have no stderr path back.
     sink = _progress_sink.get()
     if sink:
-        _post_progress(sink, payload)
+        try:
+            sink(payload)
+        except Exception:  # noqa: BLE001 - progress must never break the run
+            pass
