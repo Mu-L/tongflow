@@ -126,7 +126,13 @@ class HttpStore:
         self.token = token
 
     def _headers(self) -> dict[str, str]:
-        return {"Authorization": f"Bearer {self.token}"} if self.token else {}
+        # A non-default User-Agent is required: Cloudflare's bot filtering 403s
+        # the stock Python-urllib UA, which breaks asset IO from a plugin
+        # container talking to the Worker sink.
+        headers = {"User-Agent": "tongflow-sdk/1.0"}
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+        return headers
 
     def put(
         self,
