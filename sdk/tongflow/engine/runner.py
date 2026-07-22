@@ -41,6 +41,13 @@ from .store import AssetStore, DiskStore, HttpStore, MemoryStore
 
 EventCb = Callable[[dict[str, Any]], None]
 
+# Optional backend-specific plugin invoker. When supplied, run_workflow calls
+# this instead of spawning the plugin's entry.py — a cloud orchestrator can
+# dispatch straight to the plugin's own deployed function, skipping the shared
+# venv and the subprocess entirely. Backend-neutral here: the host owns the
+# call. Signature: (plugin_id, node_slot, prompt, plugin_dir, model) -> raw ABI dict.
+InvokerCb = Callable[[str, str, dict[str, Any], Path, Optional[str]], dict[str, Any]]
+
 
 def _inline_outputs_in_obj(obj: Any, store: MemoryStore) -> Any:
     """Recursively replace ``{file_key: mem://...}`` refs with inline bytes.
@@ -173,6 +180,7 @@ def run_workflow(
     plugin_git_urls: Optional[dict[str, str]] = None,
     on_progress: Optional[EventCb] = None,
     task_id: str = "tongflow-engine",
+    invoker: Optional[InvokerCb] = None,
 ) -> dict[str, Any]:
     """Execute an exported workflow and return its results.
 
@@ -244,8 +252,14 @@ def run_workflow(
         plugin_git_urls=plugin_git_urls,
         log=log,
     )
-    python = prepare_python_env(
-        plugin_ids, plugins_dir, data_dir, auto_install=auto_install, log=log
+    # A host-supplied invoker dispatches to the plugin's own deployed function,
+    # so there is no subprocess to host and no shared venv to provision.
+    python = (
+        ""
+        if invoker is not None
+        else prepare_python_env(
+            plugin_ids, plugins_dir, data_dir, auto_install=auto_install, log=log
+        )
     )
     manifest = scan_manifest(plugins_dir, abi_file)
     plugin_cfgs: dict[str, Any] = manifest.get("plugins", {})
@@ -316,18 +330,22 @@ def run_workflow(
                 business_input = materialize_asset_inputs(
                     slot, params, abi, search_dirs, store
                 )
-                raw = invoke_plugin(
-                    python=python,
-                    plugin_dir=plugins_dir / cfg["localSubdir"],
-                    entry_file=cfg.get("entryFile", "entry.py"),
-                    plugin_id=plugin_id,
-                    node_slot=slot,
-                    prompt=business_input,
-                    sdk_root=SDK_ROOT,
-                    task_id=task_id,
-                    model=model,
-                    on_progress=on_progress,
-                )
+                plugin_dir = plugins_dir / cfg["localSubdir"]
+                if invoker is not None:
+                    raw = invoker(plugin_id, slot, business_input, plugin_dir, model)
+                else:
+                    raw = invoke_plugin(
+                        python=python,
+                        plugin_dir=plugin_dir,
+                        entry_file=cfg.get("entryFile", "entry.py"),
+                        plugin_id=plugin_id,
+                        node_slot=slot,
+                        prompt=business_input,
+                        sdk_root=SDK_ROOT,
+                        task_id=task_id,
+                        model=model,
+                        on_progress=on_progress,
+                    )
                 result = convert_asset_outputs_to_file_refs(slot, raw, abi, store)
 
                 if result.get("success") is False:
