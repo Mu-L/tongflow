@@ -8,7 +8,12 @@ import { z } from "zod";
  * actually runs (locally, on Modal, on another cloud) is the plugin's own
  * concern — the platform binds to no backend.
  *
- * - nodePluginMap: nodeSlot -> list of `pluginId` (directory name under `plugins/`)
+ * - nodePluginMap: nodeSlot -> list of `pluginId` (directory name under `plugins/`).
+ *   The head of each list is that slot's **default implementation**: what a
+ *   freshly added node preselects and what the plugin picker lists first. A
+ *   plugin claims it with `@node_slot(..., default=True)` and the scanner
+ *   hoists it; with no claim (or the claimant not installed) the head is just
+ *   the first plugin in directory order.
  * - plugins[pluginId]: how to launch that plugin's entry
  */
 export const PluginMethodSchema = z.object({

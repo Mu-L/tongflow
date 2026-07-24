@@ -87,6 +87,19 @@ def test_slots_metadata_attached() -> None:
         return None
 
     assert handler.__tongflow_slots__ == ("a", "b")
+    assert handler.__tongflow_default_slots__ == ()
+
+
+def test_default_claim_metadata_and_marshalling() -> None:
+    """`default=True` is a scanner declaration — it must not disturb the call path."""
+
+    @node_slot("a", "b", default=True)
+    def handler(self: object, input: FooIn) -> FooOut:
+        return FooOut(success=True, result=input.text)
+
+    assert handler.__tongflow_slots__ == ("a", "b")
+    assert handler.__tongflow_default_slots__ == ("a", "b")
+    assert handler(None, {"text": "hi"}) == {"success": True, "result": "hi"}
 
 
 def test_construct_skips_validation() -> None:

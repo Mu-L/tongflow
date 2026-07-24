@@ -9,12 +9,13 @@ from .abi import load_abi
 from ._ast_utils import (
     SLOT_MODELS_CONST,
     extract_node_slot_decorators,
+    extract_node_slot_defaults,
     extract_slot_models,
     looks_like_sdk_model_type,
 )
 from .parse_deploy import _slot_to_ident, parse_deploy_py
 
-SCANNER_VERSION = 2
+SCANNER_VERSION = 3
 
 SKIP_DIR_NAMES = frozenset(
     {
@@ -106,14 +107,19 @@ def _scan_error(path: Path, reason: str, hint: str, line: int = 1) -> str:
     return f"{path}:{line}: {reason}; fix: {hint}"
 
 
-def _scan_methods_by_slot_in_file(path: Path) -> dict[str, str]:
+def _scan_methods_by_slot_in_file(
+    path: Path,
+) -> tuple[dict[str, str], set[str], list[str]]:
+    """Returns (methods_by_slot_ident, default_slot_idents, problem messages)."""
     try:
         src = path.read_text(encoding="utf-8")
         tree = ast.parse(src, filename=str(path))
     except (OSError, SyntaxError):
-        return {}
+        return {}, set(), []
 
     out: dict[str, str] = {}
+    defaults: set[str] = set()
+    problems: list[str] = []
 
     for node in ast.walk(tree):
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -133,15 +139,28 @@ def _scan_methods_by_slot_in_file(path: Path) -> dict[str, str]:
         slots = extract_node_slot_decorators(node)
         for s in slots:
             out[s] = node.name
-    return out
+        claimed, claim_problems = extract_node_slot_defaults(node)
+        defaults.update(claimed)
+        for lineno, reason in claim_problems:
+            problems.append(
+                _scan_error(path, reason, "pass a literal True", line=lineno)
+            )
+    return out, defaults, problems
 
 
-def _scan_methods_by_slot_in_dir(plugin_dir: Path) -> dict[str, str]:
+def _scan_methods_by_slot_in_dir(
+    plugin_dir: Path,
+) -> tuple[dict[str, str], set[str], list[str]]:
     out: dict[str, str] = {}
+    defaults: set[str] = set()
+    problems: list[str] = []
     for p in _iter_plugin_py_files(plugin_dir):
-        for slot_ident, method in _scan_methods_by_slot_in_file(p).items():
+        methods, file_defaults, file_problems = _scan_methods_by_slot_in_file(p)
+        for slot_ident, method in methods.items():
             out.setdefault(slot_ident, method)
-    return out
+        defaults.update(file_defaults)
+        problems.extend(file_problems)
+    return out, defaults, problems
 
 
 def _iter_plugin_py_files(plugin_dir: Path) -> list[Path]:
@@ -195,6 +214,9 @@ def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
     node_plugin_map: dict[str, list[str]] = {}
     plugins: dict[str, dict[str, object]] = {}
     errors: list[dict[str, str]] = []
+    # slot -> plugin ids that declared `@node_slot(..., default=True)` for it,
+    # in directory order. Resolved into the head of nodePluginMap below.
+    default_claims: dict[str, list[str]] = {}
 
     for pdir in _iter_plugin_dirs(plugins_root):
         plugin_id = pdir.name
@@ -206,7 +228,11 @@ def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
         # Every plugin is spawned the same way: the platform runs the plugin's
         # local entry.py and exchanges JSON. Handlers are discovered by scanning
         # every .py file for module-level @node_slot + SDK annotations.
-        methods_by_ident = _scan_methods_by_slot_in_dir(pdir)
+        methods_by_ident, default_idents, default_problems = (
+            _scan_methods_by_slot_in_dir(pdir)
+        )
+        for message in default_problems:
+            errors.append({"pluginId": plugin_id, "message": message})
         # A deploy-first plugin keeps its handlers as methods on a @deploy-marked
         # class in deploy.py — first arg `self`, so the module-level dir scan
         # skips them. Fall back to the backend-neutral deploy parser (it matches
@@ -218,6 +244,19 @@ def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
             dscan, _derr = parse_deploy_py(pdir / "deploy.py")
             if dscan and dscan.methods_by_slot:
                 methods_by_ident = dict(dscan.methods_by_slot)
+                default_idents = set(dscan.default_slots)
+                for lineno, reason in dscan.default_problems:
+                    errors.append(
+                        {
+                            "pluginId": plugin_id,
+                            "message": _scan_error(
+                                pdir / "deploy.py",
+                                reason,
+                                "pass a literal True",
+                                line=lineno,
+                            ),
+                        }
+                    )
                 needs_deploy = True
         if not methods_by_ident:
             errors.append(
@@ -252,6 +291,8 @@ def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
             node_plugin_map.setdefault(slot, [])
             if plugin_id not in node_plugin_map[slot]:
                 node_plugin_map[slot].append(plugin_id)
+            if ident in default_idents:
+                default_claims.setdefault(slot, []).append(plugin_id)
 
         if not llm_methods:
             continue
@@ -294,6 +335,25 @@ def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
             seen.add(x)
             nxt.append(x)
         node_plugin_map[k] = nxt
+
+    # The head of nodePluginMap[slot] is the slot's default implementation: what
+    # a freshly added node preselects and what the picker lists first. Without a
+    # `default=True` claim it stays the first plugin in directory order.
+    for slot, claimants in default_claims.items():
+        winner = claimants[0]
+        if len(claimants) > 1:
+            errors.append(
+                {
+                    "pluginId": winner,
+                    "message": (
+                        f"{plugins_root}:1: slot {slot!r} is claimed as default by "
+                        f"{', '.join(claimants)}; using {winner}; "
+                        "fix: keep @node_slot(..., default=True) on one plugin per slot"
+                    ),
+                }
+            )
+        ids = node_plugin_map.get(slot, [])
+        node_plugin_map[slot] = [winner, *(x for x in ids if x != winner)]
 
     return {
         "version": 1,

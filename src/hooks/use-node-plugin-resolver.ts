@@ -22,6 +22,8 @@ export function useNodePluginResolver(feature: string | undefined) {
     const nodeId = useNodeId();
     const { updateNodeData, getNode } = useReactFlow();
     const pluginOptions = useNodePluginIds(feature ?? "");
+    // Head of nodePluginMap[slot] = the slot's default implementation (a plugin's
+    // `@node_slot(..., default=True)` claim, else first in directory order).
     const defaultPluginIdFromRegistry = (pluginOptions[0] ?? "").trim();
 
     // Use a passive useEffect (rather than useLayoutEffect) so the default

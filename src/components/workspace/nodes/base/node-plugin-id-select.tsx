@@ -40,6 +40,8 @@ export function useResolvedPluginId(
     usePluginsRegistry();
     const pluginOptions = useNodePluginIds(nodeSlot);
     const current = String(data[dataKey] ?? data.pluginRepo ?? "").trim();
+    // `pluginOptions[0]` is the slot's default implementation — the scanner puts
+    // the `@node_slot(..., default=True)` plugin first (see plugins-registry-schema).
     const resolved = (current || pluginOptions[0] || "").trim();
     return { current, resolved, pluginOptions };
 }

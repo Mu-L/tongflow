@@ -144,6 +144,29 @@ runtime ABI validation; bad shapes simply raise in Python.
 
 So inside the handler you only ever touch typed objects — never a raw dict.
 
+### Claiming a slot's default implementation
+
+Most slots have several implementations. The one a node preselects when it lands on
+the canvas — and the one listed first in the node's plugin picker — is the head of
+`nodePluginMap[slot]`. Add `default=True` to claim it:
+
+```python
+@node_slot(NodeSlots.IMAGE_GEN, default=True)
+def image_gen(self, input: ImageGenInput) -> ImageGenOutput:
+    ...
+```
+
+- The claim covers **every** slot listed in that same `@node_slot(...)` call.
+- It is a declaration for the scanner only; nothing reads it at run time.
+- **One claim per slot.** If two installed plugins claim the same slot, the scanner
+  keeps the first in directory order and reports the clash in the registry `errors`.
+- Slots nobody claims — or whose claimant is not installed — fall back to the first
+  plugin in directory order, exactly as before.
+- Users are never locked in: the picker still lists every implementation, and a node
+  that already has a plugin selected keeps it.
+
+Requires `tongflow>=0.2.15`.
+
 ### Assets in, assets out
 
 Binary media crosses the wire as an `Asset`
