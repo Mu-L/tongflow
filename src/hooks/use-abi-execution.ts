@@ -83,6 +83,8 @@ export interface UseAbiExecutionReturn {
     elapsedSeconds: number;
     /** Live runner status text from SSE (label / feature / message). Null when no message yet. */
     progressLabel: string | null;
+    /** Live streamed reasoning ("thinking") for the node bubble. Null when none. */
+    thinkingText: string | null;
     canRun: boolean;
     /** ABI feature being executed. */
     feature: string;
@@ -123,6 +125,7 @@ export function useAbiExecution<F extends NodeSlot>(
 
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [progressLabel, setProgressLabel] = useState<string | null>(null);
+    const [thinkingText, setThinkingText] = useState<string | null>(null);
     const [missingPluginOpen, setMissingPluginOpen] = useState(false);
 
     /* ---------- spec resolution (memo via feature/sourceSpec ref) ---- */
@@ -313,8 +316,17 @@ export function useAbiExecution<F extends NodeSlot>(
             // so the node loading overlay can show what the backend is doing.
             if (task?.status === "PROCESSING" || task?.status === "PENDING") {
                 const d = task.data as SSEMessageData | undefined;
-                const label = d?.label || d?.feature || d?.message;
-                if (label) setProgressLabel(String(label));
+                // Streamed reasoning goes to the separate thinking bubble; the
+                // plugin sends the full accumulated (capped) text each tick, so
+                // we replace rather than append.
+                if (d?.thinking === true) {
+                    if (typeof d.message === "string") {
+                        setThinkingText(d.message);
+                    }
+                } else {
+                    const label = d?.label || d?.feature || d?.message;
+                    if (label) setProgressLabel(String(label));
+                }
             }
 
             if (task?.status === "COMPLETED") {
@@ -348,6 +360,7 @@ export function useAbiExecution<F extends NodeSlot>(
         if (!loading) {
             setElapsedSeconds(0);
             setProgressLabel(null);
+            setThinkingText(null);
             return;
         }
         const interval = setInterval(() => {
@@ -462,6 +475,7 @@ export function useAbiExecution<F extends NodeSlot>(
         loading,
         elapsedSeconds,
         progressLabel,
+        thinkingText,
         canRun,
         feature,
         isExecuteMode,

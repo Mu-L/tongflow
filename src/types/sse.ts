@@ -51,6 +51,8 @@ export interface SSEMessageData {
     totalDuration?: number;
     progress?: number;
     message?: string;
+    /** True when `message` is streamed reasoning for the node thinking bubble. */
+    thinking?: boolean;
     code?: number;
     error?: string;
     status?: string;

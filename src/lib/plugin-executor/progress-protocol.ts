@@ -21,6 +21,11 @@ export type PluginProgress = {
     message: string;
     /** Optional 0–100 completion hint. */
     percent?: number;
+    /**
+     * When true, this message is streamed reasoning ("thinking") destined for
+     * the node's live thinking bubble, not the central status label.
+     */
+    thinking?: boolean;
 };
 
 /**
@@ -46,6 +51,9 @@ export function parseProgressLine(line: string): PluginProgress | null {
         const out: PluginProgress = { message };
         if (typeof rec.percent === "number" && Number.isFinite(rec.percent)) {
             out.percent = rec.percent;
+        }
+        if (rec.thinking === true) {
+            out.thinking = true;
         }
         return out;
     } catch {
