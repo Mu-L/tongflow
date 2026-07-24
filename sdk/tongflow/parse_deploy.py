@@ -6,6 +6,7 @@ from pathlib import Path
 
 from ._ast_utils import (
     extract_node_slot_decorators,
+    extract_node_slot_defaults,
     looks_like_sdk_model_type,
 )
 
@@ -16,6 +17,10 @@ class DeployScan:
     method_names: frozenset[str]
     methods_by_slot: dict[str, str]
     cls_by_slot: dict[str, str] = field(default_factory=dict)
+    # Slots this plugin claims as the default implementation.
+    default_slots: frozenset[str] = frozenset()
+    # Malformed `default=` declarations, as (lineno, reason).
+    default_problems: tuple[tuple[int, str], ...] = ()
 
 
 def _const_str(node: ast.expr | None) -> str | None:
@@ -47,8 +52,13 @@ def _parse_class_methods(cls: ast.ClassDef) -> frozenset[str]:
     return frozenset(out)
 
 
-def _parse_methods_by_slot(cls: ast.ClassDef, tree: ast.Module) -> dict[str, str]:
+def _parse_methods_by_slot(
+    cls: ast.ClassDef, tree: ast.Module
+) -> tuple[dict[str, str], set[str], list[tuple[int, str]]]:
+    """Returns (methods_by_slot_ident, default_slot_idents, default_problems)."""
     out: dict[str, str] = {}
+    defaults: set[str] = set()
+    problems: list[tuple[int, str]] = []
     for stmt in cls.body:
         if not isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
@@ -68,7 +78,10 @@ def _parse_methods_by_slot(cls: ast.ClassDef, tree: ast.Module) -> dict[str, str
         slots = extract_node_slot_decorators(stmt)
         for s in slots:
             out[s] = stmt.name
-    return out
+        claimed, claim_problems = extract_node_slot_defaults(stmt)
+        defaults.update(claimed)
+        problems.extend(claim_problems)
+    return out, defaults, problems
 
 
 def _is_deploy_decorator(deco: ast.expr) -> bool:
@@ -87,16 +100,26 @@ def _is_deploy_decorator(deco: ast.expr) -> bool:
 
 def _parse_deploy_classes(
     tree: ast.Module,
-) -> tuple[dict[str, str], dict[str, str], frozenset[str], str | None]:
+) -> tuple[
+    dict[str, str],
+    dict[str, str],
+    frozenset[str],
+    set[str],
+    list[tuple[int, str]],
+    str | None,
+]:
     """
     Collect ``@node_slot`` methods from every class decorated with ``@deploy``.
 
-    Returns (methods_by_slot, cls_by_slot, public_method_names, error).
-    Ident keys match :class:`DeployScan.methods_by_slot` (NodeSlots attribute names).
+    Returns (methods_by_slot, cls_by_slot, public_method_names, default_slots,
+    default_problems, error). Ident keys match :class:`DeployScan.methods_by_slot`
+    (NodeSlots attribute names).
     """
     merged_mb: dict[str, str] = {}
     merged_cls: dict[str, str] = {}
     all_names: set[str] = set()
+    merged_defaults: set[str] = set()
+    merged_problems: list[tuple[int, str]] = []
 
     for node in tree.body:
         if not isinstance(node, ast.ClassDef):
@@ -104,17 +127,26 @@ def _parse_deploy_classes(
         if not any(_is_deploy_decorator(d) for d in node.decorator_list):
             continue
         all_names |= set(_parse_class_methods(node))
-        mb = _parse_methods_by_slot(node, tree)
+        mb, defaults, problems = _parse_methods_by_slot(node, tree)
+        merged_defaults |= defaults
+        merged_problems.extend(problems)
         for ident, method in mb.items():
             if ident in merged_mb:
-                return {}, {}, frozenset(), (
+                return {}, {}, frozenset(), set(), [], (
                     f"Duplicate @node_slot({ident!r}) on multiple @deploy classes "
                     f"({merged_cls.get(ident)!r} vs {node.name!r})"
                 )
             merged_mb[ident] = method
             merged_cls[ident] = node.name
 
-    return merged_mb, merged_cls, frozenset(all_names), None
+    return (
+        merged_mb,
+        merged_cls,
+        frozenset(all_names),
+        merged_defaults,
+        merged_problems,
+        None,
+    )
 
 
 def parse_deploy_py(path: Path) -> tuple[DeployScan | None, str | None]:
@@ -133,8 +165,17 @@ def parse_deploy_py(path: Path) -> tuple[DeployScan | None, str | None]:
     method_names: frozenset[str] = frozenset()
     methods_by_slot: dict[str, str] = {}
     cls_by_slot: dict[str, str] = {}
+    default_slots: set[str] = set()
+    default_problems: list[tuple[int, str]] = []
 
-    dep_mb, dep_cls, dep_mnames, dep_err = _parse_deploy_classes(tree)
+    (
+        dep_mb,
+        dep_cls,
+        dep_mnames,
+        dep_defaults,
+        dep_problems,
+        dep_err,
+    ) = _parse_deploy_classes(tree)
     if dep_err:
         return None, f"{path}:1: {dep_err}; fix: keep one @node_slot implementation per slot"
 
@@ -143,12 +184,16 @@ def parse_deploy_py(path: Path) -> tuple[DeployScan | None, str | None]:
         cls_by_slot = dict(dep_cls)
         method_names = dep_mnames
         cls_name = sorted(set(dep_cls.values()))[0]
+        default_slots = dep_defaults
+        default_problems = dep_problems
     else:
         for node in tree.body:
             if isinstance(node, ast.ClassDef) and node.name == "Inference":
                 method_names = _parse_class_methods(node)
                 cls_name = "Inference"
-                methods_by_slot = _parse_methods_by_slot(node, tree)
+                methods_by_slot, default_slots, default_problems = (
+                    _parse_methods_by_slot(node, tree)
+                )
 
     return (
         DeployScan(
@@ -156,6 +201,8 @@ def parse_deploy_py(path: Path) -> tuple[DeployScan | None, str | None]:
             method_names=method_names,
             methods_by_slot=methods_by_slot,
             cls_by_slot=cls_by_slot,
+            default_slots=frozenset(default_slots),
+            default_problems=tuple(default_problems),
         ),
         None,
     )

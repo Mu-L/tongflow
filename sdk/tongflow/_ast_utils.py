@@ -194,25 +194,71 @@ def extract_slot_models(
     return models_by_slot, problems
 
 
+def _node_slot_idents(deco: ast.Call) -> list[str]:
+    """``NodeSlots.<ident>`` positional arguments of one ``@node_slot(...)`` call."""
+
+    out: list[str] = []
+    for arg in deco.args:
+        if (
+            isinstance(arg, ast.Attribute)
+            and isinstance(arg.value, ast.Name)
+            and arg.value.id == "NodeSlots"
+            and isinstance(arg.attr, str)
+            and arg.attr
+        ):
+            out.append(arg.attr)
+    return out
+
+
+def _iter_node_slot_decorators(
+    fn: ast.FunctionDef | ast.AsyncFunctionDef,
+) -> list[ast.Call]:
+    return [
+        deco
+        for deco in fn.decorator_list
+        if isinstance(deco, ast.Call) and decorator_name(deco.func) == "node_slot"
+    ]
+
+
 def extract_node_slot_decorators(
     fn: ast.FunctionDef | ast.AsyncFunctionDef,
 ) -> tuple[str, ...]:
     """Collect ``NodeSlots.<ident>`` arguments from ``@node_slot(...)`` calls."""
 
     slots: list[str] = []
-    for deco in fn.decorator_list:
-        if not isinstance(deco, ast.Call):
-            continue
-        name = decorator_name(deco.func)
-        if name != "node_slot":
-            continue
-        for arg in deco.args:
-            if (
-                isinstance(arg, ast.Attribute)
-                and isinstance(arg.value, ast.Name)
-                and arg.value.id == "NodeSlots"
-                and isinstance(arg.attr, str)
-                and arg.attr
-            ):
-                slots.append(arg.attr)
+    for deco in _iter_node_slot_decorators(fn):
+        slots.extend(_node_slot_idents(deco))
     return tuple(slots)
+
+
+def extract_node_slot_defaults(
+    fn: ast.FunctionDef | ast.AsyncFunctionDef,
+) -> tuple[tuple[str, ...], list[tuple[int, str]]]:
+    """
+    Slots this handler claims as the default implementation, i.e. the
+    ``NodeSlots.<ident>`` arguments of every ``@node_slot(..., default=True)``
+    call. Returns ``(idents, problems)`` where each problem is
+    ``(lineno, reason)``.
+
+    Only a literal ``True`` counts — the scanner never imports plugin code, so a
+    computed value cannot be resolved and is reported rather than ignored.
+    """
+
+    idents: list[str] = []
+    problems: list[tuple[int, str]] = []
+    for deco in _iter_node_slot_decorators(fn):
+        for kw in deco.keywords:
+            if kw.arg != "default":
+                continue
+            value = kw.value
+            if not (isinstance(value, ast.Constant) and isinstance(value.value, bool)):
+                problems.append(
+                    (
+                        getattr(value, "lineno", deco.lineno),
+                        "@node_slot(default=...) must be a literal True or False",
+                    )
+                )
+                continue
+            if value.value:
+                idents.extend(_node_slot_idents(deco))
+    return tuple(dict.fromkeys(idents)), problems

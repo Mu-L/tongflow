@@ -157,7 +157,7 @@ def _is_method(fn: Callable[..., object]) -> bool:
     return False
 
 
-def node_slot(*slots: str) -> Callable[[F], F]:
+def node_slot(*slots: str, default: bool = False) -> Callable[[F], F]:
     """Declare which ABI `nodeSlot`(s) this method implements.
 
     The decorated function is also wrapped so that:
@@ -167,6 +167,13 @@ def node_slot(*slots: str) -> Callable[[F], F]:
     Works for both class methods (Modal plugins) and module functions (API
     plugins) — the wrapper introspects the underlying signature at decoration
     time.
+
+    `default=True` declares this plugin the representative implementation of
+    every slot listed in the same call: the scanner hoists it to the front of
+    `nodePluginMap[slot]`, which is what a freshly added node preselects. It is
+    a declaration for the scanner only — nothing reads it at run time. At most
+    one installed plugin should claim a given slot; when two do, the scanner
+    keeps the first in directory order and reports the clash.
     """
 
     def deco(fn: F) -> F:
@@ -217,6 +224,10 @@ def node_slot(*slots: str) -> Callable[[F], F]:
         existing: tuple[str, ...] = getattr(fn, "__tongflow_slots__", ())
         merged = existing + tuple(slots)
         setattr(wrapper, "__tongflow_slots__", tuple(dict.fromkeys(merged)))
+
+        prior_defaults: tuple[str, ...] = getattr(fn, "__tongflow_default_slots__", ())
+        claimed = prior_defaults + (tuple(slots) if default else ())
+        setattr(wrapper, "__tongflow_default_slots__", tuple(dict.fromkeys(claimed)))
         return cast(F, wrapper)
 
     return deco
