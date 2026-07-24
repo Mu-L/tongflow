@@ -1,5 +1,6 @@
-"""Scanner tests for `@node_slot(..., default=True)` — the default implementation
-of a slot is hoisted to the head of `nodePluginMap[slot]`."""
+"""Scanner tests for default-implementation claims — `TONGFLOW_DEFAULT_SLOTS` and
+the equivalent `@node_slot(..., default=True)`. The claimed plugin is hoisted to
+the head of `nodePluginMap[slot]`."""
 
 from __future__ import annotations
 
@@ -172,6 +173,76 @@ def test_non_literal_default_errors(tmp_path):
     assert any("literal True or False" in e["message"] for e in payload["errors"])
     # The handler itself still registers — only the claim is rejected.
     assert payload["nodePluginMap"]["image-gen"] == ["tongflow-api-aaa"]
+
+
+def test_default_slots_constant_is_hoisted(tmp_path):
+    claimed = (
+        'TONGFLOW_DEFAULT_SLOTS = ["image-gen"]\n'
+        + _entry_src("NodeSlots.IMAGE_GEN")
+    )
+    payload = _scan(
+        tmp_path,
+        {
+            "tongflow-api-aaa": ("entry.py", _entry_src("NodeSlots.IMAGE_GEN")),
+            "tongflow-api-zzz": ("entry.py", claimed),
+        },
+    )
+    assert payload["errors"] == []
+    assert payload["nodePluginMap"]["image-gen"] == [
+        "tongflow-api-zzz",
+        "tongflow-api-aaa",
+    ]
+
+
+def test_default_slots_constant_in_deploy_py(tmp_path):
+    claimed = (
+        'TONGFLOW_DEFAULT_SLOTS = ["image-gen"]\n'
+        + _deploy_src("NodeSlots.IMAGE_GEN")
+    )
+    payload = _scan(
+        tmp_path,
+        {
+            "tongflow-modal-aaa": ("entry.py", _entry_src("NodeSlots.IMAGE_GEN")),
+            "tongflow-modal-zzz": ("deploy.py", claimed),
+        },
+    )
+    assert payload["errors"] == []
+    assert payload["nodePluginMap"]["image-gen"][0] == "tongflow-modal-zzz"
+
+
+def test_default_slots_constant_without_handler_errors(tmp_path):
+    src = 'TONGFLOW_DEFAULT_SLOTS = ["gen-text"]\n' + _entry_src("NodeSlots.IMAGE_GEN")
+    payload = _scan(tmp_path, {"tongflow-api-aaa": ("entry.py", src)})
+    assert any("no @node_slot handler" in e["message"] for e in payload["errors"])
+    assert payload["nodePluginMap"]["image-gen"] == ["tongflow-api-aaa"]
+
+
+def test_default_slots_constant_non_literal_errors(tmp_path):
+    src = (
+        "_SLOTS = [\"image-gen\"]\n"
+        "TONGFLOW_DEFAULT_SLOTS = _SLOTS\n" + _entry_src("NodeSlots.IMAGE_GEN")
+    )
+    payload = _scan(tmp_path, {"tongflow-api-aaa": ("entry.py", src)})
+    assert any("list literal" in e["message"] for e in payload["errors"])
+
+
+def test_constant_and_kwarg_claims_from_two_plugins_clash(tmp_path):
+    payload = _scan(
+        tmp_path,
+        {
+            "tongflow-api-aaa": (
+                "entry.py",
+                _entry_src("NodeSlots.IMAGE_GEN, default=True"),
+            ),
+            "tongflow-api-zzz": (
+                "entry.py",
+                'TONGFLOW_DEFAULT_SLOTS = ["image-gen"]\n'
+                + _entry_src("NodeSlots.IMAGE_GEN"),
+            ),
+        },
+    )
+    assert payload["nodePluginMap"]["image-gen"][0] == "tongflow-api-aaa"
+    assert any("claimed as default by" in e["message"] for e in payload["errors"])
 
 
 def test_claim_covers_every_slot_in_the_same_call(tmp_path):

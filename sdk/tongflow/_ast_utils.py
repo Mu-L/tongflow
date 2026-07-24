@@ -100,6 +100,77 @@ def decorator_name(expr: ast.expr) -> str | None:
 
 
 SLOT_MODELS_CONST = "TONGFLOW_SLOT_MODELS"
+DEFAULT_SLOTS_CONST = "TONGFLOW_DEFAULT_SLOTS"
+
+
+def _const_assign_value(node: ast.stmt, name: str) -> ast.expr | None:
+    """The right-hand side of a module-level ``name = ...`` assignment, if any."""
+
+    if isinstance(node, ast.Assign):
+        targets, value = node.targets, node.value
+    elif isinstance(node, ast.AnnAssign):
+        targets, value = [node.target], node.value
+    else:
+        return None
+    if value is None:
+        return None
+    if not any(isinstance(t, ast.Name) and t.id == name for t in targets):
+        return None
+    return value
+
+
+def extract_default_slots(
+    tree: ast.Module,
+) -> tuple[list[str], list[tuple[int, str]]]:
+    """
+    Parse the optional module-level ``TONGFLOW_DEFAULT_SLOTS`` constant: a pure
+    list literal of ABI node slots this plugin claims as the default
+    implementation of, e.g. ``["image-gen", "image-edit"]``.
+
+    A plain constant rather than a decorator argument on purpose — it is never
+    executed, so a plugin declaring it still imports cleanly under any SDK
+    version, including the older ones already baked into deployed runtimes.
+
+    Returns ``(slots, problems)``; a malformed constant is reported instead of
+    silently ignored.
+    """
+
+    slots: list[str] = []
+    problems: list[tuple[int, str]] = []
+
+    for node in tree.body:
+        value = _const_assign_value(node, DEFAULT_SLOTS_CONST)
+        if value is None:
+            continue
+        if not isinstance(value, (ast.List, ast.Tuple)):
+            problems.append(
+                (node.lineno, f"{DEFAULT_SLOTS_CONST} must be a list literal of strings")
+            )
+            continue
+        for item in value.elts:
+            if not (
+                isinstance(item, ast.Constant)
+                and isinstance(item.value, str)
+                and item.value.strip()
+            ):
+                problems.append(
+                    (
+                        getattr(item, "lineno", node.lineno),
+                        f"{DEFAULT_SLOTS_CONST} items must be non-empty string literals",
+                    )
+                )
+                continue
+            if item.value in slots:
+                problems.append(
+                    (
+                        item.lineno,
+                        f"{DEFAULT_SLOTS_CONST} has duplicate slot {item.value!r}",
+                    )
+                )
+                continue
+            slots.append(item.value)
+
+    return slots, problems
 
 
 def extract_slot_models(

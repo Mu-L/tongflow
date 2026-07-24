@@ -148,16 +148,16 @@ So inside the handler you only ever touch typed objects — never a raw dict.
 
 Most slots have several implementations. The one a node preselects when it lands on
 the canvas — and the one listed first in the node's plugin picker — is the head of
-`nodePluginMap[slot]`. Add `default=True` to claim it:
+`nodePluginMap[slot]`. Claim it with a module-level constant, next to your handlers:
 
 ```python
-@node_slot(NodeSlots.IMAGE_GEN, default=True)
-def image_gen(self, input: ImageGenInput) -> ImageGenOutput:
-    ...
+TONGFLOW_DEFAULT_SLOTS = ["image-gen", "image-edit"]
 ```
 
-- The claim covers **every** slot listed in that same `@node_slot(...)` call.
-- It is a declaration for the scanner only; nothing reads it at run time.
+- Slot **strings** (as in the ABI), not `NodeSlots` idents — same convention as
+  `TONGFLOW_SLOT_MODELS`.
+- Every claimed slot must have a `@node_slot` handler in the same plugin, else the
+  scanner reports it.
 - **One claim per slot.** If two installed plugins claim the same slot, the scanner
   keeps the first in directory order and reports the clash in the registry `errors`.
 - Slots nobody claims — or whose claimant is not installed — fall back to the first
@@ -165,7 +165,13 @@ def image_gen(self, input: ImageGenInput) -> ImageGenOutput:
 - Users are never locked in: the picker still lists every implementation, and a node
   that already has a plugin selected keeps it.
 
-Requires `tongflow>=0.2.15`.
+Why a constant and not a decorator argument: the scanner reads it statically, and a
+constant is never *executed*, so a plugin that declares it still imports cleanly
+under **any** SDK version — including older ones already baked into deployed
+runtimes. `@node_slot(NodeSlots.IMAGE_GEN, default=True)` is accepted as an
+equivalent claim, but it evaluates at import time and therefore requires
+`tongflow>=0.2.15` wherever the plugin is imported (including the local
+`modal deploy` that builds a Modal plugin's image). Prefer the constant.
 
 ### Assets in, assets out
 

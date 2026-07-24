@@ -7,7 +7,9 @@ from pathlib import Path
 
 from .abi import load_abi
 from ._ast_utils import (
+    DEFAULT_SLOTS_CONST,
     SLOT_MODELS_CONST,
+    extract_default_slots,
     extract_node_slot_decorators,
     extract_node_slot_defaults,
     extract_slot_models,
@@ -207,6 +209,41 @@ def _scan_slot_models_in_dir(
     return models_by_slot, problems
 
 
+def _scan_default_slots_in_dir(plugin_dir: Path) -> tuple[list[str], list[str]]:
+    """Collect TONGFLOW_DEFAULT_SLOTS declarations across the plugin's files."""
+
+    slots: list[str] = []
+    problems: list[str] = []
+    for p in _iter_plugin_py_files(plugin_dir):
+        try:
+            tree = ast.parse(p.read_text(encoding="utf-8"), filename=str(p))
+        except (OSError, SyntaxError):
+            continue
+        found, file_problems = extract_default_slots(tree)
+        for lineno, reason in file_problems:
+            problems.append(
+                _scan_error(
+                    p,
+                    reason,
+                    "declare a pure list literal of slot strings",
+                    line=lineno,
+                )
+            )
+        for slot in found:
+            if slot in slots:
+                problems.append(
+                    _scan_error(
+                        p,
+                        f"{DEFAULT_SLOTS_CONST} declares slot {slot!r} more than once "
+                        "across files",
+                        "keep one declaration per slot",
+                    )
+                )
+                continue
+            slots.append(slot)
+    return slots, problems
+
+
 def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
     abi = load_abi(abi_path)
     valid = abi.node_slots
@@ -317,6 +354,30 @@ def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
                 )
                 continue
             llm_methods[slot]["models"] = models
+
+        # Optional default-implementation claims. The module constant is the
+        # portable form (never executed, so any SDK version imports it);
+        # `@node_slot(..., default=True)` is equivalent but needs tongflow>=0.2.15
+        # in whatever runtime imports the plugin.
+        claimed_slots, claim_problems = _scan_default_slots_in_dir(pdir)
+        for message in claim_problems:
+            errors.append({"pluginId": plugin_id, "message": message})
+        for slot in claimed_slots:
+            if slot not in llm_methods:
+                errors.append(
+                    {
+                        "pluginId": plugin_id,
+                        "message": _scan_error(
+                            pdir / "entry.py",
+                            f"{DEFAULT_SLOTS_CONST} claims slot {slot!r} but the "
+                            "plugin has no @node_slot handler for it",
+                            "remove the entry or add the matching handler",
+                        ),
+                    }
+                )
+                continue
+            if plugin_id not in default_claims.setdefault(slot, []):
+                default_claims[slot].append(plugin_id)
 
         plugins[plugin_id] = {
             "localSubdir": plugin_id,
