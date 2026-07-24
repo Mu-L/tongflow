@@ -80,11 +80,20 @@ def http_progress_sink(url: str, token: str) -> ProgressSink:
     return _sink
 
 
-def progress(message: str, *, percent: float | None = None) -> None:
-    """Emit a progress update. ``percent`` is an optional 0–100 hint."""
+def progress(
+    message: str, *, percent: float | None = None, thinking: bool = False
+) -> None:
+    """Emit a progress update. ``percent`` is an optional 0–100 hint.
+
+    Set ``thinking=True`` to route the message to the node's live "thinking"
+    bubble (streamed reasoning) instead of the central status label. The
+    platform renders these in a separate, auto-scrolling panel beside the node.
+    """
     payload: dict[str, object] = {"message": str(message)}
     if percent is not None:
         payload["percent"] = percent
+    if thinking:
+        payload["thinking"] = True
     line = PROGRESS_SENTINEL + json.dumps(payload, ensure_ascii=False)
     # One write + flush so the line is delivered promptly and never interleaves
     # with the JSON result on stdout.

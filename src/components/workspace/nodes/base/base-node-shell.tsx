@@ -38,6 +38,7 @@ import {
 import { NodeLoadingOverlay } from "./node-loading-overlay";
 import { NodePluginIdSelect } from "./node-plugin-id-select";
 import { NodePluginModelSelect } from "./node-plugin-model-select";
+import { NodeThinkingBubble } from "./node-thinking-bubble";
 
 /* ------------------------------------------------------------------ */
 /* Props                                                               */
@@ -60,6 +61,8 @@ export type BaseNodeShellProps = HTMLAttributes<HTMLDivElement> & {
     elapsedSeconds?: number;
     /** Live runner status text shown above the spinner. */
     progressLabel?: string | null;
+    /** Streamed reasoning shown in the auto-scrolling bubble beside the node. */
+    thinkingText?: string | null;
     /** When true, hides the execute button (already in execute mode). */
     isExecuteMode?: boolean;
     /**
@@ -104,6 +107,7 @@ export const BaseNodeShell = forwardRef<HTMLDivElement, BaseNodeShellProps>(
             loading = false,
             elapsedSeconds = 0,
             progressLabel = null,
+            thinkingText = null,
             isExecuteMode = false,
             onExecute,
             onCancel,
@@ -189,6 +193,11 @@ export const BaseNodeShell = forwardRef<HTMLDivElement, BaseNodeShellProps>(
                             elapsedSeconds={elapsedSeconds}
                             progressLabel={progressLabel}
                             onCancel={onCancel}
+                        />
+
+                        <NodeThinkingBubble
+                            text={thinkingText}
+                            visible={loading}
                         />
 
                         {/* Stack effect background cards */}

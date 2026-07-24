@@ -104,6 +104,7 @@ export async function execPlugin<S extends NodeSlot>(
                     ...(progress.percent != null
                         ? { percent: progress.percent }
                         : {}),
+                    ...(progress.thinking ? { thinking: true } : {}),
                 });
                 return;
             }
