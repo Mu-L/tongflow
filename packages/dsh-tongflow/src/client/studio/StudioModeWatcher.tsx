@@ -5,8 +5,9 @@
  * tab ring. Plain sessions are left untouched (dsh chat, tabs and all).
  */
 
-import type {} from "@deepseek-ai/dsh-client-runtime/client";
+import type {} from "@deepseek-ai/dsh-client-ui-chat/client";
 import type {} from "@deepseek-ai/dsh-client-ui-conversation/client";
+import type {} from "@deepseek-ai/dsh-client-ui-session/client";
 import type { PropsRuntime } from "@deepseek-ai/dsh-client-ui-slots";
 import { useEffect } from "react";
 
@@ -54,13 +55,13 @@ function findTabs():
 const LS_PREFIX = "dsh-tongflow:studio-session:";
 
 export function StudioModeWatcher({
-    useSession,
+    useChat,
     useSessions,
     sessionId,
 }: StudioModeWatcherProps) {
     // The loaded history window may not reach the first message of a long
     // session; the session title (derived from it) and a per-session memo cover that.
-    const firstText = useSession((s) => firstUserText(s.nodes));
+    const firstText = useChat((s) => firstUserText(s.legacy.nodes));
     const title = useSessions(
         (s) => s.byId[sessionId]?.title ?? s.byId[sessionId]?.displayTitle,
     );

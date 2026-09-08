@@ -5,15 +5,16 @@
  * composer is drawn; the full-featured chat stays one tab away.
  */
 
-import type {} from "@deepseek-ai/dsh-client-runtime/client";
+import type {} from "@deepseek-ai/dsh-client-ui-chat/client";
 import type {} from "@deepseek-ai/dsh-client-ui-conversation/client";
+import type {} from "@deepseek-ai/dsh-client-ui-session/client";
 import type { PropsRuntime } from "@deepseek-ai/dsh-client-ui-slots";
 import { useEffect, useMemo, useRef } from "react";
 import { useT } from "./common.tsx";
 
 export type ChatPaneProps = Pick<
     PropsRuntime<"conversation.view">,
-    "useSession" | "inputActions" | "useInput" | "sessionId"
+    "useSession" | "useChat" | "inputActions" | "useInput" | "sessionId"
 >;
 
 interface Row {
@@ -63,11 +64,13 @@ function shortArgs(raw: string): string {
     }
 }
 
-export function ChatPane({ useSession }: ChatPaneProps) {
+export function ChatPane({ useSession, useChat }: ChatPaneProps) {
     const t = useT();
-    const nodes = useSession((s) => s.nodes);
-    const partial = useSession((s) => s.partial);
-    const runningCalls = useSession((s) => s.runningCalls);
+    // The transcript lives on the Chat target (ui-chat); the session snapshot
+    // keeps only lifecycle state.
+    const nodes = useChat((s) => s.legacy.nodes);
+    const partial = useChat((s) => s.legacy.partial);
+    const runningCalls = useChat((s) => s.legacy.runningCalls);
     const running = useSession((s) => s.running);
     const listRef = useRef<HTMLDivElement>(null);
 
