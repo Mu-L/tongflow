@@ -36,7 +36,7 @@ function firstText(
 
 /** First user message already in the durable log (restored / continued sessions). */
 function firstLoggedUserText(agent: Agent): string | undefined {
-    for (const e of agent.session.events as readonly {
+    for (const e of agent.session.snapshotEvents() as readonly {
         type: string;
         data?: unknown;
     }[]) {

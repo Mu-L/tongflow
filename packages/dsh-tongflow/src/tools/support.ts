@@ -1,8 +1,8 @@
 /** Shared helpers for the tongflow_* tools: project resolution, rendering, schemas. */
 import type { Context } from "@deepseek-ai/cordis";
 import type { ContentBlock } from "@deepseek-ai/dsh-llm";
-import type { JsonValue } from "@deepseek-ai/dsh-session";
 import type { ToolRunContext } from "@deepseek-ai/dsh-tools";
+import type { JsonValue } from "@deepseek-ai/dsh-util-values";
 import type { StudioApi } from "../api.ts";
 import { isInsideProject, isProjectId } from "../project/paths.ts";
 import { getSessionProject, setSessionProject } from "../session-projects.ts";

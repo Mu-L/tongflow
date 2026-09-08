@@ -5,8 +5,8 @@
  * (apply_graph_patch, read_canvas, validate_workflow, describe_node_type),
  * adding the `workflow` file argument — the file on disk is the canvas.
  */
-import type { JsonValue } from "@deepseek-ai/dsh-session";
 import { defineTool, type ToolDefinition } from "@deepseek-ai/dsh-tools";
+import type { JsonValue } from "@deepseek-ai/dsh-util-values";
 import type { WorkflowFileMeta } from "../shared/types.ts";
 import {
     compact,

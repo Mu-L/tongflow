@@ -1,6 +1,7 @@
 import "./studio.css";
-import type {} from "@deepseek-ai/dsh-client-runtime/client";
+import type {} from "@deepseek-ai/dsh-client-ui-chat/client";
 import type {} from "@deepseek-ai/dsh-client-ui-conversation/client";
+import type {} from "@deepseek-ai/dsh-client-ui-session/client";
 import type { PropsRuntime } from "@deepseek-ai/dsh-client-ui-slots";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ProjectSummary, TreeNode } from "../../shared/types.ts";
@@ -28,7 +29,7 @@ export type StudioViewProps = Pick<
     Partial<
         Pick<
             PropsRuntime<"conversation.view">,
-            "useSession" | "inputActions" | "useInput" | "sessionId"
+            "useSession" | "useChat" | "inputActions" | "useInput" | "sessionId"
         >
     > &
     StudioInjected & { onClose?: () => void };
@@ -102,6 +103,7 @@ function StudioBody(props: StudioViewProps) {
     const { openWorkspace, locale, useSessions, onClose } = props;
     const hasChat = Boolean(
         props.useSession &&
+            props.useChat &&
             props.inputActions &&
             props.useInput &&
             props.sessionId,
@@ -347,6 +349,7 @@ function StudioBody(props: StudioViewProps) {
                     <div className="tfs-pane">
                         <ChatPane
                             useSession={props.useSession!}
+                            useChat={props.useChat!}
                             inputActions={props.inputActions!}
                             useInput={props.useInput!}
                             sessionId={props.sessionId!}

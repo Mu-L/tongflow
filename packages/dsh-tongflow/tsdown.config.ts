@@ -21,27 +21,25 @@ import { defineConfig, type UserConfig } from "tsdown";
 
 const PACKAGE_ID = "dsh-tongflow";
 
-/** Module specifiers the dsh web shell shares into the frozen module table. */
+/**
+ * Module specifiers the dsh web shell shares into the frozen module table.
+ * Mirrors `@deepseek-ai/dsh-client-web/src/platform.ts` (`PLATFORM_MODULES`);
+ * `ui-dockkit` joins the table in 0.1.3 and is listed ahead of time — an
+ * external we never import costs nothing.
+ */
 const PLATFORM_MODULES = [
     "react",
     "react/jsx-runtime",
     "react-dom",
     "react-dom/client",
     "@deepseek-ai/cordis",
+    "@deepseek-ai/dsh-client-store",
     "@deepseek-ai/dsh-client-ui-slots",
-    "@deepseek-ai/dsh-client-web-react",
     "@deepseek-ai/dsh-client-ui-primitives",
-    "@deepseek-ai/dsh-client-ui-attachment",
-    "@deepseek-ai/dsh-client-schema-form",
+    "@deepseek-ai/dsh-client-ui-dockkit",
 ] as const;
 
-/** Documented temporary exemption the loader also answers natively. */
-const RUNTIME_STORE_EXEMPTION = "@deepseek-ai/dsh-client-runtime/client";
-
-const CLIENT_EXTERNALS: readonly string[] = [
-    ...PLATFORM_MODULES,
-    RUNTIME_STORE_EXEMPTION,
-];
+const CLIENT_EXTERNALS: readonly string[] = [...PLATFORM_MODULES];
 
 /** Browser-safe dsh wire/type layers a bundle may inline (no shared runtime identity). */
 const INLINE_SAFE =

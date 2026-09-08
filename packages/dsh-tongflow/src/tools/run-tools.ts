@@ -16,12 +16,12 @@ import type {
 } from "@deepseek-ai/dsh-attachment";
 import type { JobRegistry } from "@deepseek-ai/dsh-jobs";
 import type { LlmRuntime } from "@deepseek-ai/dsh-llm";
-import type { JsonValue } from "@deepseek-ai/dsh-session";
 import {
     defineTool,
     type ToolDefinition,
     type ToolRunContext,
 } from "@deepseek-ai/dsh-tools";
+import type { JsonValue } from "@deepseek-ai/dsh-util-values";
 import type { RunRecord } from "../engine/runs.ts";
 import { formatEvent } from "../engine/runs.ts";
 import { modalityOfExt } from "../shared/types.ts";
