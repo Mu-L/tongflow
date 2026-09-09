@@ -39,6 +39,7 @@
         "tongflow-modal-qwen3tts",
         "tongflow-modal-indextts2",
         "tongflow-modal-whisper",
+        "tongflow-modal-moss-transcribe-diarize",
         "tongflow-modal-ace-step",
         "tongflow-modal-levo",
         "tongflow-modal-minimax-music3",
