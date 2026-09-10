@@ -116,3 +116,21 @@ def test_construct_skips_validation() -> None:
 
     out = handler(None, {"text": 42})
     assert out == {"success": True, "result": "42"}
+
+
+def test_params_key_is_popped_into_current_params() -> None:
+    from tongflow.slots import current_params
+
+    @node_slot("foo")
+    def handler(self: object, input: FooIn) -> FooOut:
+        # Reserved key never reaches the typed input; the body reads it via
+        # current_params() with its own fallback defaults.
+        assert isinstance(input, FooIn)
+        p = current_params()
+        return FooOut(success=True, result=f"{p.get('steps', 20)}-{p.get('turbo', False)}")
+
+    out = handler(None, {"text": "hi", "_params": {"steps": 8}})
+    assert out == {"success": True, "result": "8-False"}
+    # Resets per call: a follow-up request without params sees an empty dict.
+    out = handler(None, {"text": "hi"})
+    assert out == {"success": True, "result": "20-False"}

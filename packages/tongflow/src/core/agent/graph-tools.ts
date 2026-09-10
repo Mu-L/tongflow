@@ -252,6 +252,8 @@ export function applyGraphPatch(
         const nodeData: Record<string, unknown> = { ...data };
         if (spec.pluginId) nodeData.pluginId = spec.pluginId;
         if (spec.pluginModel) nodeData.pluginModel = spec.pluginModel;
+        if (spec.pluginParams && Object.keys(spec.pluginParams).length > 0)
+            nodeData.pluginParams = { ...spec.pluginParams };
 
         // If this node's first incoming edge originates from an
         // already-materialized node, create node+edge in one `expands` call:

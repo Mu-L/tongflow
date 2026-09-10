@@ -645,6 +645,13 @@ export class WorkflowExporter {
             typeof nodeData.pluginModel === "string"
                 ? nodeData.pluginModel.trim()
                 : "";
+        const params =
+            nodeData.pluginParams &&
+            typeof nodeData.pluginParams === "object" &&
+            !Array.isArray(nodeData.pluginParams) &&
+            Object.keys(nodeData.pluginParams).length > 0
+                ? { ...nodeData.pluginParams }
+                : undefined;
 
         return {
             id: node.id,
@@ -652,6 +659,7 @@ export class WorkflowExporter {
             feature: ns.abi.feature,
             pluginId,
             ...(model ? { model } : {}),
+            ...(params ? { params } : {}),
             label,
             comment,
             locked,

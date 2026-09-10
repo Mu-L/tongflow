@@ -41,6 +41,12 @@ F = TypeVar("F", bound=Callable[..., object])
 # pops it back out before constructing the typed input.
 MODEL_KEY = "_model"
 
+# Per-request advanced parameters (the node's collapsed "Advanced" section,
+# offered from the plugin's own `TONGFLOW_SLOT_PARAMS`). Rides inside the
+# prompt dict under this reserved key — never an ABI field — and is popped
+# by the @node_slot wrapper before the typed input is built.
+PARAMS_KEY = "_params"
+
 # Per-request cloud progress callback ({"progressUrl", "token"}). The
 # orchestrator tucks it into the prompt dict under this reserved key when it
 # runs a plugin remotely; the wrapper pops it out and installs it as the
@@ -52,9 +58,27 @@ _current_model: contextvars.ContextVar[str | None] = contextvars.ContextVar(
 )
 
 
+_current_params: contextvars.ContextVar[dict[str, Any] | None] = contextvars.ContextVar(
+    "tongflow_current_params", default=None
+)
+
+
 def current_model() -> str | None:
     """The model chosen on the node for this request, or None for default."""
     return _current_model.get()
+
+
+def current_params() -> dict[str, Any]:
+    """Advanced parameters chosen on the node for this request.
+
+    Keys follow the plugin's own ``TONGFLOW_SLOT_PARAMS`` declaration; anything
+    the user left untouched is absent, so read with a plugin-side default::
+
+        steps = int(current_params().get("steps", DEFAULT_STEPS))
+
+    Empty when the node sent none (older hosts, or a plugin without params).
+    """
+    return dict(_current_params.get() or {})
 
 
 def _basemodel_from_annotation(ann: object) -> type[BaseModel] | None:
@@ -187,6 +211,8 @@ def node_slot(*slots: str, default: bool = False) -> Callable[[F], F]:
                 # when absent we leave the sink untouched so the streaming serve
                 # (which installs an in-process queue sink) isn't clobbered.
                 _current_model.set(input.pop(MODEL_KEY, None))
+                params = input.pop(PARAMS_KEY, None)
+                _current_params.set(dict(params) if isinstance(params, dict) else None)
                 tf = input.pop(TONGFLOW_KEY, None)
                 if isinstance(tf, dict) and tf.get("progressUrl") and tf.get("token"):
                     set_progress_sink(

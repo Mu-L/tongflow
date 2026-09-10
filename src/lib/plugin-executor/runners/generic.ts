@@ -41,7 +41,14 @@ export async function execPlugin<S extends NodeSlot>(
         );
     }
 
-    const prompt = req.input as unknown as Record<string, unknown>;
+    const business = req.input as unknown as Record<string, unknown>;
+    // Advanced params ride inside the prompt under a reserved key (like the
+    // cloud `_tongflow` callback): every entry.py forwards the prompt verbatim
+    // and `@node_slot` pops `_params` out before building the typed input.
+    const prompt =
+        req.params && Object.keys(req.params).length > 0
+            ? { ...business, _params: req.params }
+            : business;
 
     const pluginDir = join(pluginsDir(), cfg.localSubdir);
     // Every plugin ships its own local entry.py (`python entry.py`). For a

@@ -35,9 +35,24 @@ export interface TaskData {
     pluginId: string;
     /** Selected model for router-style plugins; undefined = plugin default. */
     model?: string;
+    /** Advanced parameters (plugin's `TONGFLOW_SLOT_PARAMS` keys); undefined =
+     * plugin defaults. */
+    params?: Record<string, unknown>;
     prompt: Record<string, unknown>;
     nodeId: string;
     workflowId?: number | null;
+}
+
+function parseParams(raw: string | null | undefined) {
+    if (!raw) return undefined;
+    try {
+        const v = JSON.parse(raw) as unknown;
+        return v && typeof v === "object" && !Array.isArray(v)
+            ? (v as Record<string, unknown>)
+            : undefined;
+    } catch {
+        return undefined;
+    }
 }
 
 export interface HandlerResult {
@@ -72,6 +87,7 @@ export async function loadTaskData(taskId: string): Promise<TaskData | null> {
         nodeSlot,
         pluginId,
         model: (task.model ?? "").trim() || undefined,
+        params: parseParams(task.params),
         prompt,
         nodeId: task.nodeId,
         workflowId: task.workflowId,
@@ -241,6 +257,7 @@ export async function executeTask(taskId: string): Promise<void> {
             pluginId: taskData.pluginId,
             nodeSlot: taskData.nodeSlot,
             model: taskData.model,
+            params: taskData.params,
             input: businessInput as never,
             taskId,
             signal: controller.signal,

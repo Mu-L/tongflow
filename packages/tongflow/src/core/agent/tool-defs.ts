@@ -75,6 +75,12 @@ export const TONGFLOW_TOOL_DEFS: readonly AgentToolDefinition[] = [
                                 description:
                                     "Optional model id, only for plugins that advertise models.",
                             },
+                            pluginParams: {
+                                type: "object",
+                                description:
+                                    "Optional advanced parameters, only keys the plugin advertises for this slot.",
+                                additionalProperties: true,
+                            },
                             fromAttachment: {
                                 type: "integer",
                                 description:

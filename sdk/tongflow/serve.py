@@ -66,6 +66,9 @@ def serve_slot(payload: dict[str, Any], *, invoke: InvokeFn) -> dict[str, Any]:
     model = payload.get("model")
     if model:
         materialized = {**materialized, "_model": model}
+    params = payload.get("params")
+    if isinstance(params, dict) and params:
+        materialized = {**materialized, "_params": params}
 
     raw = invoke(method, materialized)
     return convert_asset_outputs_to_file_refs(slot, raw, abi, store)
@@ -249,6 +252,9 @@ def serve_stream_from_spec(
         # Router-style plugins pick their backing model per request.
         if spec.get("model"):
             payload["model"] = spec["model"]
+        # Advanced parameters from the node's collapsed section, if any.
+        if isinstance(spec.get("params"), dict) and spec["params"]:
+            payload["params"] = spec["params"]
     except Exception as e:  # noqa: BLE001
         yield _sse({"id": task_id, "status": "FAILED", "data": {"message": "Spec fetch failed", "error": str(e)}})
         return

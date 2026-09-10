@@ -34,6 +34,9 @@ export interface GraphPatchAddNode {
     /** Optional explicit plugin choice; omitted → resolved on mount. */
     pluginId?: string;
     pluginModel?: string;
+    /** Optional advanced parameters for the chosen plugin (its
+     * `TONGFLOW_SLOT_PARAMS` keys). */
+    pluginParams?: Record<string, unknown>;
     /**
      * 1-based index into the pending chat attachments. The executor substitutes
      * the real storage key so the model never transcribes a fileKey.

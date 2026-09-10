@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { create } from "zustand";
-import type { PluginModelCatalog } from "../../core";
-import { filterModelCatalog } from "../../core";
+import type {
+    PluginModelCatalog,
+    PluginParamEntry,
+    PluginParamSpec,
+} from "../../core";
+import { filterModelCatalog, visiblePluginParams } from "../../core";
 import { apiUrl, hostFetch } from "../host";
 
 export type PluginsRegistryPayload = {
@@ -16,7 +20,12 @@ export type PluginsRegistryPayload = {
         {
             methodsByNodeSlot?: Record<
                 string,
-                { methodName: string; models?: string[] }
+                {
+                    methodName: string;
+                    models?: string[];
+                    /** Advanced params declared via `TONGFLOW_SLOT_PARAMS`. */
+                    params?: Record<string, PluginParamSpec>;
+                }
             >;
             /** Live model catalog declared via `TONGFLOW_MODEL_CATALOG`. */
             modelCatalog?: PluginModelCatalog;
@@ -232,6 +241,44 @@ export function useNodePluginModels(
     }, [hasCatalog, pluginId]);
 
     return dedupeIds([...declared, ...(live ?? [])]);
+}
+
+// ── Advanced parameters ─────────────────────────────────────────────────────
+// A plugin may declare `TONGFLOW_SLOT_PARAMS`: plugin-specific run-time knobs
+// per slot (optionally gated to particular router models). The node renders
+// them under a collapsed section; nothing is shown for plugins without any.
+
+/**
+ * Synchronous read of the params a plugin offers for one slot given the
+ * selected model, in declaration order.
+ */
+export function getNodePluginParams(
+    nodeSlot: string,
+    pluginId: string,
+    model: string | undefined,
+): PluginParamEntry[] {
+    const registry = usePluginsRegistryStore.getState().registry;
+    return visiblePluginParams(
+        registry?.plugins?.[pluginId]?.methodsByNodeSlot?.[nodeSlot]?.params,
+        model,
+    );
+}
+
+/** Reactive form of {@link getNodePluginParams}. */
+export function useNodePluginParams(
+    nodeSlot: string,
+    pluginId: string,
+    model: string | undefined,
+): PluginParamEntry[] {
+    const declared = usePluginsRegistryStore(
+        (s) =>
+            s.registry?.plugins?.[pluginId]?.methodsByNodeSlot?.[nodeSlot]
+                ?.params,
+    );
+    return useMemo(
+        () => visiblePluginParams(declared, model),
+        [declared, model],
+    );
 }
 
 export type PluginMeta = {

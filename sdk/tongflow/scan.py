@@ -10,16 +10,18 @@ from ._ast_utils import (
     DEFAULT_SLOTS_CONST,
     MODEL_CATALOG_CONST,
     SLOT_MODELS_CONST,
+    SLOT_PARAMS_CONST,
     extract_default_slots,
     extract_model_catalog,
     extract_node_slot_decorators,
     extract_node_slot_defaults,
     extract_slot_models,
+    extract_slot_params,
     looks_like_sdk_model_type,
 )
 from .parse_deploy import _slot_to_ident, parse_deploy_py
 
-SCANNER_VERSION = 7
+SCANNER_VERSION = 8
 
 SKIP_DIR_NAMES = frozenset(
     {
@@ -223,6 +225,42 @@ def _scan_slot_models_in_dir(
     return models_by_slot, problems
 
 
+def _scan_slot_params_in_dir(
+    plugin_dir: Path,
+) -> tuple[dict[str, dict[str, dict]], list[str]]:
+    """Collect TONGFLOW_SLOT_PARAMS declarations across the plugin's files."""
+
+    params_by_slot: dict[str, dict[str, dict]] = {}
+    problems: list[str] = []
+    for p in _iter_plugin_py_files(plugin_dir):
+        try:
+            tree = ast.parse(p.read_text(encoding="utf-8"), filename=str(p))
+        except (OSError, SyntaxError):
+            continue
+        found, file_problems = extract_slot_params(tree)
+        for lineno, reason in file_problems:
+            problems.append(
+                _scan_error(
+                    p,
+                    reason,
+                    "declare a pure literal dict[slot, dict[name, spec]]",
+                    line=lineno,
+                )
+            )
+        for slot, params in found.items():
+            if slot in params_by_slot:
+                problems.append(
+                    _scan_error(
+                        p,
+                        f"{SLOT_PARAMS_CONST} declares slot {slot!r} more than once across files",
+                        "keep one declaration per slot",
+                    )
+                )
+                continue
+            params_by_slot[slot] = params
+    return params_by_slot, problems
+
+
 def _scan_model_catalog_in_dir(
     plugin_dir: Path,
 ) -> tuple[dict | None, list[str]]:
@@ -405,6 +443,27 @@ def scan(plugins_root: Path, abi_path: Path) -> dict[str, object]:
                 )
                 continue
             llm_methods[slot]["models"] = models
+
+        # Optional per-slot advanced parameters (plugin-specific run knobs the
+        # node exposes under a collapsed section). Additive like models.
+        params_by_slot, param_problems = _scan_slot_params_in_dir(pdir)
+        for message in param_problems:
+            errors.append({"pluginId": plugin_id, "message": message})
+        for slot, params in params_by_slot.items():
+            if slot not in llm_methods:
+                errors.append(
+                    {
+                        "pluginId": plugin_id,
+                        "message": _scan_error(
+                            pdir / "entry.py",
+                            f"{SLOT_PARAMS_CONST} declares params for slot {slot!r} "
+                            "but the plugin has no @node_slot handler for it",
+                            "remove the entry or add the matching handler",
+                        ),
+                    }
+                )
+                continue
+            llm_methods[slot]["params"] = params
 
         # Optional live model catalog (router-style plugins): the canvas fetches
         # it client-side and extends the per-slot dropdown beyond the shortlist.

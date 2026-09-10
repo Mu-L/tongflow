@@ -1,7 +1,9 @@
 import { useNodeId, useReactFlow } from "@xyflow/react";
 import { useCallback, useEffect } from "react";
+import { normalizePluginParams } from "../../core";
 import {
     getNodePluginModels,
+    getNodePluginParams,
     useNodePluginIds,
     usePluginsRegistry,
 } from "./use-plugins-registry";
@@ -89,10 +91,41 @@ export function useNodePluginResolver(feature: string | undefined) {
         return models.includes(fromData) ? fromData : models[0];
     }, [feature, nodeId, getNode, resolveActivePluginId]);
 
+    /**
+     * Advanced parameters for this run: the node's `pluginParams` filtered to
+     * what the active plugin (and model) declares, minus values equal to the
+     * declared default. `undefined` when nothing remains — the create-task API
+     * then omits the field and the plugin runs on its own defaults.
+     */
+    const resolveActiveParams = useCallback(():
+        | Record<string, unknown>
+        | undefined => {
+        if (!feature) return undefined;
+        const pluginId = resolveActivePluginId();
+        if (!pluginId) return undefined;
+        const entries = getNodePluginParams(
+            feature,
+            pluginId,
+            resolveActiveModel(),
+        );
+        if (entries.length === 0) return undefined;
+        const n = nodeId ? getNode(nodeId) : undefined;
+        const raw = (n?.data as { pluginParams?: unknown } | undefined)
+            ?.pluginParams;
+        const params = normalizePluginParams(
+            entries,
+            raw && typeof raw === "object" && !Array.isArray(raw)
+                ? (raw as Record<string, unknown>)
+                : undefined,
+        );
+        return Object.keys(params).length > 0 ? params : undefined;
+    }, [feature, nodeId, getNode, resolveActivePluginId, resolveActiveModel]);
+
     return {
         pluginOptions,
         defaultPluginIdFromRegistry,
         resolveActivePluginId,
         resolveActiveModel,
+        resolveActiveParams,
     };
 }

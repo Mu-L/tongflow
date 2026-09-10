@@ -16,12 +16,41 @@ import { z } from "zod";
  *   the first plugin in directory order.
  * - plugins[pluginId]: how to launch that plugin's entry
  */
+/**
+ * One entry of a plugin's `TONGFLOW_SLOT_PARAMS` declaration: a plugin-specific
+ * run-time knob the node offers under its collapsed "Advanced" section. These
+ * are never ABI fields — the canvas sends the user's picks top-level as
+ * `params` and the plugin reads them via `tongflow.slots.current_params()`,
+ * falling back to its own defaults for anything unset.
+ */
+const paramLiteral = z.union([z.string(), z.number(), z.boolean()]);
+export const PluginParamSpecSchema = z.object({
+    type: z.enum(["select", "number", "integer", "boolean", "text"]),
+    label: z.string().min(1).optional(),
+    description: z.string().min(1).optional(),
+    default: paramLiteral.optional(),
+    /** `select` only. */
+    options: z
+        .array(z.union([z.string(), z.number()]))
+        .min(1)
+        .optional(),
+    /** `number` / `integer` only. */
+    min: z.number().optional(),
+    max: z.number().optional(),
+    step: z.number().optional(),
+    /** When set, only offered while one of these router models is selected. */
+    models: z.array(z.string().min(1)).min(1).optional(),
+});
+
 export const PluginMethodSchema = z.object({
     methodName: z.string().min(1),
     /** Optional per-slot model ids a router-style plugin exposes
      * (`TONGFLOW_SLOT_MODELS` in the plugin source); first entry is the
      * default. Absent for single-model plugins. */
     models: z.array(z.string().min(1)).optional(),
+    /** Optional per-slot advanced parameters (`TONGFLOW_SLOT_PARAMS` in the
+     * plugin source), in declared order. Absent when the plugin exposes none. */
+    params: z.record(z.string().min(1), PluginParamSpecSchema).optional(),
 });
 
 /**
@@ -102,3 +131,4 @@ export const PluginsRegistrySchema = z.object({
 export type PluginsRegistry = z.infer<typeof PluginsRegistrySchema>;
 export type PluginConfig = z.infer<typeof PluginConfigSchema>;
 export type PluginModelCatalog = z.infer<typeof PluginModelCatalogSchema>;
+export type PluginParamSpec = z.infer<typeof PluginParamSpecSchema>;

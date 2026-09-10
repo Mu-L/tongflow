@@ -37,6 +37,7 @@ import {
 import { NodeLoadingOverlay } from "./node-loading-overlay";
 import { NodePluginIdSelect } from "./node-plugin-id-select";
 import { NodePluginModelSelect } from "./node-plugin-model-select";
+import { NodePluginParams } from "./node-plugin-params";
 import { NodeThinkingBubble } from "./node-thinking-bubble";
 
 /* ------------------------------------------------------------------ */
@@ -258,6 +259,10 @@ export const BaseNodeShell = forwardRef<HTMLDivElement, BaseNodeShellProps>(
                                     data={data ?? { feature }}
                                 />
                                 <NodePluginModelSelect
+                                    nodeSlot={feature}
+                                    data={data ?? { feature }}
+                                />
+                                <NodePluginParams
                                     nodeSlot={feature}
                                     data={data ?? { feature }}
                                 />
