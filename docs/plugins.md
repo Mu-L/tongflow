@@ -246,6 +246,8 @@ TONGFLOW_SLOT_PARAMS = {
   needs a `@node_slot` handler. Param names are identifiers. Controls: `select`
   (`options`, string or number literals), `number` / `integer` (`min` / `max` /
   `step`), `boolean`, `text`; optional `label`, `description`, `default`, `models`.
+  Always give a `default`: it is what the control shows before the user touches it,
+  and it must equal the value the handler falls back to when the key is absent.
 - The canvas stores only values that differ from `default` and sends them top-level
   as `params` (never inside the ABI prompt). They reach the slot body through the
   reserved `_params` key, which `@node_slot` pops into

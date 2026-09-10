@@ -162,9 +162,13 @@ type ParamRowProps = {
 };
 
 function ParamRow({ entry, value, onChange }: ParamRowProps) {
+    const t = useTranslations("Workspace.nodes.base");
     const { name, spec } = entry;
     const label = spec.label ?? name;
     const inline = spec.type === "boolean";
+    // Once a value diverges from the declared default, keep the default in
+    // view so the user always knows what "reset" goes back to.
+    const changed = value !== undefined && spec.default !== undefined;
     return (
         <div
             className={
@@ -172,10 +176,17 @@ function ParamRow({ entry, value, onChange }: ParamRowProps) {
             }
         >
             <Label
-                className="text-xs text-muted-foreground"
+                className="flex items-baseline gap-1.5 text-xs text-muted-foreground"
                 title={spec.description}
             >
-                {label}
+                <span>{label}</span>
+                {changed && (
+                    <span className="text-[10px] text-muted-foreground/60">
+                        {t("pluginParamDefault", {
+                            value: String(spec.default),
+                        })}
+                    </span>
+                )}
             </Label>
             <ParamControl spec={spec} value={value} onChange={onChange} />
         </div>
