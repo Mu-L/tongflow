@@ -23,6 +23,9 @@ export interface CreateTaskRequest {
     pluginId: string;
     /** Selected model for router-style plugins; omitted otherwise. */
     model?: string;
+    /** Advanced parameters (plugin's `TONGFLOW_SLOT_PARAMS` keys); omitted
+     * when the node runs on plugin defaults. */
+    params?: Record<string, unknown>;
     prompt: Record<string, unknown>;
     nodeId: string;
     workflowId?: number;

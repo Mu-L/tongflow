@@ -73,6 +73,10 @@ export interface BaseNodeData extends Record<string, unknown> {
     /** Selected model for router-style plugins that declare per-slot model
      * lists; empty/absent means the plugin's default. */
     pluginModel?: string;
+    /** Advanced parameters chosen for the active plugin (keys from its
+     * `TONGFLOW_SLOT_PARAMS`); only values differing from the declared default
+     * are kept, so absent means the plugin's own default. */
+    pluginParams?: Record<string, unknown>;
 
     /** Composition linkage (`useNodesData`) */
     ids?: string[];

@@ -35,6 +35,9 @@ export const tasks = sqliteTable(
         pluginId: text("plugin_id").notNull().default(""),
         // Selected model for router-style plugins; null = plugin default
         model: text("model"),
+        // Advanced parameters (JSON object, plugin's TONGFLOW_SLOT_PARAMS keys);
+        // null = plugin defaults
+        params: text("params"),
         prompt: text("prompt").notNull(), // JSON string (business fields only)
         status: text("status").notNull().default("pending"),
         progress: integer("progress").default(0).notNull(),

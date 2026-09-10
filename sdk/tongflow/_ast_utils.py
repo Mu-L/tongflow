@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import re
 
 
 def _collect_models_roots(tree: ast.Module) -> frozenset[str]:
@@ -102,6 +103,7 @@ def decorator_name(expr: ast.expr) -> str | None:
 SLOT_MODELS_CONST = "TONGFLOW_SLOT_MODELS"
 DEFAULT_SLOTS_CONST = "TONGFLOW_DEFAULT_SLOTS"
 MODEL_CATALOG_CONST = "TONGFLOW_MODEL_CATALOG"
+SLOT_PARAMS_CONST = "TONGFLOW_SLOT_PARAMS"
 
 
 def _const_assign_value(node: ast.stmt, name: str) -> ast.expr | None:
@@ -437,3 +439,143 @@ def _validate_model_catalog(raw: object) -> str | None:
             ):
                 return f"'slots'[{slot!r}] must map field paths to non-empty string tokens (or lists of them)"
     return None
+
+
+# ── Per-slot advanced parameters ─────────────────────────────────────────────
+
+PARAM_TYPES = ("select", "number", "integer", "boolean", "text")
+_PARAM_SPEC_KEYS = frozenset(
+    {"type", "label", "description", "default", "options", "min", "max", "step", "models"}
+)
+_PARAM_NAME_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+def _is_number(v: object) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+
+def _validate_param_spec(name: str, spec: object) -> str | None:
+    """Shape check for one ``TONGFLOW_SLOT_PARAMS`` entry; returns a reason or None."""
+
+    if not isinstance(spec, dict):
+        return f"[{name!r}] must be a dict literal"
+    unknown = set(spec) - _PARAM_SPEC_KEYS
+    if unknown:
+        return f"[{name!r}] has unknown keys {sorted(unknown)!r}"
+    kind = spec.get("type")
+    if kind not in PARAM_TYPES:
+        return f"[{name!r}] 'type' must be one of {list(PARAM_TYPES)!r}"
+    for key in ("label", "description"):
+        if key in spec and not (isinstance(spec[key], str) and spec[key].strip()):
+            return f"[{name!r}] '{key}' must be a non-empty string"
+    models = spec.get("models")
+    if models is not None and not (
+        isinstance(models, list)
+        and models
+        and all(isinstance(m, str) and m.strip() for m in models)
+    ):
+        return f"[{name!r}] 'models' must be a non-empty list of model id strings"
+    has_default = "default" in spec
+    default = spec.get("default")
+
+    if kind == "select":
+        options = spec.get("options")
+        if not (
+            isinstance(options, list)
+            and options
+            and all(isinstance(o, str) or _is_number(o) for o in options)
+        ):
+            return f"[{name!r}] select needs a non-empty 'options' list of string/number literals"
+        if len(set(options)) != len(options):
+            return f"[{name!r}] 'options' has duplicates"
+        if has_default and default not in options:
+            return f"[{name!r}] 'default' must be one of 'options'"
+        for key in ("min", "max", "step"):
+            if key in spec:
+                return f"[{name!r}] '{key}' only applies to number/integer"
+    else:
+        if "options" in spec:
+            return f"[{name!r}] 'options' only applies to select"
+        if kind in ("number", "integer"):
+            for key in ("min", "max", "step"):
+                if key in spec and not _is_number(spec[key]):
+                    return f"[{name!r}] '{key}' must be a number literal"
+            if has_default:
+                if kind == "integer" and not (isinstance(default, int) and not isinstance(default, bool)):
+                    return f"[{name!r}] integer 'default' must be an int literal"
+                if kind == "number" and not _is_number(default):
+                    return f"[{name!r}] number 'default' must be a number literal"
+        else:
+            for key in ("min", "max", "step"):
+                if key in spec:
+                    return f"[{name!r}] '{key}' only applies to number/integer"
+            if kind == "boolean" and has_default and not isinstance(default, bool):
+                return f"[{name!r}] boolean 'default' must be True or False"
+            if kind == "text" and has_default and not isinstance(default, str):
+                return f"[{name!r}] text 'default' must be a string literal"
+    return None
+
+
+def _validate_slot_params(raw: object) -> str | None:
+    """Shape check for a literal-evaluated ``TONGFLOW_SLOT_PARAMS``; returns a reason or None."""
+
+    if not isinstance(raw, dict):
+        return "must be a dict literal"
+    for slot, params in raw.items():
+        if not (isinstance(slot, str) and slot):
+            return "keys must be non-empty slot strings"
+        if not isinstance(params, dict) or not params:
+            return f"[{slot!r}] must be a non-empty dict of param name -> spec"
+        for name, spec in params.items():
+            if not (isinstance(name, str) and _PARAM_NAME_RE.fullmatch(name)):
+                return f"[{slot!r}] param names must be identifiers, got {name!r}"
+            reason = _validate_param_spec(name, spec)
+            if reason:
+                return f"[{slot!r}]{reason}"
+    return None
+
+
+def extract_slot_params(
+    tree: ast.Module,
+) -> tuple[dict[str, dict[str, dict]], list[tuple[int, str]]]:
+    """
+    Parse the optional module-level ``TONGFLOW_SLOT_PARAMS`` constant: a pure
+    dict literal describing the plugin-specific, per-run knobs a node may expose
+    under its collapsed "Advanced" section, keyed by ABI slot::
+
+        TONGFLOW_SLOT_PARAMS = {
+            "refs-gen-video": {
+                "steps": {"type": "select", "options": [8, 20, 40], "default": 20},
+                "turbo": {"type": "boolean", "default": False, "label": "Turbo"},
+                "shift": {"type": "number", "default": 12.0, "min": 1, "max": 20, "step": 0.5},
+                "sampler": {"type": "text", "default": "euler"},
+                # Only offered while one of these router models is selected:
+                "guidance": {"type": "integer", "default": 4, "models": ["fal-ai/x"]},
+            },
+        }
+
+    These are never ABI fields: the canvas sends the user's choices as the
+    reserved ``_params`` key and ``tongflow.slots.current_params()`` hands them
+    to the slot body, which falls back to its own defaults for anything unset.
+    Returns ``(params_by_slot, problems)``; a malformed constant is reported and
+    yields ``{}`` rather than being silently ignored.
+    """
+
+    problems: list[tuple[int, str]] = []
+    for node in tree.body:
+        value = _const_assign_value(node, SLOT_PARAMS_CONST)
+        if value is None:
+            continue
+        try:
+            raw = ast.literal_eval(value)
+        except (ValueError, SyntaxError, TypeError):
+            problems.append(
+                (node.lineno, f"{SLOT_PARAMS_CONST} must be a pure dict literal")
+            )
+            return {}, problems
+        reason = _validate_slot_params(raw)
+        if reason:
+            problems.append((node.lineno, f"{SLOT_PARAMS_CONST} {reason}"))
+            return {}, problems
+        return raw, problems
+    return {}, problems

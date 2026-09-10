@@ -24,6 +24,7 @@ export * from "./logger";
 export * from "./registry/feature-registry";
 export * from "./registry/feature-registry-schema";
 export * from "./registry/model-catalog";
+export * from "./registry/plugin-params";
 export * from "./registry/plugins-registry-schema";
 export * from "./schema/abi-version";
 export * from "./schema/tongflow-abi";

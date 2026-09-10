@@ -87,6 +87,9 @@ export interface ExecutableNode {
     /** Model chosen on the canvas for router-style plugins that declare
      * per-slot model lists; absent = plugin default. */
     model?: string;
+    /** Advanced parameters chosen on the canvas (plugin's `TONGFLOW_SLOT_PARAMS`
+     * keys); absent = plugin defaults. Rides to the plugin as `_params`. */
+    params?: Record<string, unknown>;
     /** Node display name (used for mobile execution progress display) */
     label?: string;
     /** Node comment */

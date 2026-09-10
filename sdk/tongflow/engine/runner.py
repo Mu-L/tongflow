@@ -328,6 +328,8 @@ def run_workflow(
             slot = (node.get("feature") or "").strip()
             plugin_id = (node.get("pluginId") or "").strip()
             model = (node.get("model") or "").strip() or None
+            raw_params = node.get("params")
+            params = raw_params if isinstance(raw_params, dict) and raw_params else None
             emit(
                 {
                     "type": "node_started",
@@ -371,8 +373,17 @@ def run_workflow(
                         slot, params, abi, search_dirs, store
                     )
                     if invoker is not None:
+                        # Host-owned invoker has a fixed signature; hand it the
+                        # advanced params inside the prompt under the reserved
+                        # key, exactly as invoke_plugin does for entry.py.
                         raw = invoker(
-                            plugin_id, slot, business_input, plugin_dir, model
+                            plugin_id,
+                            slot,
+                            {**business_input, "_params": params}
+                            if params
+                            else business_input,
+                            plugin_dir,
+                            model,
                         )
                     else:
                         raw = invoke_plugin(
@@ -385,6 +396,7 @@ def run_workflow(
                             sdk_root=SDK_ROOT,
                             task_id=task_id,
                             model=model,
+                            params=params,
                             on_progress=on_progress,
                             env_extra=env,
                         )

@@ -71,6 +71,7 @@ def invoke_plugin(
     sdk_root: Path,
     task_id: str = "tongflow-engine",
     model: Optional[str] = None,
+    params: Optional[dict[str, Any]] = None,
     env_extra: Optional[dict[str, str]] = None,
     on_progress: Optional[ProgressCb] = None,
 ) -> dict[str, Any]:
@@ -87,6 +88,10 @@ def invoke_plugin(
         if cloud_progress
         else prompt
     )
+    # Advanced parameters ride the same reserved-key path: entry.py forwards the
+    # prompt verbatim and @node_slot pops `_params` into `current_params()`.
+    if params:
+        prompt_out = {**prompt_out, "_params": params}
 
     payload = json.dumps(
         {

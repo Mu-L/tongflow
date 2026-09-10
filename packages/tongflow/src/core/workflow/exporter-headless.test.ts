@@ -47,3 +47,44 @@ describe("exportWorkflow (headless)", () => {
         expect(strip(a)).toBe(strip(b));
     });
 });
+
+describe("exportWorkflow advanced params", () => {
+    const { nodes, edges } = (
+        exampleWorkflow as unknown as {
+            originalFlow: { nodes: Node[]; edges: Edge[] };
+        }
+    ).originalFlow;
+
+    it("passes a node's pluginParams through top-level, never into bindings", () => {
+        const withParams = nodes.map((n) =>
+            n.type === "textGenImageNode"
+                ? { ...n, data: { ...n.data, pluginParams: { steps: 8 } } }
+                : n,
+        );
+        const wf = exportWorkflow(withParams, edges);
+        const gen = wf.executableNodes.find(
+            (n) => n.type === "textGenImageNode",
+        );
+        expect(gen?.params).toEqual({ steps: 8 });
+        expect(Object.keys(gen?.bindings ?? {})).not.toContain("pluginParams");
+        // Untouched nodes carry no `params` key at all.
+        const fusion = wf.executableNodes.find(
+            (n) => n.type === "imageFusionNode",
+        );
+        expect(fusion).toBeDefined();
+        expect("params" in (fusion ?? {})).toBe(false);
+    });
+
+    it("omits an empty pluginParams record", () => {
+        const withEmpty = nodes.map((n) =>
+            n.type === "textGenImageNode"
+                ? { ...n, data: { ...n.data, pluginParams: {} } }
+                : n,
+        );
+        const wf = exportWorkflow(withEmpty, edges);
+        const gen = wf.executableNodes.find(
+            (n) => n.type === "textGenImageNode",
+        );
+        expect("params" in (gen ?? {})).toBe(false);
+    });
+});
