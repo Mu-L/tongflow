@@ -266,7 +266,9 @@ export function RecentRuns({
 }) {
     const t = useT();
     const { data, reload } = useAsync(
-        () => studio.runs(pid),
+        // No project selected yet: the header mounts before the project list
+        // resolves, and `/p//runs` would 404.
+        () => (pid === "" ? Promise.resolve([]) : studio.runs(pid)),
         [pid, refreshToken],
     );
     const live = useMemo(
@@ -329,7 +331,9 @@ export function RecentRuns({
 /** Live count of active runs for the header button. */
 export function useActiveRuns(pid: string, refreshToken: number): number {
     const { data, reload } = useAsync(
-        () => studio.runs(pid),
+        // No project selected yet: the header mounts before the project list
+        // resolves, and `/p//runs` would 404.
+        () => (pid === "" ? Promise.resolve([]) : studio.runs(pid)),
         [pid, refreshToken],
     );
     const n = (data ?? []).filter(
