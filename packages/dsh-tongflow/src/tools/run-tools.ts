@@ -14,7 +14,7 @@ import type {
     ImageAttachmentRef,
     ImageMediaType,
 } from "@deepseek-ai/dsh-attachment";
-import type { JobRegistry } from "@deepseek-ai/dsh-jobs";
+import type { JobHandle, JobRegistry, JobSpec } from "@deepseek-ai/dsh-jobs";
 import type { LlmRuntime } from "@deepseek-ai/dsh-llm";
 import {
     defineTool,
@@ -221,6 +221,57 @@ function runResult(record: RunRecord): JsonValue {
     });
 }
 
+/**
+ * Background job spec for a workflow run, valid on both job APIs we support.
+ * dsh >= 0.1.7 keys ownership by session id, passes a JobHandle to `run` for
+ * streaming output, and returns the final value as `result`. dsh 0.1.5 took
+ * the live Agent as owner, pulled `readOutput()`, and read `output`. The newer
+ * registry is the one exposing `events` (0.1.5 had `onJobDone`).
+ */
+function backgroundJobSpec(
+    jobs: JobRegistry,
+    agent: ToolRunContext["agent"],
+    workflow: string,
+    record: RunRecord,
+): JobSpec {
+    const modern = "events" in jobs;
+    const owner = agent ? { owner: modern ? agent.id : agent } : {};
+    return {
+        kind: "tongflow",
+        label: `tongflow ${workflow}`,
+        ...owner,
+        run: (job?: JobHandle) => {
+            let stop = () => {};
+            if (job) {
+                const append = (text: string) => {
+                    if (text) job.append(`${text}\n`);
+                };
+                append(record.readOutput());
+                stop = record.subscribe((event) => append(formatEvent(event)));
+            }
+            return {
+                cancel: (reason?: string) => record.cancel(reason),
+                done: record.done.then((r) => {
+                    stop();
+                    const final = JSON.stringify(runResult(r), null, 2);
+                    return {
+                        status:
+                            r.summary.status === "completed"
+                                ? ("completed" as const)
+                                : r.summary.status === "cancelled"
+                                  ? ("killed" as const)
+                                  : ("failed" as const),
+                        ...(r.error ? { detail: r.error } : {}),
+                        result: final,
+                        output: final,
+                    };
+                }),
+                readOutput: () => record.readOutput(),
+            };
+        },
+    } as JobSpec;
+}
+
 export function runTools(env: ToolEnv): ToolDefinition[] {
     const { api, ctx, studio } = env;
     return [
@@ -285,25 +336,14 @@ export function runTools(env: ToolEnv): ToolDefinition[] {
                         await record.done;
                         return runResult(record);
                     }
-                    const jobId = jobs.start({
-                        kind: "tongflow",
-                        label: `tongflow ${args.workflow}`,
-                        ...(exec.agent ? { owner: exec.agent } : {}),
-                        run: () => ({
-                            cancel: (reason) => record.cancel(reason),
-                            done: record.done.then((r) => ({
-                                status:
-                                    r.summary.status === "completed"
-                                        ? ("completed" as const)
-                                        : r.summary.status === "cancelled"
-                                          ? ("killed" as const)
-                                          : ("failed" as const),
-                                ...(r.error ? { detail: r.error } : {}),
-                                output: JSON.stringify(runResult(r), null, 2),
-                            })),
-                            readOutput: () => record.readOutput(),
-                        }),
-                    });
+                    const jobId = jobs.start(
+                        backgroundJobSpec(
+                            jobs,
+                            exec.agent,
+                            args.workflow,
+                            record,
+                        ),
+                    );
                     return compact({
                         kind: "background",
                         jobId,
