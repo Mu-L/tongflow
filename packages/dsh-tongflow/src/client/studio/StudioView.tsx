@@ -108,10 +108,9 @@ function StudioBody(props: StudioViewProps) {
             props.useInput &&
             props.sessionId,
     );
-    const cwd = useSessions((s) => {
-        const id = props.sessionId ?? s.current;
-        return id ? s.byId[id]?.cwd : undefined;
-    });
+    const cwd = useSessions((s) =>
+        props.sessionId ? s.byId[props.sessionId]?.cwd : undefined,
+    );
     const rootRef = useRef<HTMLDivElement>(null);
     const fillHeight = useFillScrollport(rootRef);
     const projects = useAsync(() => studio.projects(), []);
